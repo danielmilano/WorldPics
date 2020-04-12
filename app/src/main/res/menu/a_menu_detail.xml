@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/download"
+        android:title="@string/download"
+        android:icon="@drawable/ic_file_download_white"
+        app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/share"
+        android:title="@string/share"
+        android:icon="@drawable/ic_share_white"
+        app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/set_image_as"
+        android:title="@string/set_photo_as"
+        android:icon="@drawable/ic_image"
+        app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/pixabay_site"
+        android:title="@string/visit_pixabay"
+        android:icon="@drawable/ic_world"
+        app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/pixabay_profile"
+        android:title="@string/pixabay_profile"
+        android:icon="@drawable/ic_profile"
+        app:showAsAction="ifRoom" />
+
+</menu>

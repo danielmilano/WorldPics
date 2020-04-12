@@ -1,0 +1,116 @@
+apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'
+apply plugin: 'kotlin-kapt'
+apply plugin: 'com.google.firebase.crashlytics'
+
+android {
+    compileSdkVersion 29
+    defaultConfig {
+        applicationId "dreamlab.worldpics"
+        minSdkVersion 21
+        targetSdkVersion 29
+        versionCode 28
+        versionName "3.6"
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+    dataBinding {
+        enabled = true
+    }
+    buildTypes {
+        debug {
+            manifestPlaceholders = [crashlyticsCollectionEnabled: "false"]
+            buildConfigField "String", "admob_app_id", "\"ca-app-pub-3940256099942544~3347511713\""
+            buildConfigField "String", "banner_item_id", "\"ca-app-pub-3940256099942544/6300978111\""
+            buildConfigField "String", "intestitial_ad", "\"ca-app-pub-3940256099942544/1033173712\""
+        }
+        release {
+            manifestPlaceholders = [crashlyticsCollectionEnabled: "true"]
+            buildConfigField "String", "admob_app_id", "\"ca-app-pub-1216156475155252~4729423948\""
+            buildConfigField "String", "banner_item_id", "\"ca-app-pub-1216156475155252/9298583713\""
+            buildConfigField "String", "intestitial_ad", "\"ca-app-pub-1216156475155252/5954837718\""
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    // work-runtime-ktx 2.1.0 and above requires Java 8
+    kotlinOptions {
+        jvmTarget = "1.8"
+    }
+}
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+
+    //KOTLIN
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.3.71"
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.3.0'
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.0'
+
+    //ANDROID X
+    implementation "androidx.lifecycle:lifecycle-extensions:2.2.0"
+    implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:2.3.0-alpha01"
+    implementation "androidx.lifecycle:lifecycle-livedata-ktx:2.2.0"
+    implementation 'androidx.appcompat:appcompat:1.1.0'
+    implementation 'androidx.browser:browser:1.2.0'
+    implementation 'androidx.cardview:cardview:1.0.0'
+    implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
+    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
+    implementation 'androidx.preference:preference:1.1.0'
+    implementation 'androidx.recyclerview:recyclerview:1.1.0'
+    implementation "androidx.work:work-runtime-ktx:2.3.4"
+    implementation "androidx.paging:paging-runtime:2.1.2"
+
+    // Google
+    implementation 'com.google.android.ads.consent:consent-library:1.0.8'
+    implementation 'com.google.android.gms:play-services-ads:19.0.1'
+    implementation 'com.google.android.gms:play-services-analytics:17.0.0'
+    implementation 'com.google.android.material:material:1.2.0-alpha05'
+    implementation 'com.google.code.gson:gson:2.8.6'
+    implementation 'com.google.firebase:firebase-core:17.3.0'
+    implementation 'com.google.firebase:firebase-database:19.2.1'
+    implementation 'com.google.firebase:firebase-messaging:20.1.5'
+    implementation "com.google.firebase:firebase-crashlytics:17.0.0-beta03"
+    implementation 'com.android.billingclient:billing:2.2.0'
+
+    // Dagger
+    kapt "com.google.dagger:dagger-compiler:2.23.2"
+    kapt "com.google.dagger:dagger-android-processor:2.23.2"
+    implementation "com.google.dagger:dagger:2.23.2"
+    implementation "com.google.dagger:dagger-android:2.23.2"
+    implementation "com.google.dagger:dagger-android-support:2.23.2"
+
+    // Network
+    implementation "com.google.code.gson:gson:2.8.6"
+    implementation "com.squareup.retrofit2:retrofit:2.7.2"
+    implementation "com.squareup.retrofit2:converter-gson:2.6.2"
+    implementation "com.squareup.okhttp3:okhttp:3.14.7"
+    implementation "com.squareup.okhttp3:logging-interceptor:3.14.7"
+
+    //DB
+    kapt "androidx.room:room-compiler:2.2.5"
+    implementation "androidx.room:room-runtime:2.2.5"
+    implementation "androidx.room:room-ktx:2.2.5"
+
+    // Glide
+    kapt 'com.github.bumptech.glide:compiler:4.9.0'
+    implementation 'com.github.bumptech.glide:glide:4.10.0'
+
+    // Tools
+    implementation "com.jakewharton.timber:timber:4.7.1"
+    implementation "com.facebook.stetho:stetho:1.5.1"
+    implementation "com.facebook.stetho:stetho-okhttp3:1.5.1"
+    implementation 'com.codemybrainsout.rating:ratingdialog:1.0.8'
+    implementation 'com.github.chrisbanes:PhotoView:2.1.3'
+    implementation 'com.github.javiersantos:AppUpdater:2.7'
+}
+apply plugin: 'com.google.gms.google-services'
+repositories {
+    mavenCentral()
+}

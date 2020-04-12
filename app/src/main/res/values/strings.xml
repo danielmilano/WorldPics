@@ -1,0 +1,74 @@
+<resources>
+    <string name="app_name">World Pics</string>
+    <string name="title_home">Home</string>
+
+    <string name="photos">Photos</string>
+    <string name="illustration">Illustrations</string>
+    <string name="vector_graphics">Vector graphics</string>
+    <string name="settings">Settings</string>
+
+    <string name="orientation">Orientation</string>
+    <string name="horizontal">Horizontal</string>
+    <string name="vertical">Vertical</string>
+    <string name="any_orientation">Any orientation</string>
+
+    <string name="category">Category</string>
+    <string name="all">All</string>
+    <string name="animals">Animals</string>
+    <string name="architecture_buildings">Architecture/buildings</string>
+    <string name="background_textures">Background/textures</string>
+    <string name="beauty_fashion">Beauty/Fashion</string>
+    <string name="business_finance">Business/Finance</string>
+    <string name="computer_communication">Computer/Communication</string>
+    <string name="education">Education</string>
+    <string name="emotions">Emotions</string>
+    <string name="food_drink">Food/Drink</string>
+    <string name="health_medical">Health/Medical</string>
+    <string name="industry_craft">Industry/Craft</string>
+    <string name="music">Music</string>
+    <string name="nature_landscapes">Nature/Landscapes</string>
+    <string name="people">People</string>
+    <string name="places_monuments">Places/Monuments</string>
+    <string name="religion">Religion</string>
+    <string name="science_technology">Science/Technology</string>
+    <string name="sports">Sports</string>
+    <string name="transportation_traffic">Transportation/Traffic</string>
+    <string name="travel_vacation">Travel/Vacation</string>
+
+    <string name="size">Size</string>
+
+    <string name="color">Color</string>
+    <string name="transparent">Transparent</string>
+    <string name="black_and_white">Black and white</string>
+
+    <string name="width">Width</string>
+    <string name="height">Height</string>
+    <string name="px">px</string>
+
+    <string name="no_tag_inserted">"Enter a search tag"</string>
+    <string name="error">"Error occurred"</string>
+    <string name="token_not_valid">"Access token not valid"</string>
+    <string name="login_required">"Login required"</string>
+    <string name="search">Search…</string>
+    <string name="error_message">"Error while downloading the image. Please try again later."</string>
+    <string name="network_error">"Network error"</string>
+    <string name="network_not_available">"Network not available"</string>
+    <string name="loading">"Loading…"</string>
+    <string name="no_data">"Nothing to show"</string>
+    <string name="image_saved">"Image saved in %s"</string>
+    <string name="image_added_to_gallery">"Image added to gallery"</string>
+    <string name="title_activity_detail">DetailActivity</string>
+    <string name="download">Download</string>
+    <string name="share">Share</string>
+    <string name="share_image">Share image</string>
+    <string name="add_to_gallery">Add to gallery</string>
+    <string name="confirm_logout">Are you sure you want to logout?</string>
+    <string name="confirm">Yes</string>
+    <string name="cancel">No</string>
+    <string name="portfolio">Portfolio</string>
+    <string name="set_photo_as">Set photo as…</string>
+    <string name="pixabay_profile">Pixabay profile</string>
+    <string name="visit_pixabay">Visit Pixabay</string>
+    <string name="by">By</string>
+
+</resources>

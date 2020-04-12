@@ -1,0 +1,57 @@
+{
+  "project_info": {
+    "project_number": "1034209610812",
+    "firebase_url": "https://fir-worldpics.firebaseio.com",
+    "project_id": "firebase-worldpics",
+    "storage_bucket": "firebase-worldpics.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1034209610812:android:0df84e30ae98974b",
+        "android_client_info": {
+          "package_name": "dreamlab.worldpics"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1034209610812-uvu6pj1g3o1luhjakn1t0bj172kvechk.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "dreamlab.worldpics",
+            "certificate_hash": "91f068d227b0229c32eab05576bc23ae988836d4"
+          }
+        },
+        {
+          "client_id": "1034209610812-g1e74uq8n4lgg8lfuoaqmpk2prsf8eu4.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "dreamlab.worldpics",
+            "certificate_hash": "91c4bb30346abf3a0e42228ba20b5ca15a4f4fc1"
+          }
+        },
+        {
+          "client_id": "1034209610812-togp809jaie23tab6ul0t9m9cl3i8r16.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCPl1eeYySA6Dk_rfPHNqzulz14TBjTovo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1034209610812-togp809jaie23tab6ul0t9m9cl3i8r16.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      },
+      "admob_app_id": "ca-app-pub-1216156475155252~4729423948"
+    }
+  ],
+  "configuration_version": "1"
+}
