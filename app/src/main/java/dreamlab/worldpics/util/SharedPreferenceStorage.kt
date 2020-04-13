@@ -22,7 +22,6 @@ class SharedPreferenceStorage @Inject constructor(private val context: Context) 
     }
 
     private val observableRemoveAdsResult = MutableLiveData<Boolean>()
-    private val observableSelectedThemeResult = MutableLiveData<String>()
 
     private val changeListener = SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
         when (key) {

@@ -1,110 +1,126 @@
 package dreamlab.worldpics.adapter
 
+import android.annotation.SuppressLint
 import android.content.Context
+import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
-import androidx.recyclerview.widget.AsyncListDiffer
-import androidx.recyclerview.widget.DiffUtil
-import androidx.recyclerview.widget.RecyclerView
-import androidx.recyclerview.widget.StaggeredGridLayoutManager
+import androidx.recyclerview.widget.*
 import com.google.android.gms.ads.AdRequest
+import com.google.android.gms.ads.AdSize
 import com.google.android.gms.ads.AdView
+import dreamlab.worldpics.BuildConfig
 import dreamlab.worldpics.R
-import dreamlab.worldpics.WorldPics
-import dreamlab.worldpics.databinding.CellBannerItemBinding
-import dreamlab.worldpics.databinding.CellPhotoItemBinding
+import dreamlab.worldpics.databinding.ItemBannerBinding
+import dreamlab.worldpics.databinding.ItemPhotoBinding
 import dreamlab.worldpics.fragment.main.photo.data.Photo
-import kotlin.collections.ArrayList
 
 /**
  * Created by danielm on 10/02/2018.
  */
 
-class PhotoAdapter(val context: Context?,
-                   private val mValues: ArrayList<Photo?>,
-                   val adBuilder: AdRequest.Builder?,
-                   val mListener: Listener
-) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+class PhotoAdapter(
+    val context: Context?,
+    private val adBuilder: AdRequest.Builder? = null,
+    val mListener: Listener
+) : ListAdapter<Any, ItemsViewHolder>(ItemsDiffCallback) {
 
-    private val mDiffer: AsyncListDiffer<Photo?> = AsyncListDiffer(this, object : DiffUtil.ItemCallback<Photo?>() {
-        override fun areItemsTheSame(oldItem: Photo, newItem: Photo): Boolean {
-            return oldItem.id == newItem.id
+    private var mValues = ArrayList<Any>()
+
+    override fun submitList(list: List<Any>?) {
+        var arrayList: ArrayList<Any>? = null
+
+        list?.let {
+            arrayList = ArrayList(it)
+            mValues.addAll(arrayList!!)
+            for (index in arrayList!!.indices step 10) {
+                val adView = AdView(context)
+                arrayList!!.add(index, adView)
+            }
         }
 
-        override fun areContentsTheSame(oldItem: Photo, newItem: Photo): Boolean {
-            return oldItem.user_id == newItem.user_id
-        }
-    })
-
-    companion object {
-        val PHOTO_VIEW_TYPE = 0
-        val AD_VIEW_TYPE = 1
-        val ITEMS_PER_AD = 10
+        super.submitList(arrayList)
     }
 
     override fun getItemViewType(position: Int): Int {
-        return if (WorldPics.isPremium) {
-            PHOTO_VIEW_TYPE
-        } else {
-            if (position % ITEMS_PER_AD == 0 && adBuilder != null) {
-                AD_VIEW_TYPE
-            } else {
-                PHOTO_VIEW_TYPE
-            }
+        return when (val item = getItem(position)) {
+            is Photo -> R.layout.item_photo
+            is AdView -> R.layout.item_banner
+            else -> throw IllegalStateException("Unknown type: ${item::class.java.simpleName}")
         }
     }
 
-    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-        when (holder) {
-            is ViewHolderAdMob -> {
-                mValues.add(position, null)
-                mDiffer.submitList(ArrayList(mValues))
-                holder.bind(AdView(context), position)
-            }
-            is PhotoViewHolder -> holder.bind(mDiffer.currentList[position] as Photo, position)
-        }
-    }
-
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ItemsViewHolder {
+        val inflater = LayoutInflater.from(parent.context)
         return when (viewType) {
-            AD_VIEW_TYPE -> ViewHolderAdMob(parent)
-            PHOTO_VIEW_TYPE -> PhotoViewHolder(parent)
-            else -> throw RuntimeException("VIEW_TYPE NOT FOUND")
+            R.layout.item_photo ->
+                ItemsViewHolder.PhotoViewHolder(ItemPhotoBinding.inflate(inflater, parent, false))
+            R.layout.item_banner ->
+                ItemsViewHolder.BannerItemHolder(ItemBannerBinding.inflate(inflater, parent, false))
+            else -> throw IllegalArgumentException("Invalid viewType")
         }
     }
 
-    override fun getItemCount(): Int {
-        return mDiffer.currentList.size
-    }
-
-    fun setValues(photos: ArrayList<Photo>) {
-        mValues.addAll(photos)
-        mDiffer.submitList(ArrayList(mValues))
-    }
-
-    inner class PhotoViewHolder : BaseBindingRecyclerHolder<Photo, CellPhotoItemBinding> {
-
-        constructor(parent: ViewGroup) : super(parent, R.layout.cell_photo_item){
-            binding.root.setOnClickListener { mListener.onPhotoClick(binding.photo!!) }
-        }
-
-        override fun bind(item: Photo, position: Int) {
-            binding.photo = item
+    override fun onBindViewHolder(holder: ItemsViewHolder, position: Int) {
+        when (holder) {
+            is ItemsViewHolder.PhotoViewHolder -> {
+                bindPhotoItemHolder(holder, getItem(position) as Photo)
+            }
+            is ItemsViewHolder.BannerItemHolder -> {
+                bindBannerItemHolder(holder.binding.adView)
+            }
         }
     }
 
-    inner class ViewHolderAdMob : BaseBindingRecyclerHolder<AdView, CellBannerItemBinding> {
+    private fun bindPhotoItemHolder(holder: ItemsViewHolder.PhotoViewHolder, item: Photo) {
+        holder.binding.photo = item
+        holder.binding.root.setOnClickListener { mListener.onPhotoClick(item) }
+    }
 
-        constructor(parent: ViewGroup) : super(parent, R.layout.cell_banner_item) {
-            val layoutParams = itemView.layoutParams as StaggeredGridLayoutManager.LayoutParams
-            layoutParams.isFullSpan = true
-        }
-
-        override fun bind(item: AdView, position: Int) {
-            item.loadAd(adBuilder?.build())
-        }
+    private fun bindBannerItemHolder(item: AdView) {
+        item.loadAd(adBuilder?.build())
     }
 
     interface Listener {
         fun onPhotoClick(photo: Photo)
+    }
+}
+
+sealed class ItemsViewHolder(
+    itemView: View
+) : RecyclerView.ViewHolder(itemView) {
+
+    class PhotoViewHolder(
+        val binding: ItemPhotoBinding
+    ) : ItemsViewHolder(binding.root)
+
+    class BannerItemHolder(val binding: ItemBannerBinding) :
+        ItemsViewHolder(binding.root) {
+
+        init {
+            val layoutParams = itemView.layoutParams as StaggeredGridLayoutManager.LayoutParams
+            layoutParams.isFullSpan = true
+            binding.adView.adUnitId = BuildConfig.banner_item_id
+            binding.adView.adSize = AdSize.SMART_BANNER
+        }
+    }
+
+}
+
+internal object ItemsDiffCallback : DiffUtil.ItemCallback<Any>() {
+
+    override fun areItemsTheSame(oldItem: Any, newItem: Any): Boolean {
+        return when {
+            oldItem is Photo && newItem is Photo -> oldItem.id == newItem.id
+            else -> false
+        }
+    }
+
+    @SuppressLint("DiffUtilEquals")
+    override fun areContentsTheSame(oldItem: Any, newItem: Any): Boolean {
+        return when {
+            oldItem is Photo && newItem is Photo -> oldItem == newItem
+            else -> false
+        }
     }
 }

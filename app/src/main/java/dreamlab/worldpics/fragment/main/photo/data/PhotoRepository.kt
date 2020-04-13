@@ -35,10 +35,7 @@ class PhotoRepository @Inject constructor(
 
     private fun observeRemotePagedPhotos(ioCoroutineScope: CoroutineScope)
             : LiveData<PagedList<Photo>> {
-        val dataSourceFactory = PhotoPageDataSourceFactory(
-            photosRemoteDataSource,
-            dao, ioCoroutineScope
-        )
+        val dataSourceFactory = PhotoPageDataSourceFactory(photosRemoteDataSource, dao, ioCoroutineScope)
         return LivePagedListBuilder(
             dataSourceFactory,
             PhotoPageDataSourceFactory.pagedListConfig()

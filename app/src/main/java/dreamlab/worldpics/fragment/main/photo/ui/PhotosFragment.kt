@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.observe
 import com.elifox.legocatalog.data.Result
 import com.google.ads.consent.ConsentInformation
 import com.google.ads.consent.ConsentStatus
@@ -47,9 +48,12 @@ class PhotosFragment : DaggerFragment(), PhotoAdapter.Listener {
                 extras.putString("npa", "1")
                 builder.addNetworkExtrasBundle(AdMobAdapter::class.java, extras)
             }
-        }
 
-        mAdapter = PhotoAdapter(requireContext(), ArrayList(), builder, this)
+            mAdapter = PhotoAdapter(requireContext(), builder, this)
+        } else {
+            mAdapter =
+                PhotoAdapter(context = requireContext(), mListener = this)
+        }
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -73,26 +77,8 @@ class PhotosFragment : DaggerFragment(), PhotoAdapter.Listener {
     }
 
     private fun subscribeUi(binding: FragmentPhotosBinding) {
-        viewModel.photos.observe(viewLifecycleOwner, Observer { result ->
-            when (result.status) {
-                Result.Status.SUCCESS -> {
-                    //binding.recycler.adapter.hideLoading()
-                    result.data?.let {
-                        mAdapter.setValues(ArrayList(it))
-                    }
-                }
-                Result.Status.LOADING -> {
-                    //binding.recycler.adapter.showLoading()
-                }
-                Result.Status.ERROR -> {
-                    //binding.recycler.adapter.hideLoading()
-                    Snackbar.make(
-                        this.requireView(),
-                        result.message!!,
-                        Snackbar.LENGTH_LONG
-                    ).show()
-                }
-            }
-        })
+        viewModel.photos.observe(viewLifecycleOwner) {
+            mAdapter.submitList(it)
+        }
     }
 }

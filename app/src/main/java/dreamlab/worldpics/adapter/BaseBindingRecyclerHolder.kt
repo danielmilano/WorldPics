@@ -10,5 +10,5 @@ abstract class BaseBindingRecyclerHolder<in T, out DB : ViewDataBinding>(parent:
 
     val binding: DB = DataBindingUtil.getBinding(itemView)!!
 
-    abstract fun bind(item: T, position: Int)
+    abstract fun bind(item: T)
 }

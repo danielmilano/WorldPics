@@ -15,7 +15,7 @@ abstract class BaseDataSource {
                 val body = response.body()
                 if (body != null) return Result.success(body)
             }
-            return error(" ${response.code()} ${response.message()}")
+            return error(" ${response.code()} ${response.raw()}}")
         } catch (e: Exception) {
             return error(e.message ?: e.toString())
         }

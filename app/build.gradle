@@ -22,13 +22,13 @@ android {
             manifestPlaceholders = [crashlyticsCollectionEnabled: "false"]
             buildConfigField "String", "admob_app_id", "\"ca-app-pub-3940256099942544~3347511713\""
             buildConfigField "String", "banner_item_id", "\"ca-app-pub-3940256099942544/6300978111\""
-            buildConfigField "String", "intestitial_ad", "\"ca-app-pub-3940256099942544/1033173712\""
+            buildConfigField "String", "interstitial_ad", "\"ca-app-pub-3940256099942544/1033173712\""
         }
         release {
             manifestPlaceholders = [crashlyticsCollectionEnabled: "true"]
             buildConfigField "String", "admob_app_id", "\"ca-app-pub-1216156475155252~4729423948\""
             buildConfigField "String", "banner_item_id", "\"ca-app-pub-1216156475155252/9298583713\""
-            buildConfigField "String", "intestitial_ad", "\"ca-app-pub-1216156475155252/5954837718\""
+            buildConfigField "String", "interstitial_ad", "\"ca-app-pub-1216156475155252/5954837718\""
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }

@@ -22,7 +22,7 @@ class PhotoPageDataSource
         params: LoadInitialParams<Int>,
         callback: LoadInitialCallback<Int, Photo>
     ) {
-        fetchData(page = 0, per_page = params.requestedLoadSize) {
+        fetchData(page = 1, per_page = params.requestedLoadSize) {
             callback.onResult(it, null, 2)
         }
     }

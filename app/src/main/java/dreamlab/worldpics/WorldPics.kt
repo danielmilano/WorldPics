@@ -25,7 +25,7 @@ class WorldPics : DaggerApplication() {
         val PRIVACY_POLICY_URL =
             "https://htmlpreview.github.io/?https://github.com/danielmilano/WorldPics/blob/master/Privacy%20Policy.html"
 
-        var isPremium: Boolean = true
+        var isPremium: Boolean = false
 
         val MAX_CACHE_SIZE = 30000000L
     }
