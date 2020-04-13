@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.preference.PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <PreferenceCategory
+        android:title="Filters">
+    </PreferenceCategory>
+
+    <SwitchPreference
+        android:defaultValue="false"
+        android:key="pref_enable_settings"
+        android:title="Enable settings" />
+
+    <ListPreference
+        android:defaultValue="all"
+        android:entries="@array/horientation_options"
+        android:entryValues="@array/horientation_values"
+        android:key="pref_orientation"
+        android:summary="%s"
+        android:title="Orientation" />
+
+    <ListPreference
+        android:defaultValue="all"
+        android:entries="@array/categories_options"
+        android:entryValues="@array/categories_values"
+        android:key="pref_categories"
+        android:summary="%s"
+        android:title="Category" />
+
+    <ListPreference
+        android:defaultValue="none"
+        android:entries="@array/colors_options"
+        android:entryValues="@array/colors_values"
+        android:key="pref_color"
+        android:summary="%s"
+        android:title="Color" />
+
+    <Preference
+        android:title="Reset filters"
+        android:key="pref_reset"/>
+
+    <PreferenceCategory
+        android:title="Other">
+    </PreferenceCategory>
+
+    <Preference
+        android:title="Remove ads"
+        android:key="pref_remove_ads"/>
+
+    <Preference
+        android:title="Clear cache"
+        android:key="pref_clear_cache"/>
+
+    <Preference
+        android:title="Rate us"
+        android:key="pref_rate_us"/>
+
+    <Preference
+        android:title="Visit Pixabay.com"
+        android:key="pref_visit_pixabay"/>
+
+    <Preference
+        android:title="Privacy Policy"
+        android:key="pref_privacy"/>
+
+    <Preference
+        android:title="Version"
+        android:key="pref_version"/>
+
+
+</androidx.preference.PreferenceScreen>

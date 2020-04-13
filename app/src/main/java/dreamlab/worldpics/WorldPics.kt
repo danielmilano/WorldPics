@@ -6,23 +6,16 @@ package dreamlab.worldpics
 
 import android.annotation.SuppressLint
 import android.app.Activity
-import android.app.Application
 import android.content.ComponentCallbacks2
 import com.bumptech.glide.Glide
 import com.facebook.stetho.Stetho
-import com.google.android.gms.tasks.OnCompleteListener
-import com.google.firebase.iid.FirebaseInstanceId
-import dagger.android.DispatchingAndroidInjector
-import dagger.android.HasActivityInjector
-import dreamlab.worldpics.di.AppInjector
+import dagger.android.AndroidInjector
+import dagger.android.DaggerApplication
+import dreamlab.worldpics.di.component.DaggerApplicationComponent
 import dreamlab.worldpics.util.CrashReportingTree
 import timber.log.Timber
-import javax.inject.Inject
 
-class WorldPics : Application(), HasActivityInjector {
-
-    @Inject
-    lateinit var dispatchingAndroidInjector: DispatchingAndroidInjector<Activity>
+class WorldPics : DaggerApplication() {
 
     var currentActivity: Activity? = null
 
@@ -41,30 +34,9 @@ class WorldPics : Application(), HasActivityInjector {
         super.onCreate()
 
         if (BuildConfig.DEBUG) Stetho.initializeWithDefaults(this)
-
         if (BuildConfig.DEBUG) Timber.plant(Timber.DebugTree())
         else Timber.plant(CrashReportingTree())
-
-        AppInjector.init(this)
-
-        FirebaseInstanceId.getInstance().instanceId
-            .addOnCompleteListener(OnCompleteListener { task ->
-                if (!task.isSuccessful) {
-                    Timber.tag(TAG).w(task.exception, "getInstanceId failed")
-                    return@OnCompleteListener
-                }
-
-                // Get new Instance ID token
-                val token = task.result?.token
-
-                token?.let {
-                    Timber.d(TAG, it)
-                }
-
-            })
     }
-
-    override fun activityInjector() = dispatchingAndroidInjector
 
     @SuppressLint("SwitchIntDef")
     override fun onTrimMemory(level: Int) {
@@ -83,6 +55,10 @@ class WorldPics : Application(), HasActivityInjector {
     override fun onLowMemory() {
         super.onLowMemory()
         clearGlideCache()
+    }
+
+    override fun applicationInjector(): AndroidInjector<out DaggerApplication> {
+        return DaggerApplicationComponent.factory().create(this)
     }
 
     private fun clearGlideCache() {

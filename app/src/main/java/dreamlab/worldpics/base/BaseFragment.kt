@@ -11,12 +11,13 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.CallSuper
 import androidx.fragment.app.Fragment
+import dagger.android.support.DaggerFragment
 import dreamlab.worldpics.util.FragmentListenerHelper
 
 /**
  * A simple [Fragment] subclass.
  */
-abstract class BaseFragment<L> : Fragment, BaseViewFragmentHelper {
+abstract class BaseFragment<L> : DaggerFragment, BaseViewFragmentHelper {
 
     protected var mListenerHelper: FragmentListenerHelper<L>
 

@@ -1,25 +1,29 @@
 package dreamlab.worldpics.di.component
 
-import android.app.Application
 import dagger.BindsInstance
 import dagger.Component
 import dagger.android.AndroidInjectionModule
+import dagger.android.AndroidInjector
 import dreamlab.worldpics.WorldPics
+import dreamlab.worldpics.di.module.ActivityBindingModule
 import dreamlab.worldpics.di.module.ApplicationModule
-import dreamlab.worldpics.di.module.ActivityModule
+import dreamlab.worldpics.di.module.ViewModelModule
 import javax.inject.Singleton
 
 @Singleton
-@Component(modules = [AndroidInjectionModule::class, ApplicationModule::class, ActivityModule::class])
-interface ApplicationComponent {
+@Component(
+    modules = [
+        AndroidInjectionModule::class,
+        ApplicationModule::class,
+        ViewModelModule::class,
+        ActivityBindingModule::class
+    ]
+)
 
-    fun inject(application: WorldPics)
+interface ApplicationComponent : AndroidInjector<WorldPics> {
 
-    @Component.Builder
-    interface Builder {
-        @BindsInstance
-        fun application(application: Application): Builder
-
-        fun build(): ApplicationComponent
+    @Component.Factory
+    interface Factory {
+        fun create(@BindsInstance application: WorldPics): ApplicationComponent
     }
 }

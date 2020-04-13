@@ -7,7 +7,6 @@ import android.os.Bundle
 import android.os.PersistableBundle
 import android.view.MenuItem
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
 import com.android.billingclient.api.BillingClient
 import com.android.billingclient.api.Purchase
 import com.codemybrainsout.ratingdialog.RatingDialog
@@ -20,6 +19,7 @@ import com.github.javiersantos.appupdater.objects.Update
 import com.google.ads.consent.*
 import com.google.android.gms.ads.MobileAds
 import com.google.firebase.database.FirebaseDatabase
+import dagger.android.support.DaggerAppCompatActivity
 import dreamlab.worldpics.BuildConfig
 import dreamlab.worldpics.WorldPics
 import dreamlab.worldpics.billing.BillingManager
@@ -28,7 +28,7 @@ import java.net.URL
 import java.text.SimpleDateFormat
 import java.util.*
 
-abstract class BaseActivity : AppCompatActivity(), BaseViewFragmentHelper {
+abstract class BaseActivity : DaggerAppCompatActivity(), BaseViewFragmentHelper {
 
     private var billingManager: BillingManager? = null
     private var form: ConsentForm? = null

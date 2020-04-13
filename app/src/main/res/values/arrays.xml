@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="categories_options">
+        <item>All</item>
+        <item>Animals</item>
+        <item>Architecture/buildings</item>
+        <item>Background/textures</item>
+        <item>Beauty/Fashion</item>
+        <item>Business/Finance</item>
+        <item>Computer/Communication</item>
+        <item>Education</item>
+        <item>Emotions</item>
+        <item>Food/Drink</item>
+        <item>Health/Medical</item>
+        <item>Industry/Craft</item>
+        <item>Music</item>
+        <item>Nature/Landscapes</item>
+        <item>People</item>
+        <item>Places/Monuments</item>
+        <item>Religion</item>
+        <item>Science/Technology</item>
+        <item>Sports</item>
+        <item>Transportation/Traffic</item>
+        <item>Travel/Vacation</item>
+    </string-array>
+
+    <string-array name="categories_values">
+        <item>all</item>
+        <item>animals</item>
+        <item>buildings</item>
+        <item>backgrounds</item>
+        <item>fashion</item>
+        <item>business</item>
+        <item>computer</item>
+        <item>education</item>
+        <item>feelings</item>
+        <item>food</item>
+        <item>health</item>
+        <item>industry</item>
+        <item>music</item>
+        <item>nature</item>
+        <item>People</item>
+        <item>places</item>
+        <item>religion</item>
+        <item>science</item>
+        <item>sports</item>
+        <item>transportation</item>
+        <item>travel</item>
+    </string-array>
+
+    <string-array name="horientation_options">
+        <item>Any</item>
+        <item>Horizontal</item>
+        <item>Vertical</item>
+    </string-array>
+
+    <string-array name="horientation_values">
+        <item>all</item>
+        <item>horizontal</item>
+        <item>vertical</item>
+    </string-array>
+
+    <string-array name="colors_options">
+        <item>None</item>
+        <item>Grayscale</item>
+        <item>Transparent</item>
+        <item>Red</item>
+        <item>Orange</item>
+        <item>Yellow</item>
+        <item>Green</item>
+        <item>Turquoise</item>
+        <item>Blue</item>
+        <item>Lilac</item>
+        <item>Pink</item>
+        <item>White</item>
+        <item>Gray</item>
+        <item>Black</item>
+        <item>Brown</item>
+    </string-array>
+
+    <string-array name="colors_values">
+        <item>none</item>
+        <item>grayscale</item>
+        <item>transparent</item>
+        <item>red</item>
+        <item>orange</item>
+        <item>yellow</item>
+        <item>green</item>
+        <item>turquoise</item>
+        <item>blue</item>
+        <item>lilac</item>
+        <item>pink</item>
+        <item>white</item>
+        <item>gray</item>
+        <item>black</item>
+        <item>brown</item>
+    </string-array>
+
+</resources>

@@ -1,20 +1,11 @@
 package dreamlab.worldpics.adapter
 
 import android.content.Context
-import android.graphics.drawable.Drawable
-import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
-import com.bumptech.glide.RequestManager
-import com.bumptech.glide.load.DataSource
-import com.bumptech.glide.load.engine.DiskCacheStrategy
-import com.bumptech.glide.load.engine.GlideException
-import com.bumptech.glide.request.RequestListener
-import com.bumptech.glide.request.RequestOptions
-import com.bumptech.glide.request.target.Target
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.AdView
 import dreamlab.worldpics.R
@@ -30,8 +21,7 @@ import kotlin.collections.ArrayList
 
 class PhotoAdapter(val context: Context?,
                    private val mValues: ArrayList<Photo?>,
-                   private val glide: RequestManager?,
-                   val builder: AdRequest.Builder?,
+                   val adBuilder: AdRequest.Builder?,
                    val mListener: Listener
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
@@ -55,7 +45,7 @@ class PhotoAdapter(val context: Context?,
         return if (WorldPics.isPremium) {
             PHOTO_VIEW_TYPE
         } else {
-            if (position % ITEMS_PER_AD == 0 && builder != null) {
+            if (position % ITEMS_PER_AD == 0 && adBuilder != null) {
                 AD_VIEW_TYPE
             } else {
                 PHOTO_VIEW_TYPE
@@ -110,7 +100,7 @@ class PhotoAdapter(val context: Context?,
         }
 
         override fun bind(item: AdView, position: Int) {
-            item.loadAd(builder?.build())
+            item.loadAd(adBuilder?.build())
         }
     }
 

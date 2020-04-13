@@ -7,13 +7,20 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProviders
 
 /**
- * Kotlin extensions for dependency injection
+ * For Fragments, allows declarations like
+ * ```
+ * val myViewModel = viewModelProvider(myViewModelFactory)
+ * ```
  */
+inline fun <reified VM : ViewModel> Fragment.viewModelProvider(
+    provider: ViewModelProvider.Factory
+) =
+    ViewModelProviders.of(this, provider).get(VM::class.java)
 
-inline fun <reified T : ViewModel> FragmentActivity.injectViewModel(factory: ViewModelProvider.Factory): T {
-    return ViewModelProviders.of(this, factory)[T::class.java]
-}
-
-inline fun <reified T : ViewModel> Fragment.injectViewModel(factory: ViewModelProvider.Factory): T {
-    return ViewModelProviders.of(this, factory)[T::class.java]
-}
+/**
+ * Like [Fragment.viewModelProvider] for Fragments that want a [ViewModel] scoped to the Activity.
+ */
+inline fun <reified VM : ViewModel> Fragment.activityViewModelProvider(
+    provider: ViewModelProvider.Factory
+) =
+    ViewModelProviders.of(requireActivity(), provider).get(VM::class.java)
