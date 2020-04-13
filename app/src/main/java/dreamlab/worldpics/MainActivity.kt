@@ -1,4 +1,4 @@
-package dreamlab.worldpics.activity
+package dreamlab.worldpics
 
 import android.os.Bundle
 import androidx.databinding.DataBindingUtil

@@ -8,8 +8,8 @@ import dagger.android.ContributesAndroidInjector
 import dagger.multibindings.IntoMap
 import dreamlab.worldpics.di.ViewModelKey
 import dreamlab.worldpics.di.scope.FragmentScoped
-import dreamlab.worldpics.fragment.main.photo.ui.PhotoViewModel
-import dreamlab.worldpics.fragment.main.photo.ui.PhotosFragment
+import dreamlab.worldpics.ui.photo.PhotoViewModel
+import dreamlab.worldpics.ui.photo.PhotosFragment
 
 @Suppress("UNUSED")
 @Module

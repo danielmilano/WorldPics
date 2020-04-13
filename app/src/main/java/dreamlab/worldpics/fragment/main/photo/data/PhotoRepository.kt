@@ -1,6 +1,7 @@
 package dreamlab.worldpics.fragment.main.photo.data
 
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.distinctUntilChanged
 import androidx.paging.LivePagedListBuilder
 import androidx.paging.PagedList
@@ -22,8 +23,11 @@ class PhotoRepository @Inject constructor(
         connectivityAvailable: Boolean,
         coroutineScope: CoroutineScope
     ) =
-        if (connectivityAvailable) observeRemotePagedPhotos(coroutineScope)
-        else observeLocalPagedPhotos()
+        if (connectivityAvailable) {
+            observeRemotePagedPhotos(coroutineScope)
+        } else {
+            observeLocalPagedPhotos()
+        }
 
     private fun observeLocalPagedPhotos(): LiveData<PagedList<Photo>> {
         val dataSourceFactory = dao.getPagedPhotos()
@@ -36,6 +40,7 @@ class PhotoRepository @Inject constructor(
     private fun observeRemotePagedPhotos(ioCoroutineScope: CoroutineScope)
             : LiveData<PagedList<Photo>> {
         val dataSourceFactory = PhotoPageDataSourceFactory(photosRemoteDataSource, dao, ioCoroutineScope)
+
         return LivePagedListBuilder(
             dataSourceFactory,
             PhotoPageDataSourceFactory.pagedListConfig()

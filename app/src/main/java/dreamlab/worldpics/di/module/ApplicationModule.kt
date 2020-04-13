@@ -3,6 +3,11 @@ package dreamlab.worldpics.di.module
 import android.app.Application
 import android.content.Context
 import android.net.ConnectivityManager
+import android.os.Bundle
+import com.google.ads.consent.ConsentInformation
+import com.google.ads.consent.ConsentStatus
+import com.google.ads.mediation.admob.AdMobAdapter
+import com.google.android.gms.ads.AdRequest
 import com.google.gson.Gson
 import dagger.Module
 import dagger.Provides
@@ -93,4 +98,21 @@ class ApplicationModule {
     @Singleton
     @Provides
     fun providePhotoDao(db: ApplicationDatabase) = db.photoDao()
+
+    @Singleton
+    @Provides
+    fun provideAdRequestBuilder(context: Context) : AdRequest.Builder {
+        val builder = AdRequest.Builder()
+
+        val extras = Bundle()
+        extras.putBoolean("is_designed_for_families", true)
+
+        if (ConsentInformation.getInstance(context).consentStatus == ConsentStatus.NON_PERSONALIZED) {
+            extras.putString("npa", "1")
+            builder.addNetworkExtrasBundle(AdMobAdapter::class.java, extras)
+        }
+
+        return builder
+    }
+
 }

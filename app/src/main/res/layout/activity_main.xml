@@ -27,7 +27,7 @@
 
                     <fragment
                         android:id="@+id/fragment_photos"
-                        android:name="dreamlab.worldpics.fragment.main.photo.ui.PhotosFragment"
+                        android:name="dreamlab.worldpics.ui.photo.PhotosFragment"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:tag="FRAGMENT_PHOTOS" />

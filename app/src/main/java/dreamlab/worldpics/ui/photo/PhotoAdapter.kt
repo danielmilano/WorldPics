@@ -1,4 +1,4 @@
-package dreamlab.worldpics.adapter
+package dreamlab.worldpics.ui.photo
 
 import android.annotation.SuppressLint
 import android.content.Context
@@ -11,35 +11,40 @@ import com.google.android.gms.ads.AdSize
 import com.google.android.gms.ads.AdView
 import dreamlab.worldpics.BuildConfig
 import dreamlab.worldpics.R
+import dreamlab.worldpics.WorldPics
 import dreamlab.worldpics.databinding.ItemBannerBinding
 import dreamlab.worldpics.databinding.ItemPhotoBinding
 import dreamlab.worldpics.fragment.main.photo.data.Photo
+import javax.inject.Inject
 
 /**
  * Created by danielm on 10/02/2018.
  */
 
-class PhotoAdapter(
-    val context: Context?,
-    private val adBuilder: AdRequest.Builder? = null,
-    val mListener: Listener
-) : ListAdapter<Any, ItemsViewHolder>(ItemsDiffCallback) {
+class PhotoAdapter(private val onPhotoClicked: (Photo) -> Unit) :
+    ListAdapter<Any, ItemsViewHolder>(
+        ItemsDiffCallback
+    ) {
+
+    @Inject
+    lateinit var context: Context
 
     private var mValues = ArrayList<Any>()
 
     override fun submitList(list: List<Any>?) {
-        var arrayList: ArrayList<Any>? = null
 
         list?.let {
-            arrayList = ArrayList(it)
-            mValues.addAll(arrayList!!)
-            for (index in arrayList!!.indices step 10) {
-                val adView = AdView(context)
-                arrayList!!.add(index, adView)
+            mValues.addAll(it)
+
+            if (!WorldPics.isPremium) {
+                for (index in mValues.indices step 10) {
+                    val adView = AdView(context)
+                    mValues.add(index, adView)
+                }
             }
         }
 
-        super.submitList(arrayList)
+        super.submitList(mValues)
     }
 
     override fun getItemViewType(position: Int): Int {
@@ -54,9 +59,13 @@ class PhotoAdapter(
         val inflater = LayoutInflater.from(parent.context)
         return when (viewType) {
             R.layout.item_photo ->
-                ItemsViewHolder.PhotoViewHolder(ItemPhotoBinding.inflate(inflater, parent, false))
+                ItemsViewHolder.PhotoViewHolder(
+                    ItemPhotoBinding.inflate(inflater, parent, false)
+                )
             R.layout.item_banner ->
-                ItemsViewHolder.BannerItemHolder(ItemBannerBinding.inflate(inflater, parent, false))
+                ItemsViewHolder.BannerItemHolder(
+                    ItemBannerBinding.inflate(inflater, parent, false)
+                )
             else -> throw IllegalArgumentException("Invalid viewType")
         }
     }
@@ -64,44 +73,40 @@ class PhotoAdapter(
     override fun onBindViewHolder(holder: ItemsViewHolder, position: Int) {
         when (holder) {
             is ItemsViewHolder.PhotoViewHolder -> {
-                bindPhotoItemHolder(holder, getItem(position) as Photo)
+                holder.bind(holder, getItem(position) as Photo, onPhotoClicked)
             }
             is ItemsViewHolder.BannerItemHolder -> {
-                bindBannerItemHolder(holder.binding.adView)
+                holder.bind(holder.binding.adView)
+            }
+        }
+    }
+}
+
+sealed class ItemsViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+
+    class PhotoViewHolder(val binding: ItemPhotoBinding) : ItemsViewHolder(binding.root) {
+        fun bind(holder: PhotoViewHolder, item: Photo, onPhotoClicked: (Photo) -> Unit) {
+            holder.binding.photo = item
+            holder.binding.root.setOnClickListener {
+                onPhotoClicked(item)
             }
         }
     }
 
-    private fun bindPhotoItemHolder(holder: ItemsViewHolder.PhotoViewHolder, item: Photo) {
-        holder.binding.photo = item
-        holder.binding.root.setOnClickListener { mListener.onPhotoClick(item) }
-    }
+    class BannerItemHolder(val binding: ItemBannerBinding) : ItemsViewHolder(binding.root) {
 
-    private fun bindBannerItemHolder(item: AdView) {
-        item.loadAd(adBuilder?.build())
-    }
-
-    interface Listener {
-        fun onPhotoClick(photo: Photo)
-    }
-}
-
-sealed class ItemsViewHolder(
-    itemView: View
-) : RecyclerView.ViewHolder(itemView) {
-
-    class PhotoViewHolder(
-        val binding: ItemPhotoBinding
-    ) : ItemsViewHolder(binding.root)
-
-    class BannerItemHolder(val binding: ItemBannerBinding) :
-        ItemsViewHolder(binding.root) {
+        @Inject
+        lateinit var adBuilder: AdRequest.Builder
 
         init {
             val layoutParams = itemView.layoutParams as StaggeredGridLayoutManager.LayoutParams
             layoutParams.isFullSpan = true
             binding.adView.adUnitId = BuildConfig.banner_item_id
             binding.adView.adSize = AdSize.SMART_BANNER
+        }
+
+        fun bind(item: AdView) {
+            item.loadAd(adBuilder.build())
         }
     }
 

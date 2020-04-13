@@ -1,5 +1,6 @@
 package dreamlab.worldpics.fragment.main.photo.data
 
+import androidx.lifecycle.MutableLiveData
 import androidx.paging.PageKeyedDataSource
 import com.elifox.legocatalog.data.Result
 import kotlinx.coroutines.CoroutineExceptionHandler
@@ -53,7 +54,8 @@ class PhotoPageDataSource
         editors_choice: Boolean? = null,
         order: String? = null,
         page: Int? = null,
-        per_page: Int? = null, callback: (List<Photo>) -> Unit
+        per_page: Int? = null,
+        callback: (List<Photo>) -> Unit
     ) {
         scope.launch(getJobErrorHandler()) {
             val response = dataSource.fetchPhotos(
