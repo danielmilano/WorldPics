@@ -7,7 +7,7 @@
 
         <variable
             name="photo"
-            type="dreamlab.worldpics.fragment.main.photo.data.Photo" />
+            type="dreamlab.worldpics.model.Photo" />
     </data>
 
 

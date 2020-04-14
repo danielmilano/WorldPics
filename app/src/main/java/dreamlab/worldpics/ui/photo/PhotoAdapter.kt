@@ -5,6 +5,8 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.paging.PagedList
+import androidx.paging.PagedListAdapter
 import androidx.recyclerview.widget.*
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.AdSize
@@ -14,7 +16,7 @@ import dreamlab.worldpics.R
 import dreamlab.worldpics.WorldPics
 import dreamlab.worldpics.databinding.ItemBannerBinding
 import dreamlab.worldpics.databinding.ItemPhotoBinding
-import dreamlab.worldpics.fragment.main.photo.data.Photo
+import dreamlab.worldpics.model.Photo
 import javax.inject.Inject
 
 /**
@@ -22,36 +24,29 @@ import javax.inject.Inject
  */
 
 class PhotoAdapter(private val onPhotoClicked: (Photo) -> Unit) :
-    ListAdapter<Any, ItemsViewHolder>(
-        ItemsDiffCallback
-    ) {
+    PagedListAdapter<Photo?, ItemsViewHolder>(ItemsDiffCallback) {
 
     @Inject
     lateinit var context: Context
 
-    private var mValues = ArrayList<Any>()
-
-    override fun submitList(list: List<Any>?) {
-
-        list?.let {
-            mValues.addAll(it)
-
+    override fun submitList(pagedList: PagedList<Photo?>?) {
+        /*pagedList?.let {
             if (!WorldPics.isPremium) {
-                for (index in mValues.indices step 10) {
-                    val adView = AdView(context)
-                    mValues.add(index, adView)
+                for (index in pagedList.indices step 10) {
+                    pagedList.add(index, null)
                 }
             }
-        }
+        }*/
 
-        super.submitList(mValues)
+        super.submitList(pagedList)
     }
 
     override fun getItemViewType(position: Int): Int {
-        return when (val item = getItem(position)) {
-            is Photo -> R.layout.item_photo
-            is AdView -> R.layout.item_banner
-            else -> throw IllegalStateException("Unknown type: ${item::class.java.simpleName}")
+        val item = getItem(position)
+        item?.let {
+            return R.layout.item_photo
+        } ?: run {
+            return R.layout.item_banner
         }
     }
 
@@ -112,20 +107,14 @@ sealed class ItemsViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
 
 }
 
-internal object ItemsDiffCallback : DiffUtil.ItemCallback<Any>() {
+internal object ItemsDiffCallback : DiffUtil.ItemCallback<Photo?>() {
 
-    override fun areItemsTheSame(oldItem: Any, newItem: Any): Boolean {
-        return when {
-            oldItem is Photo && newItem is Photo -> oldItem.id == newItem.id
-            else -> false
-        }
+    override fun areItemsTheSame(oldItem: Photo, newItem: Photo): Boolean {
+        return oldItem.id == newItem.id
     }
 
     @SuppressLint("DiffUtilEquals")
-    override fun areContentsTheSame(oldItem: Any, newItem: Any): Boolean {
-        return when {
-            oldItem is Photo && newItem is Photo -> oldItem == newItem
-            else -> false
-        }
+    override fun areContentsTheSame(oldItem: Photo, newItem: Photo): Boolean {
+        return oldItem == newItem
     }
 }

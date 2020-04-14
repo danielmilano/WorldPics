@@ -1,13 +1,14 @@
 package dreamlab.worldpics.worker
 
 import android.content.Context
+import androidx.paging.PagedList
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.google.gson.stream.JsonReader
-import dreamlab.worldpics.data.ApplicationDatabase
-import dreamlab.worldpics.fragment.main.photo.data.Photo
+import dreamlab.worldpics.db.WorldPicsDatabase
+import dreamlab.worldpics.model.Photo
 import dreamlab.worldpics.util.DATA_FILENAME
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
@@ -25,9 +26,9 @@ class SeedDatabaseWorker(
                 applicationContext.assets.open(DATA_FILENAME).use { inputStream ->
                     JsonReader(inputStream.reader()).use { jsonReader ->
                         val type = object : TypeToken<List<Photo>>() {}.type
-                        val list: List<Photo> = Gson().fromJson(jsonReader, type)
+                        val list: PagedList<Photo> = Gson().fromJson(jsonReader, type)
 
-                        ApplicationDatabase.getInstance(applicationContext).photoDao().insertAll(list)
+                        WorldPicsDatabase.getInstance(applicationContext).photoDao().insertAll(list)
 
                         Result.success()
                     }

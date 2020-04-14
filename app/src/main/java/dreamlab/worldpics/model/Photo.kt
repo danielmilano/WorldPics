@@ -1,4 +1,4 @@
-package dreamlab.worldpics.fragment.main.photo.data
+package dreamlab.worldpics.model
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey

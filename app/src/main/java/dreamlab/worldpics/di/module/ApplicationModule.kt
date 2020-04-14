@@ -1,6 +1,5 @@
 package dreamlab.worldpics.di.module
 
-import android.app.Application
 import android.content.Context
 import android.net.ConnectivityManager
 import android.os.Bundle
@@ -11,11 +10,14 @@ import com.google.android.gms.ads.AdRequest
 import com.google.gson.Gson
 import dagger.Module
 import dagger.Provides
+import dreamlab.worldpics.AppExecutors
 import dreamlab.worldpics.WorldPics
-import dreamlab.worldpics.data.ApplicationDatabase
+import dreamlab.worldpics.data.PhotoRepository
+import dreamlab.worldpics.db.PhotoDao
+import dreamlab.worldpics.db.PhotoLocalCache
+import dreamlab.worldpics.db.WorldPicsDatabase
 import dreamlab.worldpics.di.CoroutineScopeIO
-import dreamlab.worldpics.fragment.main.photo.data.PhotoRemoteDataSource
-import dreamlab.worldpics.network.service.PhotoService
+import dreamlab.worldpics.network.PhotoService
 import dreamlab.worldpics.util.SharedPreferenceStorage
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -25,6 +27,8 @@ import okhttp3.OkHttpClient
 import okhttp3.TlsVersion
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import java.util.concurrent.Executor
+import java.util.concurrent.Executors
 import javax.inject.Singleton
 
 @Module
@@ -44,10 +48,6 @@ class ApplicationModule {
     fun providesConnectivityManager(context: Context): ConnectivityManager =
         context.applicationContext.getSystemService(Context.CONNECTIVITY_SERVICE)
                 as ConnectivityManager
-
-    @CoroutineScopeIO
-    @Provides
-    fun provideCoroutineScopeIO() = CoroutineScope(Dispatchers.IO)
 
     @Provides
     @Singleton
@@ -88,20 +88,25 @@ class ApplicationModule {
 
     @Singleton
     @Provides
-    fun providePhotoSetRemoteDataSource(photoService: PhotoService) =
-        PhotoRemoteDataSource(photoService)
+    fun provideDb(context: Context) = WorldPicsDatabase.getInstance(context)
 
     @Singleton
     @Provides
-    fun provideDb(context: Context) = ApplicationDatabase.getInstance(context)
+    fun providePhotoDao(db: WorldPicsDatabase) = db.photoDao()
 
     @Singleton
     @Provides
-    fun providePhotoDao(db: ApplicationDatabase) = db.photoDao()
+    fun providePhotoLocalCache(photoDao: PhotoDao) =
+        PhotoLocalCache(photoDao, Executors.newSingleThreadExecutor())
 
     @Singleton
     @Provides
-    fun provideAdRequestBuilder(context: Context) : AdRequest.Builder {
+    fun providePhotoRepository(photoService: PhotoService, photoLocalCache: PhotoLocalCache) =
+        PhotoRepository(photoService, photoLocalCache)
+
+    @Singleton
+    @Provides
+    fun provideAdRequestBuilder(context: Context): AdRequest.Builder {
         val builder = AdRequest.Builder()
 
         val extras = Bundle()

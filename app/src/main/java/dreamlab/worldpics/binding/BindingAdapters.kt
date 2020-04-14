@@ -12,7 +12,7 @@ import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.bumptech.glide.request.RequestOptions
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import dreamlab.worldpics.R
-import dreamlab.worldpics.fragment.main.photo.data.Photo
+import dreamlab.worldpics.model.Photo
 
 @BindingAdapter("isGone")
 fun bindIsGone(view: View, isGone: Boolean) {

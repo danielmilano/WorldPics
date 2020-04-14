@@ -1,6 +1,6 @@
 package dreamlab.worldpics.model
 
-class RequestBuilder() : Builder {
+class PhotoRequestBuilder() : Builder {
 
     private var q: String? = null
     private var language: String? = null
@@ -63,8 +63,8 @@ class RequestBuilder() : Builder {
         this.per_page = per_page
     }
 
-    fun build(): Request {
-        return Request(
+    fun build(): PhotoRequest {
+        return PhotoRequest(
             q,
             language,
             image_type,

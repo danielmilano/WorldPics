@@ -3,18 +3,18 @@ package dreamlab.worldpics.model
 import android.os.Parcel
 import android.os.Parcelable
 
-class Request(var q: String? = null,
-              var lang: String? = null,
-              var image_type: String? = null,
-              var orientation: String? = null,
-              var category: String? = null,
-              var min_width: Int? = null,
-              var min_height: Int? = null,
-              var colors: String? = null,
-              var editors_choice: Boolean? = false,
-              var order: String? = null,
-              var page: Int? = 0,
-              var per_page: Int? = 20) : Parcelable {
+class PhotoRequest(var q: String? = null,
+                   var lang: String? = null,
+                   var image_type: String? = null,
+                   var orientation: String? = null,
+                   var category: String? = null,
+                   var min_width: Int? = null,
+                   var min_height: Int? = null,
+                   var colors: String? = null,
+                   var editors_choice: Boolean? = false,
+                   var order: String? = null,
+                   var page: Int? = 0,
+                   var per_page: Int? = 20) : Parcelable {
 
     override fun describeContents(): Int {
         return 0
@@ -38,9 +38,9 @@ class Request(var q: String? = null,
     companion object {
 
         @JvmField
-        val CREATOR: Parcelable.Creator<Request> = object : Parcelable.Creator<Request> {
-            override fun createFromParcel(`in`: Parcel): Request {
-                val instance = Request()
+        val CREATOR: Parcelable.Creator<PhotoRequest> = object : Parcelable.Creator<PhotoRequest> {
+            override fun createFromParcel(`in`: Parcel): PhotoRequest {
+                val instance = PhotoRequest()
                 instance.q = `in`.readValue(String::class.java.classLoader) as? String
                 instance.lang = `in`.readValue(String::class.java.classLoader) as?  String
                 instance.image_type = `in`.readValue(String::class.java.classLoader) as?  String
@@ -57,7 +57,7 @@ class Request(var q: String? = null,
                 return instance
             }
 
-            override fun newArray(size: Int): Array<Request?> {
+            override fun newArray(size: Int): Array<PhotoRequest?> {
                 return arrayOfNulls(size)
             }
         }
