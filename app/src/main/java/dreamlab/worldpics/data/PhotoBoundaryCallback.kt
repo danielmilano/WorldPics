@@ -1,5 +1,6 @@
 package dreamlab.worldpics.data
 
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.paging.PagedList
 import dreamlab.worldpics.db.PhotoLocalCache
@@ -16,8 +17,10 @@ class PhotoBoundaryCallback(
     // keep the last requested page. When the request is successful, increment the page number.
     private var lastRequestedPage = 1
 
+    private val _networkErrors = MutableLiveData<String>()
     // LiveData of network errors.
-    val networkErrors = MutableLiveData<String>()
+    val networkErrors: LiveData<String>
+        get() = _networkErrors
 
     // avoid triggering multiple requests in the same time
     private var isRequestInProgress = false
@@ -26,13 +29,13 @@ class PhotoBoundaryCallback(
         if (isRequestInProgress) return
 
         isRequestInProgress = true
-        searchPhotos(service, query, lastRequestedPage, NETWORK_PAGE_SIZE, { repos ->
-            cache.insert(repos) {
+        searchPhotos(service, query, lastRequestedPage, NETWORK_PAGE_SIZE, { photos ->
+            cache.insert(photos) {
                 lastRequestedPage++
                 isRequestInProgress = false
             }
         }, { error ->
-            networkErrors.postValue(error)
+            _networkErrors.postValue(error)
             isRequestInProgress = false
         })
     }
@@ -46,6 +49,6 @@ class PhotoBoundaryCallback(
     }
 
     companion object {
-        private const val NETWORK_PAGE_SIZE = 50
+        private const val NETWORK_PAGE_SIZE = 200
     }
 }

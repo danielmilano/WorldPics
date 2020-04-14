@@ -1,6 +1,5 @@
 package dreamlab.worldpics.network
 
-import androidx.paging.PagedList
 import com.google.gson.annotations.SerializedName
 import dreamlab.worldpics.model.Photo
 
@@ -12,5 +11,5 @@ data class PhotoSearchResponse(
     var totalHits: Int,
 
     @SerializedName("hits")
-    val photos: PagedList<Photo>
+    val photos: ArrayList<Photo>
 )

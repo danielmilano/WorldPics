@@ -10,7 +10,6 @@ import com.google.android.gms.ads.AdRequest
 import com.google.gson.Gson
 import dagger.Module
 import dagger.Provides
-import dreamlab.worldpics.AppExecutors
 import dreamlab.worldpics.WorldPics
 import dreamlab.worldpics.data.PhotoRepository
 import dreamlab.worldpics.db.PhotoDao
@@ -25,6 +24,7 @@ import okhttp3.CipherSuite
 import okhttp3.ConnectionSpec
 import okhttp3.OkHttpClient
 import okhttp3.TlsVersion
+import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.util.concurrent.Executor
@@ -71,7 +71,11 @@ class ApplicationModule {
             )
             .build()
 
-        return client.newBuilder().connectionSpecs((listOf<ConnectionSpec>(spec))).build()
+        val logger = HttpLoggingInterceptor()
+        logger.level = HttpLoggingInterceptor.Level.BASIC
+
+        return client.newBuilder().addInterceptor(logger)
+            .connectionSpecs((listOf<ConnectionSpec>(spec))).build()
     }
 
     @Singleton
@@ -106,7 +110,7 @@ class ApplicationModule {
 
     @Singleton
     @Provides
-    fun provideAdRequestBuilder(context: Context): AdRequest.Builder {
+    fun provideAdRequest(context: Context): AdRequest {
         val builder = AdRequest.Builder()
 
         val extras = Bundle()
@@ -117,7 +121,6 @@ class ApplicationModule {
             builder.addNetworkExtrasBundle(AdMobAdapter::class.java, extras)
         }
 
-        return builder
+        return builder.build()
     }
-
 }

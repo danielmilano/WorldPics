@@ -15,7 +15,8 @@ import dreamlab.worldpics.model.Photo
  */
 @Database(
     entities = [Photo::class],
-    version = 1, exportSchema = false
+    version = 1,
+    exportSchema = false
 )
 
 abstract class WorldPicsDatabase : RoomDatabase() {
@@ -24,31 +25,23 @@ abstract class WorldPicsDatabase : RoomDatabase() {
 
     companion object {
 
-        // For Singleton instantiation
         @Volatile
-        private var instance: WorldPicsDatabase? = null
+        private var INSTANCE: WorldPicsDatabase? = null
 
-        fun getInstance(context: Context): WorldPicsDatabase {
-            return instance ?: synchronized(this) {
-                instance
-                    ?: buildDatabase(
-                        context
-                    )
-                        .also { instance = it }
+        fun getInstance(context: Context): WorldPicsDatabase =
+            INSTANCE ?: synchronized(this) {
+                INSTANCE ?: buildDatabase(context).also { INSTANCE = it }
             }
-        }
 
-        // Create and pre-populate the database. See this article for more details:
-        // https://medium.com/google-developers/7-pro-tips-for-room-fbadea4bfbd1#4785
         private fun buildDatabase(context: Context): WorldPicsDatabase {
             return Room.databaseBuilder(context, WorldPicsDatabase::class.java, "worldpics-db")
-                .addCallback(object : RoomDatabase.Callback() {
+                /*.addCallback(object : RoomDatabase.Callback() {
                     override fun onCreate(db: SupportSQLiteDatabase) {
                         super.onCreate(db)
                         val request = OneTimeWorkRequestBuilder<SeedDatabaseWorker>().build()
                         WorkManager.getInstance(context).enqueue(request)
                     }
-                })
+                })*/
                 .build()
         }
     }

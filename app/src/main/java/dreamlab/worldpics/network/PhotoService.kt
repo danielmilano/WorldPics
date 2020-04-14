@@ -14,7 +14,7 @@ fun searchPhotos(
     query: String?,
     page: Int,
     itemsPerPage: Int,
-    onSuccess: (photos: PagedList<Photo>) -> Unit,
+    onSuccess: (photos: ArrayList<Photo>) -> Unit,
     onError: (error: String) -> Unit
 ) {
     Timber.d("query: $query, page: $page, itemsPerPage: $itemsPerPage")

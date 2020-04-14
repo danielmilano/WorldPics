@@ -1,12 +1,12 @@
 package dreamlab.worldpics.db
 
 import androidx.paging.DataSource
-import androidx.paging.PagedList
 import dreamlab.worldpics.model.Photo
 import timber.log.Timber
 import java.util.concurrent.Executor
+import javax.inject.Inject
 
-class PhotoLocalCache(
+class PhotoLocalCache @Inject constructor(
     private val photoDao: PhotoDao,
     private val ioExecutor: Executor
 ) {
@@ -14,7 +14,7 @@ class PhotoLocalCache(
     /**
      * Insert a list of repos in the database, on a background thread.
      */
-    fun insert(photos: PagedList<Photo>, insertFinished: () -> Unit) {
+    fun insert(photos: ArrayList<Photo>, insertFinished: () -> Unit) {
         ioExecutor.execute {
             Timber.d("Inserting ${photos.size} photos")
             photoDao.insertAll(photos)

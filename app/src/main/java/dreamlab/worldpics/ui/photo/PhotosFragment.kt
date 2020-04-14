@@ -9,8 +9,13 @@ import android.widget.Toast
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.paging.PagedList
+import com.google.ads.consent.ConsentInformation
+import com.google.ads.consent.ConsentStatus
+import com.google.ads.mediation.admob.AdMobAdapter
+import com.google.android.gms.ads.AdRequest
 import dagger.android.support.AndroidSupportInjection
 import dagger.android.support.DaggerFragment
+import dreamlab.worldpics.WorldPics
 import dreamlab.worldpics.databinding.FragmentPhotosBinding
 import dreamlab.worldpics.model.Photo
 import dreamlab.worldpics.util.viewModelProvider
@@ -39,7 +44,18 @@ class PhotosFragment : DaggerFragment() {
         super.onCreateView(inflater, container, savedInstanceState)
         viewModel = viewModelProvider(viewModelFactory)
 
-        mAdapter = PhotoAdapter(::onPhotoClicked)
+        val builder = AdRequest.Builder()
+        if (!WorldPics.isPremium) {
+            val extras = Bundle()
+            extras.putBoolean("is_designed_for_families", true)
+
+            if (ConsentInformation.getInstance(context).consentStatus == ConsentStatus.NON_PERSONALIZED) {
+                extras.putString("npa", "1")
+                builder.addNetworkExtrasBundle(AdMobAdapter::class.java, extras)
+            }
+        }
+
+        mAdapter = PhotoAdapter(builder.build(), ::onPhotoClicked)
         mBinding = FragmentPhotosBinding.inflate(inflater, container, false)
 
         initAdapter()

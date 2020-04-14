@@ -2,12 +2,14 @@ package dreamlab.worldpics.ui.photo
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.paging.PagedList
 import androidx.paging.PagedListAdapter
 import androidx.recyclerview.widget.*
+import com.google.ads.mediation.admob.AdMobAdapter
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.AdSize
 import com.google.android.gms.ads.AdView
@@ -23,14 +25,11 @@ import javax.inject.Inject
  * Created by danielm on 10/02/2018.
  */
 
-class PhotoAdapter(private val onPhotoClicked: (Photo) -> Unit) :
+class PhotoAdapter(private val adRequest: AdRequest?, private val onPhotoClicked: (Photo) -> Unit) :
     PagedListAdapter<Photo?, ItemsViewHolder>(ItemsDiffCallback) {
 
-    @Inject
-    lateinit var context: Context
-
     override fun submitList(pagedList: PagedList<Photo?>?) {
-        /*pagedList?.let {
+       /* pagedList?.let {
             if (!WorldPics.isPremium) {
                 for (index in pagedList.indices step 10) {
                     pagedList.add(index, null)
@@ -59,7 +58,7 @@ class PhotoAdapter(private val onPhotoClicked: (Photo) -> Unit) :
                 )
             R.layout.item_banner ->
                 ItemsViewHolder.BannerItemHolder(
-                    ItemBannerBinding.inflate(inflater, parent, false)
+                    ItemBannerBinding.inflate(inflater, parent, false), adRequest
                 )
             else -> throw IllegalArgumentException("Invalid viewType")
         }
@@ -79,7 +78,7 @@ class PhotoAdapter(private val onPhotoClicked: (Photo) -> Unit) :
 
 sealed class ItemsViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
-    class PhotoViewHolder(val binding: ItemPhotoBinding) : ItemsViewHolder(binding.root) {
+    class PhotoViewHolder(private val binding: ItemPhotoBinding) : ItemsViewHolder(binding.root) {
         fun bind(holder: PhotoViewHolder, item: Photo, onPhotoClicked: (Photo) -> Unit) {
             holder.binding.photo = item
             holder.binding.root.setOnClickListener {
@@ -88,10 +87,7 @@ sealed class ItemsViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
         }
     }
 
-    class BannerItemHolder(val binding: ItemBannerBinding) : ItemsViewHolder(binding.root) {
-
-        @Inject
-        lateinit var adBuilder: AdRequest.Builder
+    class BannerItemHolder(val binding: ItemBannerBinding, val adRequest: AdRequest?) : ItemsViewHolder(binding.root) {
 
         init {
             val layoutParams = itemView.layoutParams as StaggeredGridLayoutManager.LayoutParams
@@ -101,7 +97,9 @@ sealed class ItemsViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
         }
 
         fun bind(item: AdView) {
-            item.loadAd(adBuilder.build())
+            adRequest?.let {
+                item.loadAd(it)
+            }
         }
     }
 

@@ -13,7 +13,7 @@ import dreamlab.worldpics.model.Photo
 interface PhotoDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertAll(photos: PagedList<Photo>)
+    fun insertAll(photos: ArrayList<Photo>)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insert(photo: Photo)

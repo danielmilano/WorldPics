@@ -5,11 +5,12 @@ import dreamlab.worldpics.db.PhotoLocalCache
 import dreamlab.worldpics.model.PhotoSearchResult
 import dreamlab.worldpics.network.PhotoService
 import timber.log.Timber
+import javax.inject.Inject
 
 /**
  * Repository module for handling data operations.
  */
-class PhotoRepository(
+class PhotoRepository @Inject constructor(
     private val service: PhotoService,
     private val cache: PhotoLocalCache
 ) {
@@ -56,7 +57,7 @@ class PhotoRepository(
     }
 
     companion object {
-        private const val DATABASE_PAGE_SIZE = 20
+        private const val DATABASE_PAGE_SIZE = 100
     }
 
 }

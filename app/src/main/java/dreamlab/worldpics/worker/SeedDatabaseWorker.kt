@@ -28,7 +28,7 @@ class SeedDatabaseWorker(
                         val type = object : TypeToken<List<Photo>>() {}.type
                         val list: PagedList<Photo> = Gson().fromJson(jsonReader, type)
 
-                        WorldPicsDatabase.getInstance(applicationContext).photoDao().insertAll(list)
+                        //WorldPicsDatabase.getInstance(applicationContext).photoDao().insertAll(list)
 
                         Result.success()
                     }
