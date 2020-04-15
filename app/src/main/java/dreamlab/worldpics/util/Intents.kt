@@ -16,7 +16,6 @@ fun intentShareText(activity: Activity, text: String) {
             .setType("text/plain")
             .createChooserIntent()
             .apply {
-                // https://android-developers.googleblog.com/2012/02/share-with-intents.html
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                     // If we're on Lollipop, we can open the intent as a document
                     addFlags(Intent.FLAG_ACTIVITY_NEW_DOCUMENT or Intent.FLAG_ACTIVITY_MULTIPLE_TASK)

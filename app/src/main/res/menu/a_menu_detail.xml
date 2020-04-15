@@ -17,19 +17,19 @@
     <item
         android:id="@+id/set_image_as"
         android:title="@string/set_photo_as"
-        android:icon="@drawable/ic_image"
+        android:icon="@drawable/ic_image_white"
         app:showAsAction="ifRoom" />
 
     <item
         android:id="@+id/pixabay_site"
         android:title="@string/visit_pixabay"
-        android:icon="@drawable/ic_world"
+        android:icon="@drawable/ic_world_white"
         app:showAsAction="ifRoom" />
 
     <item
         android:id="@+id/pixabay_profile"
         android:title="@string/pixabay_profile"
-        android:icon="@drawable/ic_profile"
+        android:icon="@drawable/ic_profile_white"
         app:showAsAction="ifRoom" />
 
 </menu>

@@ -40,11 +40,11 @@ class MainActivity : BaseActivity(), BaseViewFragmentHelper {
                 mBinding.navigationSwitcher.displayedChild = 0
                 return@OnNavigationItemSelectedListener true
             }
-            R.id.illustration -> {
+            R.id.hottest -> {
                 mBinding.navigationSwitcher.displayedChild = 1
                 return@OnNavigationItemSelectedListener true
             }
-            R.id.vector_graphics -> {
+            R.id.favourites -> {
                 mBinding.navigationSwitcher.displayedChild = 2
                 return@OnNavigationItemSelectedListener true
             }

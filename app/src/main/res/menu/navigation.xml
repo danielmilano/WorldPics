@@ -3,22 +3,22 @@
 
     <item
         android:id="@+id/photos"
-        android:icon="@drawable/ic_photos"
+        android:icon="@drawable/ic_search_black"
         android:title="@string/photos" />
 
     <item
-        android:id="@+id/illustration"
-        android:icon="@drawable/ic_dashboard_black_24dp"
-        android:title="@string/illustration" />
+        android:id="@+id/hottest"
+        android:icon="@drawable/ic_hottest_black"
+        android:title="@string/hottest" />
 
     <item
-        android:id="@+id/vector_graphics"
-        android:icon="@drawable/ic_vector"
-        android:title="@string/vector_graphics" />
+        android:id="@+id/favourites"
+        android:icon="@drawable/ic_favorite_black"
+        android:title="@string/favourites" />
 
     <item
         android:id="@+id/settings"
-        android:icon="@drawable/ic_settings"
+        android:icon="@drawable/ic_settings_black"
         android:title="@string/settings" />
 
 </menu>

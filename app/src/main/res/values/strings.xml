@@ -2,9 +2,9 @@
     <string name="app_name">World Pics</string>
     <string name="title_home">Home</string>
 
-    <string name="photos">Photos</string>
-    <string name="illustration">Illustrations</string>
-    <string name="vector_graphics">Vector graphics</string>
+    <string name="photos">Search</string>
+    <string name="hottest">Hottest</string>
+    <string name="favourites">Favourites</string>
     <string name="settings">Settings</string>
 
     <string name="orientation">Orientation</string>
