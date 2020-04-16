@@ -11,15 +11,11 @@ import com.google.gson.Gson
 import dagger.Module
 import dagger.Provides
 import dreamlab.worldpics.WorldPics
-import dreamlab.worldpics.data.PhotoRepository
+import dreamlab.worldpics.repository.PhotoRepository
 import dreamlab.worldpics.db.PhotoDao
-import dreamlab.worldpics.db.PhotoLocalCache
 import dreamlab.worldpics.db.WorldPicsDatabase
-import dreamlab.worldpics.di.CoroutineScopeIO
-import dreamlab.worldpics.network.PhotoService
+import dreamlab.worldpics.api.PhotoApi
 import dreamlab.worldpics.util.SharedPreferenceStorage
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import okhttp3.CipherSuite
 import okhttp3.ConnectionSpec
 import okhttp3.OkHttpClient
@@ -27,7 +23,6 @@ import okhttp3.TlsVersion
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import java.util.concurrent.Executor
 import java.util.concurrent.Executors
 import javax.inject.Singleton
 
@@ -82,12 +77,12 @@ class ApplicationModule {
     @Provides
     fun providePhotoService(
         converterFactory: GsonConverterFactory
-    ): PhotoService {
+    ): PhotoApi {
         return Retrofit.Builder()
-            .baseUrl(PhotoService.BASE_URL)
+            .baseUrl(PhotoApi.BASE_URL)
             .addConverterFactory(converterFactory)
             .client(OkHttpClient())
-            .build().create(PhotoService::class.java)
+            .build().create(PhotoApi::class.java)
     }
 
     @Singleton
@@ -100,13 +95,8 @@ class ApplicationModule {
 
     @Singleton
     @Provides
-    fun providePhotoLocalCache(photoDao: PhotoDao) =
-        PhotoLocalCache(photoDao, Executors.newSingleThreadExecutor())
-
-    @Singleton
-    @Provides
-    fun providePhotoRepository(photoService: PhotoService, photoLocalCache: PhotoLocalCache) =
-        PhotoRepository(photoService, photoLocalCache)
+    fun providePhotoRepository(photoApi: PhotoApi) =
+        PhotoRepository(photoApi, Executors.newFixedThreadPool(5))
 
     @Singleton
     @Provides

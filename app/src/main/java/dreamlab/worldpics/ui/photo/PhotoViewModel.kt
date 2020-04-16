@@ -1,19 +1,18 @@
 package dreamlab.worldpics.ui.photo
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Transformations
-import androidx.lifecycle.ViewModel
+import androidx.lifecycle.*
 import androidx.paging.PagedList
-import dreamlab.worldpics.data.PhotoRepository
+import dreamlab.worldpics.repository.PhotoRepository
 import dreamlab.worldpics.model.Photo
 import dreamlab.worldpics.model.PhotoSearchResult
+import dreamlab.worldpics.repository.Listing
 import javax.inject.Inject
 
 class PhotoViewModel @Inject constructor(private val repository: PhotoRepository) : ViewModel() {
 
     private val queryLiveData = MutableLiveData<String?>()
-    private val photosResult: LiveData<PhotoSearchResult> = Transformations.map(queryLiveData) {
+
+    private val photosResult: LiveData<Listing<Photo>> = Transformations.map(queryLiveData) {
         it?.let {
             repository.searchPhotos(it)
         } ?: kotlin.run {
@@ -21,20 +20,17 @@ class PhotoViewModel @Inject constructor(private val repository: PhotoRepository
         }
     }
 
-    val photos: LiveData<PagedList<Photo?>> = Transformations.switchMap(photosResult) { it.data }
-    val networkErrors: LiveData<String> = Transformations.switchMap(photosResult) {
-        it.networkErrors
+    val networkState = photosResult.switchMap { it.networkState }
+    val photos = photosResult.switchMap {
+        it.pagedList
     }
 
-    /**
-     * Search photos based on a query string.
-     */
-    fun searchPhotos(queryString: String?) {
+    fun searchPhotos(queryString: String? = null) {
         queryLiveData.postValue(queryString)
     }
 
-    /**
-     * Get the last query value.
-     */
-    fun lastQueryValue(): String? = queryLiveData.value
+    fun retry() {
+        val listing = photosResult.value
+        listing?.retry?.invoke()
+    }
 }

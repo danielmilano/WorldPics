@@ -21,8 +21,6 @@ import dreamlab.worldpics.model.Photo
 
 abstract class WorldPicsDatabase : RoomDatabase() {
 
-    abstract fun photoDao(): PhotoDao
-
     companion object {
 
         @Volatile
@@ -45,4 +43,6 @@ abstract class WorldPicsDatabase : RoomDatabase() {
                 .build()
         }
     }
+
+    abstract fun photoDao(): PhotoDao
 }

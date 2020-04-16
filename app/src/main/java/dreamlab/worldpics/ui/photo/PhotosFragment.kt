@@ -55,17 +55,17 @@ class PhotosFragment : DaggerFragment() {
             }
         }
 
-        mAdapter = PhotoAdapter(builder.build(), ::onPhotoClicked)
+        mAdapter = PhotoAdapter(builder.build(), ::onPhotoClicked) { viewModel.retry() }
         mBinding = FragmentPhotosBinding.inflate(inflater, container, false)
 
         initAdapter()
 
-        viewModel.searchPhotos(null)
+        viewModel.searchPhotos()
 
         return mBinding.root
     }
 
-    fun onPhotoClicked(photo: Photo) {
+    fun onPhotoClicked(photo: Photo?) {
         //TODO
     }
 
@@ -79,8 +79,8 @@ class PhotosFragment : DaggerFragment() {
             Timber.d("list: ${it?.size}")
             mAdapter.submitList(it)
         })
-        viewModel.networkErrors.observe(viewLifecycleOwner, Observer {
-            Toast.makeText(requireContext(), "\uD83D\uDE28 Wooops $it", Toast.LENGTH_LONG).show()
+        viewModel.networkState.observe(viewLifecycleOwner, Observer {
+            mAdapter.setNetworkState(it)
         })
     }
 

@@ -1,6 +1,6 @@
-package dreamlab.worldpics.network
+package dreamlab.worldpics.api
 
-import androidx.paging.PagedList
+import com.google.gson.annotations.SerializedName
 import dreamlab.worldpics.model.Photo
 import retrofit2.Call
 import retrofit2.Callback
@@ -9,6 +9,7 @@ import retrofit2.http.GET
 import retrofit2.http.Query
 import timber.log.Timber
 
+/*
 fun searchPhotos(
     service: PhotoService,
     query: String?,
@@ -40,12 +41,9 @@ fun searchPhotos(
         }
     )
 }
+*/
 
-interface PhotoService {
-
-    companion object {
-        const val BASE_URL = "https://pixabay.com/"
-    }
+interface PhotoApi {
 
     @GET("api/?key=8577302-c39c620e7f60e6e6db9dd48d8")
     fun searchPhotos(
@@ -62,4 +60,15 @@ interface PhotoService {
         @Query("page") page: Int? = null,
         @Query("per_page") per_page: Int? = null
     ): Call<PhotoSearchResponse>
+
+    class PhotoSearchResponse(
+        var total: Int,
+        var totalHits: Int,
+        @SerializedName("hits")
+        val photos: ArrayList<Photo>
+    )
+
+    companion object {
+        const val BASE_URL = "https://pixabay.com/"
+    }
 }

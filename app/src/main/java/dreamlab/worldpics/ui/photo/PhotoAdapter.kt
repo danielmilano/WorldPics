@@ -17,35 +17,33 @@ import dreamlab.worldpics.BuildConfig
 import dreamlab.worldpics.R
 import dreamlab.worldpics.WorldPics
 import dreamlab.worldpics.databinding.ItemBannerBinding
+import dreamlab.worldpics.databinding.ItemLoaderBinding
 import dreamlab.worldpics.databinding.ItemPhotoBinding
 import dreamlab.worldpics.model.Photo
+import dreamlab.worldpics.repository.NetworkState
+import dreamlab.worldpics.repository.Status
 import javax.inject.Inject
 
 /**
  * Created by danielm on 10/02/2018.
  */
 
-class PhotoAdapter(private val adRequest: AdRequest?, private val onPhotoClicked: (Photo) -> Unit) :
-    PagedListAdapter<Photo?, ItemsViewHolder>(ItemsDiffCallback) {
+class PhotoAdapter(
+    private val adRequest: AdRequest?,
+    private val onPhotoClicked: (Photo?) -> Unit,
+    private val retryCallback: () -> Unit
+) :
+    PagedListAdapter<Photo, ItemsViewHolder>(ItemsDiffCallback) {
 
-    override fun submitList(pagedList: PagedList<Photo?>?) {
-       /* pagedList?.let {
-            if (!WorldPics.isPremium) {
-                for (index in pagedList.indices step 10) {
-                    pagedList.add(index, null)
-                }
-            }
-        }*/
+    private var networkState: NetworkState? = null
 
-        super.submitList(pagedList)
-    }
+    private fun hasExtraRow() = networkState != null && networkState != NetworkState.LOADED
 
     override fun getItemViewType(position: Int): Int {
-        val item = getItem(position)
-        item?.let {
-            return R.layout.item_photo
-        } ?: run {
-            return R.layout.item_banner
+        return if (hasExtraRow() && position == itemCount - 1) {
+            R.layout.item_loader
+        } else {
+            R.layout.item_photo
         }
     }
 
@@ -60,18 +58,45 @@ class PhotoAdapter(private val adRequest: AdRequest?, private val onPhotoClicked
                 ItemsViewHolder.BannerItemHolder(
                     ItemBannerBinding.inflate(inflater, parent, false), adRequest
                 )
+            R.layout.item_loader -> ItemsViewHolder.LoaderItemHolder(
+                ItemLoaderBinding.inflate(inflater, parent, false)
+            )
             else -> throw IllegalArgumentException("Invalid viewType")
         }
     }
 
     override fun onBindViewHolder(holder: ItemsViewHolder, position: Int) {
-        when (holder) {
-            is ItemsViewHolder.PhotoViewHolder -> {
-                holder.bind(holder, getItem(position) as Photo, onPhotoClicked)
+        when (getItemViewType(position)) {
+            R.layout.item_photo -> {
+                (holder as ItemsViewHolder.PhotoViewHolder).bind(
+                    holder,
+                    getItem(position),
+                    onPhotoClicked
+                )
             }
-            is ItemsViewHolder.BannerItemHolder -> {
-                holder.bind(holder.binding.adView)
+            R.layout.item_loader -> {
+                (holder as ItemsViewHolder.LoaderItemHolder).bind(networkState, retryCallback)
             }
+        }
+    }
+
+    override fun getItemCount(): Int {
+        return super.getItemCount() + if (hasExtraRow()) 1 else 0
+    }
+
+    fun setNetworkState(newNetworkState: NetworkState?) {
+        val previousState = this.networkState
+        val hadExtraRow = hasExtraRow()
+        this.networkState = newNetworkState
+        val hasExtraRow = hasExtraRow()
+        if (hadExtraRow != hasExtraRow) {
+            if (hadExtraRow) {
+                notifyItemRemoved(super.getItemCount())
+            } else {
+                notifyItemInserted(super.getItemCount())
+            }
+        } else if (hasExtraRow && previousState != newNetworkState) {
+            notifyItemChanged(itemCount - 1)
         }
     }
 }
@@ -79,7 +104,7 @@ class PhotoAdapter(private val adRequest: AdRequest?, private val onPhotoClicked
 sealed class ItemsViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
     class PhotoViewHolder(private val binding: ItemPhotoBinding) : ItemsViewHolder(binding.root) {
-        fun bind(holder: PhotoViewHolder, item: Photo, onPhotoClicked: (Photo) -> Unit) {
+        fun bind(holder: PhotoViewHolder, item: Photo?, onPhotoClicked: (Photo?) -> Unit) {
             holder.binding.photo = item
             holder.binding.root.setOnClickListener {
                 onPhotoClicked(item)
@@ -87,7 +112,8 @@ sealed class ItemsViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
         }
     }
 
-    class BannerItemHolder(val binding: ItemBannerBinding, val adRequest: AdRequest?) : ItemsViewHolder(binding.root) {
+    class BannerItemHolder(binding: ItemBannerBinding, private val adRequest: AdRequest?) :
+        ItemsViewHolder(binding.root) {
 
         init {
             val layoutParams = itemView.layoutParams as StaggeredGridLayoutManager.LayoutParams
@@ -103,9 +129,30 @@ sealed class ItemsViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
         }
     }
 
+    class LoaderItemHolder(
+        private val binding: ItemLoaderBinding
+    ) : ItemsViewHolder(binding.root) {
+
+        fun bind(networkState: NetworkState?, retryCallback: () -> Unit) {
+            binding.progressBar.visibility = toVisibility(networkState?.status == Status.RUNNING)
+            binding.retry.visibility = toVisibility(networkState?.status == Status.FAILED)
+            binding.error.visibility = toVisibility(networkState?.msg != null)
+            binding.error.text = networkState?.msg
+            binding.retry.setOnClickListener { retryCallback() }
+        }
+
+        private fun toVisibility(constraint: Boolean): Int {
+            return if (constraint) {
+                View.VISIBLE
+            } else {
+                View.GONE
+            }
+        }
+    }
+
 }
 
-internal object ItemsDiffCallback : DiffUtil.ItemCallback<Photo?>() {
+internal object ItemsDiffCallback : DiffUtil.ItemCallback<Photo>() {
 
     override fun areItemsTheSame(oldItem: Photo, newItem: Photo): Boolean {
         return oldItem.id == newItem.id
