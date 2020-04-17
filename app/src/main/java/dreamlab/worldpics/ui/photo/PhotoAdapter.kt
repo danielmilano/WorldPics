@@ -76,16 +76,16 @@ class PhotoAdapter(
         return super.getItemCount() + if (hasExtraRow()) 1 else 0
     }
 
-    fun setNetworkState(newNetworkState: NetworkState?) {
+    fun setNetworkState(newNetworkState: NetworkState) {
         val previousState = this.networkState
         val hadExtraRow = hasExtraRow()
         this.networkState = newNetworkState
         val hasExtraRow = hasExtraRow()
         if (hadExtraRow != hasExtraRow) {
             if (hadExtraRow) {
-                notifyItemRemoved(super.getItemCount())
+                notifyItemRemoved(itemCount - 1)
             } else {
-                notifyItemInserted(super.getItemCount())
+                notifyItemInserted(itemCount - 1)
             }
         } else if (hasExtraRow && previousState != newNetworkState) {
             notifyItemChanged(itemCount - 1)

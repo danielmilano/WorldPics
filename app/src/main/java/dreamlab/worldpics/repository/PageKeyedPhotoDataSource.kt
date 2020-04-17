@@ -7,6 +7,7 @@ import dreamlab.worldpics.model.Photo
 import dreamlab.worldpics.util.NetworkLogger
 import retrofit2.Call
 import retrofit2.Response
+import java.io.IOException
 import java.util.concurrent.Executor
 
 /**
@@ -52,33 +53,19 @@ class PageKeyedPhotoDataSource(
             per_page = params.requestedLoadSize
         )
         NetworkLogger.debug(request)
-        request.enqueue(object : retrofit2.Callback<PhotoApi.PhotoSearchResponse> {
-            override fun onFailure(call: Call<PhotoApi.PhotoSearchResponse>, t: Throwable) {
-                NetworkLogger.failure(call, t)
-                retry = {
-                    loadInitial(params, callback)
-                }
-                networkState.postValue(NetworkState.error(t.message ?: "unknown err"))
-            }
 
-            override fun onResponse(
-                call: Call<PhotoApi.PhotoSearchResponse>,
-                response: Response<PhotoApi.PhotoSearchResponse>
-            ) {
-                if (response.isSuccessful) {
-                    val items = response.body()!!.photos
-                    callback.onResult(items, null, 2)
-                    retry = null
-                    networkState.postValue(NetworkState.LOADED)
-                } else {
-                    retry = {
-                        loadInitial(params, callback)
-                    }
-                    networkState.postValue(NetworkState(Status.FAILED, response.message()))
-                }
+        try {
+            val response = request.execute()
+            val items = response.body()!!.photos
+            retry = null
+            networkState.postValue(NetworkState.LOADED)
+            callback.onResult(items, null, 2)
+        } catch (ioException: IOException) {
+            retry = {
+                loadInitial(params, callback)
             }
-
-        })
+            networkState.postValue(NetworkState(Status.FAILED, ioException.message))
+        }
     }
 
     override fun loadAfter(params: LoadParams<Int>, callback: LoadCallback<Int, Photo>) {

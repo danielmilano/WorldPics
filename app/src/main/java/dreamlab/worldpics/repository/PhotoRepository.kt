@@ -72,8 +72,8 @@ class PhotoRepository @Inject constructor(
     }
 
     companion object {
-        private const val INITIAL_NETWORK_PAGE_SIZE = 25
         private const val NETWORK_PAGE_SIZE = 50
+        private const val INITIAL_NETWORK_PAGE_SIZE = 150
     }
 
 

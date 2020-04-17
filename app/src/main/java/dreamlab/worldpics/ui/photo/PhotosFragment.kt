@@ -18,6 +18,7 @@ import dagger.android.support.DaggerFragment
 import dreamlab.worldpics.WorldPics
 import dreamlab.worldpics.databinding.FragmentPhotosBinding
 import dreamlab.worldpics.model.Photo
+import dreamlab.worldpics.repository.NetworkState
 import dreamlab.worldpics.util.viewModelProvider
 import javax.inject.Inject
 
@@ -72,15 +73,8 @@ class PhotosFragment : DaggerFragment() {
         mBinding.recycler.adapter = mAdapter
         viewModel.photos.observe(viewLifecycleOwner, Observer {
             Log.d("initAdapter", "list: ${it?.size}")
-            mAdapter.submitList(it) {
-                // Workaround for an issue where RecyclerView incorrectly uses the loading / spinner
-                // item added to the end of the list as an anchor during initial load.
-                val position =
-                    (mBinding.recycler.layoutManager as LinearLayoutManager).findFirstCompletelyVisibleItemPosition()
-                if (position != RecyclerView.NO_POSITION) {
-                    mBinding.recycler.scrollToPosition(position)
-                }
-            }
+            mBinding.recycler.adapter = mAdapter
+            mAdapter.submitList(it)
         })
         viewModel.networkState.observe(viewLifecycleOwner, Observer {
             mAdapter.setNetworkState(it)
