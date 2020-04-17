@@ -63,7 +63,8 @@ class PhotoAdapter(
     override fun onBindViewHolder(holder: ItemsViewHolder, position: Int) {
         when (getItemViewType(position)) {
             R.layout.item_photo -> {
-                (holder as PhotoViewHolder).bind(getItem(position), onPhotoClicked)
+                val item = getItem(position)
+                (holder as PhotoViewHolder).bind(item, onPhotoClicked)
             }
             R.layout.item_loader -> {
                 (holder as LoaderItemHolder).bind(networkState, retryCallback)

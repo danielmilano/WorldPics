@@ -1,11 +1,14 @@
 package dreamlab.worldpics.ui.photo
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.google.ads.consent.ConsentInformation
 import com.google.ads.consent.ConsentStatus
 import com.google.ads.mediation.admob.AdMobAdapter
@@ -15,9 +18,7 @@ import dagger.android.support.DaggerFragment
 import dreamlab.worldpics.WorldPics
 import dreamlab.worldpics.databinding.FragmentPhotosBinding
 import dreamlab.worldpics.model.Photo
-import dreamlab.worldpics.repository.NetworkState
 import dreamlab.worldpics.util.viewModelProvider
-import timber.log.Timber
 import javax.inject.Inject
 
 class PhotosFragment : DaggerFragment() {
@@ -70,8 +71,16 @@ class PhotosFragment : DaggerFragment() {
         mAdapter = PhotoAdapter(adRequest, ::onPhotoClicked) { viewModel.retry() }
         mBinding.recycler.adapter = mAdapter
         viewModel.photos.observe(viewLifecycleOwner, Observer {
-            Timber.d("list: ${it?.size}")
-            mAdapter.submitList(it)
+            Log.d("initAdapter", "list: ${it?.size}")
+            mAdapter.submitList(it) {
+                // Workaround for an issue where RecyclerView incorrectly uses the loading / spinner
+                // item added to the end of the list as an anchor during initial load.
+                val position =
+                    (mBinding.recycler.layoutManager as LinearLayoutManager).findFirstCompletelyVisibleItemPosition()
+                if (position != RecyclerView.NO_POSITION) {
+                    mBinding.recycler.scrollToPosition(position)
+                }
+            }
         })
         viewModel.networkState.observe(viewLifecycleOwner, Observer {
             mAdapter.setNetworkState(it)

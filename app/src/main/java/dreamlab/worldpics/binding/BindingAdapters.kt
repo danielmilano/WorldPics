@@ -7,10 +7,14 @@ import android.widget.TextView
 import androidx.core.text.HtmlCompat
 import androidx.databinding.BindingAdapter
 import com.bumptech.glide.Glide
+import com.bumptech.glide.TransitionOptions
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
+import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.RequestOptions
+import com.bumptech.glide.request.target.Target.SIZE_ORIGINAL
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import dreamlab.worldpics.R
 import dreamlab.worldpics.model.Photo
 
 @BindingAdapter("isGone")
@@ -35,6 +39,11 @@ fun bindIsGone(view: FloatingActionButton, isGone: Boolean?) {
 fun bindImageFromUrl(view: ImageView, photo: Photo) {
     Glide.with(view)
         .load(photo.webformatURL)
+        .transition(DrawableTransitionOptions.withCrossFade())
+        .diskCacheStrategy(DiskCacheStrategy.ALL)
+
+        .override(photo.webformatWidth?.toInt()!!, photo.webformatHeight?.toInt()!!)
+        .fitCenter()
         .into(view)
 }
 

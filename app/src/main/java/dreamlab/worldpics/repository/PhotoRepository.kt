@@ -1,10 +1,11 @@
 package dreamlab.worldpics.repository
 
+import android.util.Log
 import androidx.lifecycle.switchMap
 import androidx.paging.LivePagedListBuilder
+import androidx.paging.PagedList
 import dreamlab.worldpics.api.PhotoApi
 import dreamlab.worldpics.model.Photo
-import timber.log.Timber
 import java.util.concurrent.Executor
 import javax.inject.Inject
 
@@ -20,11 +21,17 @@ class PhotoRepository @Inject constructor(
      * Search repositories whose names match the query.
      */
     fun searchPhotos(query: String): Listing<Photo> {
-        Timber.d("New query: $query")
+        Log.d("PhotoRepository","New query: $query")
 
         val dataSourceFactory = PhotoDataSourceFactory(photoApi, query, networkExecutor)
 
-        val livePagedList = LivePagedListBuilder(dataSourceFactory, NETWORK_PAGE_SIZE)
+        val pagedListConfig: PagedList.Config = PagedList.Config.Builder()
+            .setEnablePlaceholders(true)
+            .setPageSize(NETWORK_PAGE_SIZE)
+            .setInitialLoadSizeHint(NETWORK_PAGE_SIZE)
+            .build()
+
+        val livePagedList = LivePagedListBuilder(dataSourceFactory, pagedListConfig)
             .setFetchExecutor(networkExecutor)
             .build()
 
@@ -40,11 +47,16 @@ class PhotoRepository @Inject constructor(
     }
 
     fun getPhotos(): Listing<Photo> {
-        Timber.d("Getting all photos")
-
+        Log.d("PhotoRepository","Getting all photos")
         val dataSourceFactory = PhotoDataSourceFactory(photoApi, null, networkExecutor)
 
-        val livePagedList = LivePagedListBuilder(dataSourceFactory, NETWORK_PAGE_SIZE)
+        val pagedListConfig: PagedList.Config = PagedList.Config.Builder()
+            .setEnablePlaceholders(true)
+            .setInitialLoadSizeHint(INITIAL_NETWORK_PAGE_SIZE)
+            .setPageSize(NETWORK_PAGE_SIZE)
+            .build()
+
+        val livePagedList = LivePagedListBuilder(dataSourceFactory, pagedListConfig)
             .setFetchExecutor(networkExecutor)
             .build()
 
@@ -60,7 +72,8 @@ class PhotoRepository @Inject constructor(
     }
 
     companion object {
-        private const val NETWORK_PAGE_SIZE = 100
+        private const val INITIAL_NETWORK_PAGE_SIZE = 25
+        private const val NETWORK_PAGE_SIZE = 50
     }
 
 

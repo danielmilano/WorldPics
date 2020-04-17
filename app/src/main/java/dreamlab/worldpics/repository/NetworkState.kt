@@ -6,8 +6,7 @@ enum class Status {
     FAILED
 }
 
-@Suppress("DataClassPrivateConstructor")
-data class NetworkState private constructor(
+data class NetworkState constructor(
         val status: Status,
         val msg: String? = null) {
     companion object {

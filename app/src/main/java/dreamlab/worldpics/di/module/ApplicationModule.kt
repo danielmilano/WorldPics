@@ -12,7 +12,6 @@ import dagger.Module
 import dagger.Provides
 import dreamlab.worldpics.WorldPics
 import dreamlab.worldpics.repository.PhotoRepository
-import dreamlab.worldpics.db.PhotoDao
 import dreamlab.worldpics.db.WorldPicsDatabase
 import dreamlab.worldpics.api.PhotoApi
 import dreamlab.worldpics.util.SharedPreferenceStorage
@@ -54,9 +53,7 @@ class ApplicationModule {
         GsonConverterFactory.create(gson)
 
     @Provides
-    fun provideOkHttpClient(
-        client: OkHttpClient
-    ): OkHttpClient {
+    fun provideOkHttpClient(): OkHttpClient {
         val spec = ConnectionSpec.Builder(ConnectionSpec.MODERN_TLS)
             .tlsVersions(TlsVersion.TLS_1_2)
             .cipherSuites(
@@ -67,10 +64,10 @@ class ApplicationModule {
             .build()
 
         val logger = HttpLoggingInterceptor()
-        logger.level = HttpLoggingInterceptor.Level.BASIC
+        logger.level = HttpLoggingInterceptor.Level.BODY
 
-        return client.newBuilder().addInterceptor(logger)
-            .connectionSpecs((listOf<ConnectionSpec>(spec))).build()
+        return OkHttpClient().newBuilder().addInterceptor(logger)
+            .connectionSpecs((listOf(spec))).build()
     }
 
     @Singleton
