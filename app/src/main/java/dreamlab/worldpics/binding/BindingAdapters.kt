@@ -11,7 +11,6 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.bumptech.glide.request.RequestOptions
 import com.google.android.material.floatingactionbutton.FloatingActionButton
-import dreamlab.worldpics.R
 import dreamlab.worldpics.model.Photo
 
 @BindingAdapter("isGone")
@@ -34,15 +33,8 @@ fun bindIsGone(view: FloatingActionButton, isGone: Boolean?) {
 
 @BindingAdapter("imageFromUrl")
 fun bindImageFromUrl(view: ImageView, photo: Photo) {
-    val requestOptions = RequestOptions()
-        .diskCacheStrategy(DiskCacheStrategy.RESOURCE)
-        .placeholder(R.drawable.ic_photo_black)
-        .override(photo.webformatWidth?.toInt()!!, photo.webformatHeight?.toInt()!!)
-
-    Glide.with(view.context)
-        .apply { requestOptions }
+    Glide.with(view)
         .load(photo.webformatURL)
-        .transition(DrawableTransitionOptions.withCrossFade())
         .into(view)
 }
 

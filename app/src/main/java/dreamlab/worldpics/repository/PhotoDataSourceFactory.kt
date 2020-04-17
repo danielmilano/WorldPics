@@ -16,7 +16,9 @@ class PhotoDataSourceFactory(
     private val query: String?,
     private val retryExecutor: Executor
 ) : DataSource.Factory<Int, Photo>() {
+
     val sourceLiveData = MutableLiveData<PageKeyedPhotoDataSource>()
+
     override fun create(): DataSource<Int, Photo> {
         val source = PageKeyedPhotoDataSource(photoApi, query, retryExecutor)
         sourceLiveData.postValue(source)

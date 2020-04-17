@@ -1,28 +1,24 @@
 package dreamlab.worldpics.ui.photo
 
 import android.annotation.SuppressLint
-import android.content.Context
-import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.paging.PagedList
 import androidx.paging.PagedListAdapter
-import androidx.recyclerview.widget.*
-import com.google.ads.mediation.admob.AdMobAdapter
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.AdSize
 import com.google.android.gms.ads.AdView
 import dreamlab.worldpics.BuildConfig
 import dreamlab.worldpics.R
-import dreamlab.worldpics.WorldPics
 import dreamlab.worldpics.databinding.ItemBannerBinding
 import dreamlab.worldpics.databinding.ItemLoaderBinding
 import dreamlab.worldpics.databinding.ItemPhotoBinding
 import dreamlab.worldpics.model.Photo
 import dreamlab.worldpics.repository.NetworkState
 import dreamlab.worldpics.repository.Status
-import javax.inject.Inject
 
 /**
  * Created by danielm on 10/02/2018.
@@ -32,8 +28,7 @@ class PhotoAdapter(
     private val adRequest: AdRequest?,
     private val onPhotoClicked: (Photo?) -> Unit,
     private val retryCallback: () -> Unit
-) :
-    PagedListAdapter<Photo, ItemsViewHolder>(ItemsDiffCallback) {
+) : PagedListAdapter<Photo, PhotoAdapter.ItemsViewHolder>(ItemsDiffCallback) {
 
     private var networkState: NetworkState? = null
 
@@ -51,14 +46,14 @@ class PhotoAdapter(
         val inflater = LayoutInflater.from(parent.context)
         return when (viewType) {
             R.layout.item_photo ->
-                ItemsViewHolder.PhotoViewHolder(
+                PhotoViewHolder(
                     ItemPhotoBinding.inflate(inflater, parent, false)
                 )
             R.layout.item_banner ->
-                ItemsViewHolder.BannerItemHolder(
+                BannerItemHolder(
                     ItemBannerBinding.inflate(inflater, parent, false), adRequest
                 )
-            R.layout.item_loader -> ItemsViewHolder.LoaderItemHolder(
+            R.layout.item_loader -> LoaderItemHolder(
                 ItemLoaderBinding.inflate(inflater, parent, false)
             )
             else -> throw IllegalArgumentException("Invalid viewType")
@@ -68,14 +63,10 @@ class PhotoAdapter(
     override fun onBindViewHolder(holder: ItemsViewHolder, position: Int) {
         when (getItemViewType(position)) {
             R.layout.item_photo -> {
-                (holder as ItemsViewHolder.PhotoViewHolder).bind(
-                    holder,
-                    getItem(position),
-                    onPhotoClicked
-                )
+                (holder as PhotoViewHolder).bind(getItem(position), onPhotoClicked)
             }
             R.layout.item_loader -> {
-                (holder as ItemsViewHolder.LoaderItemHolder).bind(networkState, retryCallback)
+                (holder as LoaderItemHolder).bind(networkState, retryCallback)
             }
         }
     }
@@ -99,37 +90,20 @@ class PhotoAdapter(
             notifyItemChanged(itemCount - 1)
         }
     }
-}
 
-sealed class ItemsViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+    open inner class ItemsViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
 
-    class PhotoViewHolder(private val binding: ItemPhotoBinding) : ItemsViewHolder(binding.root) {
-        fun bind(holder: PhotoViewHolder, item: Photo?, onPhotoClicked: (Photo?) -> Unit) {
-            holder.binding.photo = item
-            holder.binding.root.setOnClickListener {
+    inner class PhotoViewHolder(private val binding: ItemPhotoBinding) :
+        ItemsViewHolder(binding.root) {
+        fun bind(item: Photo?, onPhotoClicked: (Photo?) -> Unit) {
+            binding.photo = item
+            binding.root.setOnClickListener {
                 onPhotoClicked(item)
             }
         }
     }
 
-    class BannerItemHolder(binding: ItemBannerBinding, private val adRequest: AdRequest?) :
-        ItemsViewHolder(binding.root) {
-
-        init {
-            val layoutParams = itemView.layoutParams as StaggeredGridLayoutManager.LayoutParams
-            layoutParams.isFullSpan = true
-            binding.adView.adUnitId = BuildConfig.banner_item_id
-            binding.adView.adSize = AdSize.SMART_BANNER
-        }
-
-        fun bind(item: AdView) {
-            adRequest?.let {
-                item.loadAd(it)
-            }
-        }
-    }
-
-    class LoaderItemHolder(
+    inner class LoaderItemHolder(
         private val binding: ItemLoaderBinding
     ) : ItemsViewHolder(binding.root) {
 
@@ -150,16 +124,33 @@ sealed class ItemsViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
         }
     }
 
-}
+    inner class BannerItemHolder(binding: ItemBannerBinding, private val adRequest: AdRequest?) :
+        ItemsViewHolder(binding.root) {
 
-internal object ItemsDiffCallback : DiffUtil.ItemCallback<Photo>() {
+        init {
+            val layoutParams = itemView.layoutParams as StaggeredGridLayoutManager.LayoutParams
+            layoutParams.isFullSpan = true
+            binding.adView.adUnitId = BuildConfig.banner_item_id
+            binding.adView.adSize = AdSize.SMART_BANNER
+        }
 
-    override fun areItemsTheSame(oldItem: Photo, newItem: Photo): Boolean {
-        return oldItem.id == newItem.id
+        fun bind(item: AdView) {
+            adRequest?.let {
+                item.loadAd(it)
+            }
+        }
     }
 
-    @SuppressLint("DiffUtilEquals")
-    override fun areContentsTheSame(oldItem: Photo, newItem: Photo): Boolean {
-        return oldItem == newItem
+    object ItemsDiffCallback : DiffUtil.ItemCallback<Photo>() {
+
+        override fun areItemsTheSame(oldItem: Photo, newItem: Photo): Boolean {
+            return oldItem.id == newItem.id
+        }
+
+        @SuppressLint("DiffUtilEquals")
+        override fun areContentsTheSame(oldItem: Photo, newItem: Photo): Boolean {
+            return oldItem == newItem
+        }
     }
 }
+

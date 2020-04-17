@@ -1,8 +1,8 @@
 <component name="libraryTable">
   <library name="Gradle: com.github.javiersantos:AppUpdater:2.7@aar">
     <CLASSES>
-      <root url="jar://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/59cff73bf79075063f23d76737c4942a/jetified-AppUpdater-2.7/jars/classes.jar!/" />
-      <root url="file://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/59cff73bf79075063f23d76737c4942a/jetified-AppUpdater-2.7/res" />
+      <root url="jar://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/3c1cfaf4d2fbc3b06fdd7eafa0e40140/jetified-AppUpdater-2.7/jars/classes.jar!/" />
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/3c1cfaf4d2fbc3b06fdd7eafa0e40140/jetified-AppUpdater-2.7/res" />
     </CLASSES>
     <JAVADOC />
     <SOURCES>

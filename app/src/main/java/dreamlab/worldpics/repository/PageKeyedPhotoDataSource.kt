@@ -29,8 +29,6 @@ class PageKeyedPhotoDataSource(
      */
     val networkState = MutableLiveData<NetworkState>()
 
-    val initialLoad = MutableLiveData<NetworkState>()
-
     fun retryAllFailed() {
         val prevRetry = retry
         retry = null
@@ -41,50 +39,42 @@ class PageKeyedPhotoDataSource(
         }
     }
 
-    override fun loadBefore(
-        params: LoadParams<Int>,
-        callback: LoadCallback<Int, Photo>
-    ) {
-        // ignored, since we only ever append to our initial load
-    }
+    override fun loadBefore(params: LoadParams<Int>, callback: LoadCallback<Int, Photo>) {}
 
     override fun loadAfter(params: LoadParams<Int>, callback: LoadCallback<Int, Photo>) {
         val page = params.key
         networkState.postValue(NetworkState.LOADING)
-        photoApi.searchPhotos(
-            query = query,
-            page = page,
-            per_page = 100
-        ).enqueue(
-            object : retrofit2.Callback<PhotoApi.PhotoSearchResponse> {
-                override fun onFailure(call: Call<PhotoApi.PhotoSearchResponse>, t: Throwable) {
-                    retry = {
-                        loadAfter(params, callback)
-                    }
-                    networkState.postValue(NetworkState.error(t.message ?: "unknown err"))
-                }
-
-                override fun onResponse(
-                    call: Call<PhotoApi.PhotoSearchResponse>,
-                    response: Response<PhotoApi.PhotoSearchResponse>
-                ) {
-                    if (response.isSuccessful) {
-                        val data = response.body()?.photos
-                        val items = data?.map { it } ?: emptyList()
-                        retry = null
-                        callback.onResult(items, page + 1)
-                        networkState.postValue(NetworkState.LOADED)
-                    } else {
+        photoApi.searchPhotos(query = query, page = page, per_page = DEFAULT_NETWORK_PAGE_SIZE)
+            .enqueue(
+                object : retrofit2.Callback<PhotoApi.PhotoSearchResponse> {
+                    override fun onFailure(call: Call<PhotoApi.PhotoSearchResponse>, t: Throwable) {
                         retry = {
                             loadAfter(params, callback)
                         }
-                        networkState.postValue(
-                            NetworkState.error("error code: ${response.code()}")
-                        )
+                        networkState.postValue(NetworkState.error(t.message ?: "unknown err"))
+                    }
+
+                    override fun onResponse(
+                        call: Call<PhotoApi.PhotoSearchResponse>,
+                        response: Response<PhotoApi.PhotoSearchResponse>
+                    ) {
+                        if (response.isSuccessful) {
+                            val data = response.body()?.photos
+                            val items = data.orEmpty()
+                            retry = null
+                            callback.onResult(items, page + 1)
+                            networkState.postValue(NetworkState.LOADED)
+                        } else {
+                            retry = {
+                                loadAfter(params, callback)
+                            }
+                            networkState.postValue(
+                                NetworkState.error("error code: ${response.code()}")
+                            )
+                        }
                     }
                 }
-            }
-        )
+            )
     }
 
     override fun loadInitial(
@@ -94,19 +84,16 @@ class PageKeyedPhotoDataSource(
         val request = photoApi.searchPhotos(
             query = query,
             page = 1,
-            per_page = 100
+            per_page = DEFAULT_NETWORK_PAGE_SIZE
         )
         networkState.postValue(NetworkState.LOADING)
-        initialLoad.postValue(NetworkState.LOADING)
 
-        // triggered by a refresh, we better execute sync
         try {
             val response = request.execute()
             val data = response.body()?.photos
             val items = data?.map { it } ?: emptyList()
             retry = null
             networkState.postValue(NetworkState.LOADED)
-            initialLoad.postValue(NetworkState.LOADED)
             callback.onResult(items, null, 2)
         } catch (ioException: IOException) {
             retry = {
@@ -114,7 +101,10 @@ class PageKeyedPhotoDataSource(
             }
             val error = NetworkState.error(ioException.message ?: "unknown error")
             networkState.postValue(error)
-            initialLoad.postValue(error)
         }
+    }
+
+    companion object {
+        private const val DEFAULT_NETWORK_PAGE_SIZE = 20
     }
 }
