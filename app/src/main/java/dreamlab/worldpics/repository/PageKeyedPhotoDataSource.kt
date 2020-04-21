@@ -40,7 +40,7 @@ class PageKeyedPhotoDataSource(
         }
     }
 
-    private fun load(){
+    private fun load() {
 
     }
 
@@ -83,10 +83,15 @@ class PageKeyedPhotoDataSource(
 
         try {
             val response = request.execute()
-            val items = response.body()?.photos
-            retry = null
-            networkState.postValue(NetworkState.LOADED)
-            callback.onResult(items.orEmpty(), params.key.inc())
+            if (response.isSuccessful) {
+                val items = response.body()?.photos
+                retry = null
+                networkState.postValue(NetworkState.LOADED)
+                callback.onResult(items.orEmpty(), params.key.inc())
+            } else {
+                networkState.postValue(NetworkState.LOADED)
+                callback.onResult(emptyList(), null)
+            }
         } catch (ioException: IOException) {
             retry = {
                 loadAfter(params, callback)
