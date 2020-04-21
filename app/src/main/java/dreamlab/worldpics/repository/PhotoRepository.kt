@@ -17,51 +17,22 @@ class PhotoRepository @Inject constructor(
     private val networkExecutor: Executor
 ) {
 
-    /**
-     * Search repositories whose names match the query.
-     */
-    fun searchPhotos(query: String): Listing<Photo> {
-        Log.d("PhotoRepository","New query: $query")
+    private fun getListingPhoto(query: String? = null): Listing<Photo> {
 
         val dataSourceFactory = PhotoDataSourceFactory(photoApi, query, networkExecutor)
 
-        val pagedListConfig: PagedList.Config = PagedList.Config.Builder()
-            .setEnablePlaceholders(true)
-            .setPageSize(NETWORK_PAGE_SIZE)
-            .setInitialLoadSizeHint(NETWORK_PAGE_SIZE)
-            .build()
-
-        val livePagedList = LivePagedListBuilder(dataSourceFactory, pagedListConfig)
-            .setFetchExecutor(networkExecutor)
-            .build()
-
-        return Listing(
-            pagedList = livePagedList,
-            networkState = dataSourceFactory.sourceLiveData.switchMap {
-                it.networkState
-            },
-            retry = {
-                dataSourceFactory.sourceLiveData.value?.retryAllFailed()
-            }
-        )
-    }
-
-    fun getPhotos(): Listing<Photo> {
-        Log.d("PhotoRepository","Getting all photos")
-        val dataSourceFactory = PhotoDataSourceFactory(photoApi, null, networkExecutor)
-
-        val pagedListConfig: PagedList.Config = PagedList.Config.Builder()
-            .setEnablePlaceholders(true)
+        val config = PagedList.Config.Builder()
+            .setEnablePlaceholders(false)
             .setInitialLoadSizeHint(INITIAL_NETWORK_PAGE_SIZE)
             .setPageSize(NETWORK_PAGE_SIZE)
             .build()
 
-        val livePagedList = LivePagedListBuilder(dataSourceFactory, pagedListConfig)
+        val pagedList = LivePagedListBuilder(dataSourceFactory, config)
             .setFetchExecutor(networkExecutor)
             .build()
 
         return Listing(
-            pagedList = livePagedList,
+            pagedList = pagedList,
             networkState = dataSourceFactory.sourceLiveData.switchMap {
                 it.networkState
             },
@@ -71,10 +42,19 @@ class PhotoRepository @Inject constructor(
         )
     }
 
-    companion object {
-        private const val NETWORK_PAGE_SIZE = 50
-        private const val INITIAL_NETWORK_PAGE_SIZE = 150
+    fun searchPhotos(query: String): Listing<Photo> {
+        Log.d("PhotoRepository", "New query: $query")
+        return getListingPhoto(query)
     }
 
+    fun getPhotos(): Listing<Photo> {
+        Log.d("PhotoRepository", "Getting all photos")
+        return getListingPhoto()
+    }
+
+    companion object {
+        private const val NETWORK_PAGE_SIZE = 200
+        private const val INITIAL_NETWORK_PAGE_SIZE = 200
+    }
 
 }

@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.databinding.DataBindingUtil
 import androidx.paging.PagedListAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
@@ -51,7 +52,8 @@ class PhotoAdapter(
                 )
             R.layout.item_banner ->
                 BannerItemHolder(
-                    ItemBannerBinding.inflate(inflater, parent, false), adRequest
+                    ItemBannerBinding.inflate(inflater, parent, false),
+                    adRequest
                 )
             R.layout.item_loader -> LoaderItemHolder(
                 ItemLoaderBinding.inflate(inflater, parent, false)
@@ -83,9 +85,9 @@ class PhotoAdapter(
         val hasExtraRow = hasExtraRow()
         if (hadExtraRow != hasExtraRow) {
             if (hadExtraRow) {
-                notifyItemRemoved(itemCount - 1)
+                notifyItemRemoved(super.getItemCount())
             } else {
-                notifyItemInserted(itemCount - 1)
+                notifyItemInserted(super.getItemCount())
             }
         } else if (hasExtraRow && previousState != newNetworkState) {
             notifyItemChanged(itemCount - 1)
@@ -148,7 +150,6 @@ class PhotoAdapter(
             return oldItem.id == newItem.id
         }
 
-        @SuppressLint("DiffUtilEquals")
         override fun areContentsTheSame(oldItem: Photo, newItem: Photo): Boolean {
             return oldItem == newItem
         }

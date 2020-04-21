@@ -70,6 +70,26 @@ class PageKeyedPhotoDataSource(
 
     override fun loadAfter(params: LoadParams<Int>, callback: LoadCallback<Int, Photo>) {
         networkState.postValue(NetworkState.LOADING)
+        val request = photoApi.searchPhotos(
+            query = query,
+            page = params.key,
+            per_page = params.requestedLoadSize
+        )
+        NetworkLogger.debug(request)
+
+        try {
+            val response = request.execute()
+            val items = response.body()?.photos
+            retry = null
+            networkState.postValue(NetworkState.LOADED)
+            callback.onResult(items.orEmpty(), params.key.inc())
+        } catch (ioException: IOException) {
+            retry = {
+                loadAfter(params, callback)
+            }
+            networkState.postValue(NetworkState(Status.FAILED, ioException.message))
+        }
+        /*networkState.postValue(NetworkState.LOADING)
 
         val call = photoApi.searchPhotos(
             query = query,
@@ -95,7 +115,7 @@ class PageKeyedPhotoDataSource(
                     if (response.isSuccessful) {
                         val items = response.body()!!.photos
                         retry = null
-                        callback.onResult(items, params.key + 1)
+                        callback.onResult(items, params.key.inc())
                         networkState.postValue(NetworkState.LOADED)
                     } else {
                         retry = {
@@ -105,6 +125,6 @@ class PageKeyedPhotoDataSource(
                     }
                 }
             }
-        )
+        )*/
     }
 }
