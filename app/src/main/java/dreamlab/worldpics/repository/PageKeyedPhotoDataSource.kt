@@ -40,6 +40,10 @@ class PageKeyedPhotoDataSource(
         }
     }
 
+    private fun load(){
+
+    }
+
     override fun loadBefore(params: LoadParams<Int>, callback: LoadCallback<Int, Photo>) {}
 
     override fun loadInitial(
@@ -56,10 +60,10 @@ class PageKeyedPhotoDataSource(
 
         try {
             val response = request.execute()
-            val items = response.body()!!.photos
+            val items = response.body()?.photos
             retry = null
             networkState.postValue(NetworkState.LOADED)
-            callback.onResult(items, null, 2)
+            callback.onResult(items.orEmpty(), null, 2)
         } catch (ioException: IOException) {
             retry = {
                 loadInitial(params, callback)
@@ -89,42 +93,5 @@ class PageKeyedPhotoDataSource(
             }
             networkState.postValue(NetworkState(Status.FAILED, ioException.message))
         }
-        /*networkState.postValue(NetworkState.LOADING)
-
-        val call = photoApi.searchPhotos(
-            query = query,
-            page = params.key,
-            per_page = params.requestedLoadSize
-        )
-        NetworkLogger.debug(call)
-        call.enqueue(
-            object : retrofit2.Callback<PhotoApi.PhotoSearchResponse> {
-                override fun onFailure(call: Call<PhotoApi.PhotoSearchResponse>, t: Throwable) {
-                    NetworkLogger.failure(call, t)
-                    retry = {
-                        loadAfter(params, callback)
-                    }
-                    networkState.postValue(NetworkState.error(t.message ?: "unknown err"))
-                }
-
-                override fun onResponse(
-                    call: Call<PhotoApi.PhotoSearchResponse>,
-                    response: Response<PhotoApi.PhotoSearchResponse>
-                ) {
-                    NetworkLogger.success(call, response)
-                    if (response.isSuccessful) {
-                        val items = response.body()!!.photos
-                        retry = null
-                        callback.onResult(items, params.key.inc())
-                        networkState.postValue(NetworkState.LOADED)
-                    } else {
-                        retry = {
-                            loadAfter(params, callback)
-                        }
-                        networkState.postValue(NetworkState.error("error code: ${response.code()}"))
-                    }
-                }
-            }
-        )*/
     }
 }

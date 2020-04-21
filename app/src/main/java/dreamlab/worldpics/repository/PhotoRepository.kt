@@ -22,7 +22,7 @@ class PhotoRepository @Inject constructor(
         val dataSourceFactory = PhotoDataSourceFactory(photoApi, query, networkExecutor)
 
         val config = PagedList.Config.Builder()
-            .setEnablePlaceholders(false)
+            .setEnablePlaceholders(true)
             .setInitialLoadSizeHint(INITIAL_NETWORK_PAGE_SIZE)
             .setPageSize(NETWORK_PAGE_SIZE)
             .build()
@@ -53,8 +53,8 @@ class PhotoRepository @Inject constructor(
     }
 
     companion object {
-        private const val NETWORK_PAGE_SIZE = 200
-        private const val INITIAL_NETWORK_PAGE_SIZE = 200
+        private const val INITIAL_NETWORK_PAGE_SIZE = 40
+        private const val NETWORK_PAGE_SIZE = 20
     }
 
 }

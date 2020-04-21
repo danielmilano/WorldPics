@@ -81,7 +81,7 @@ class PhotosFragment : DaggerFragment() {
         mBinding.searchToolbar.clear.setOnClickListener { clearSearchingText() }
         mBinding.searchToolbar.editText.addTextChangedListener(object : TextWatcher {
             private var timer: Timer = Timer()
-            private val DELAY: Long = 1000
+            private val DELAY: Long = 600
 
             override fun afterTextChanged(s: Editable?) {
                 timer.cancel()
