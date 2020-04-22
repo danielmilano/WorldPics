@@ -48,6 +48,10 @@ abstract class BaseActivity : DaggerAppCompatActivity(), BaseViewFragmentHelper 
         }
     }
 
+    override fun onBackPressed() {
+        super.onBackPressed()
+    }
+
     override fun replacePushFragment(idFrameContainer: Int, baseFragment: BaseFragment<*>, withTag: String, anim: Anim, backStack: String?) {
         super.replacePushFragment(idFrameContainer, baseFragment, withTag, anim, backStack)
     }

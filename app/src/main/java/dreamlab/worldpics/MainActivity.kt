@@ -17,7 +17,7 @@ import dreamlab.worldpics.ui.photo.search.SearchPhotosFragment
 import dreamlab.worldpics.ui.photo.top.TopPhotosFragment
 
 class MainActivity : BaseActivity(), BaseViewFragmentHelper, BasePhotosFragment.Listener,
-    FilterFragment.Listener {
+    FilterFragment.Listener, DetailFragment.Listener {
 
     val SEARCH_PHOTOS_FRAGMENT_TAG = "SEARCH_PHOTOS_FRAGMENT"
     val TOP_PHOTOS_FRAGMENT_TAG = "TOP_PHOTOS_FRAGMENT"
@@ -28,7 +28,7 @@ class MainActivity : BaseActivity(), BaseViewFragmentHelper, BasePhotosFragment.
         SEARCH(0),
         TOP(1),
 
-        //FAVOURITES(2),
+        //FAVOURITES(2), //TODO
         SETTINGS(2)
     }
 
@@ -55,6 +55,7 @@ class MainActivity : BaseActivity(), BaseViewFragmentHelper, BasePhotosFragment.
                     return@OnNavigationItemSelectedListener true
                 }
                 R.id.favourites -> {
+                    //TODO
                     //mBinding.navigationSwitcher.displayedChild = DisplayedFragment.FAVOURITES.id
                     return@OnNavigationItemSelectedListener true
                 }
@@ -111,4 +112,11 @@ class MainActivity : BaseActivity(), BaseViewFragmentHelper, BasePhotosFragment.
         }
     }
 
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+    }
 }

@@ -35,26 +35,6 @@ import java.lang.Exception
 object FileUtils {
     private val TAG = FileUtils::class.java.simpleName
 
-    const val WRITE_EXTERNAL_STORAGE_PERMISSION_REQUEST = 1
-
-    fun isStoragePermissionGranted(activity: Activity): Boolean {
-        if (Build.VERSION.SDK_INT >= 23) {
-            if (activity.checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
-                Log.v(TAG, "Permission is granted")
-                return true
-            } else {
-
-                Log.v(TAG, "Permission is revoked")
-
-                ActivityCompat.requestPermissions(activity, arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE), WRITE_EXTERNAL_STORAGE_PERMISSION_REQUEST)
-                return false
-            }
-        } else { //permission is automatically granted on sdk<23 upon installation
-            Log.v(TAG, "Permission is granted")
-            return true
-        }
-    }
-
     fun getCacheSizeInMB(context: Context): Int {
         var size: Long = 0
         val files = context.cacheDir.listFiles()
