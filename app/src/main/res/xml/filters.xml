@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.preference.PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <ListPreference
+        android:defaultValue="all"
+        android:entries="@array/horientation_options"
+        android:entryValues="@array/horientation_values"
+        android:key="pref_orientation"
+        android:summary="%s"
+        android:title="Orientation"
+        app:iconSpaceReserved="false" />
+
+    <ListPreference
+        android:defaultValue="all"
+        android:entries="@array/categories_options"
+        android:entryValues="@array/categories_values"
+        android:key="pref_categories"
+        android:summary="%s"
+        android:title="Category"
+        app:iconSpaceReserved="false" />
+
+    <ListPreference
+        android:defaultValue="none"
+        android:entries="@array/colors_options"
+        android:entryValues="@array/colors_values"
+        android:key="pref_color"
+        android:summary="%s"
+        android:title="Color"
+        app:iconSpaceReserved="false" />
+
+</androidx.preference.PreferenceScreen>

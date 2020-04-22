@@ -45,7 +45,7 @@ class SharedPreferenceStorage @Inject constructor(private val context: Context) 
         //Clear all the saved preference values.
         preferencesEditor.clear()
         //Read the default values and set them as the current values.
-        PreferenceManager.setDefaultValues(context, R.xml.preferences, true)
+        PreferenceManager.setDefaultValues(context, R.xml.filters, true)
         //Commit all changes.
         preferencesEditor.apply()
     }

@@ -25,6 +25,7 @@ import com.google.android.gms.ads.AdRequest
 import dagger.android.support.AndroidSupportInjection
 import dagger.android.support.DaggerFragment
 import dreamlab.worldpics.WorldPics
+import dreamlab.worldpics.base.BaseFragment
 import dreamlab.worldpics.databinding.FragmentPhotosBinding
 import dreamlab.worldpics.model.Photo
 import dreamlab.worldpics.util.viewModelProvider
@@ -32,7 +33,7 @@ import java.util.*
 import javax.inject.Inject
 import kotlin.math.hypot
 
-class PhotosFragment : DaggerFragment() {
+class PhotosFragment : BaseFragment<PhotosFragment.Listener>(Listener::class.java) {
 
     @Inject
     lateinit var viewModelFactory: ViewModelProvider.Factory
@@ -76,6 +77,7 @@ class PhotosFragment : DaggerFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        mBinding.mainToolbar.filters.setOnClickListener { mListenerHelper.listener?.onFiltersClick() }
         mBinding.mainToolbar.search.setOnClickListener { showToolbarSearching() }
         mBinding.searchToolbar.back.setOnClickListener { hideToolbarSearching() }
         mBinding.searchToolbar.clear.setOnClickListener { clearSearchingText() }
@@ -192,6 +194,10 @@ class PhotosFragment : DaggerFragment() {
 
     private fun clearSearchingText() {
         mBinding.searchToolbar.editText.text.clear()
+    }
+
+    interface Listener {
+        fun onFiltersClick()
     }
 
 }

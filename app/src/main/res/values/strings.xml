@@ -6,6 +6,9 @@
     <string name="hottest">Hottest</string>
     <string name="favourites">Favourites</string>
     <string name="settings">Settings</string>
+    <string name="filters">Filters</string>
+    <string name="apply">Apply</string>
+    <string name="reset_filters">Reset filters</string>
 
     <string name="orientation">Orientation</string>
     <string name="horizontal">Horizontal</string>
