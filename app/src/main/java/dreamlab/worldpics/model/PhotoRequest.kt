@@ -11,7 +11,7 @@ data class PhotoRequest(
     var min_width: Int? = null,
     var min_height: Int? = null,
     var colors: String? = null,
-    var top: Boolean? = false,
+    var top: Boolean = false,
     var order: String? = null,
     var page: Int? = 0,
     var per_page: Int? = 20

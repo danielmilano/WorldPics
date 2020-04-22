@@ -9,11 +9,11 @@ import dreamlab.worldpics.base.BaseViewFragmentHelper
 import dreamlab.worldpics.databinding.ActivityMainBinding
 import dreamlab.worldpics.model.PhotoRequest
 import dreamlab.worldpics.ui.filter.FilterFragment
+import dreamlab.worldpics.ui.photo.base.BasePhotosFragment
 import dreamlab.worldpics.ui.photo.search.SearchPhotosFragment
 import dreamlab.worldpics.ui.photo.top.TopPhotosFragment
 
-class MainActivity : BaseActivity(), BaseViewFragmentHelper, SearchPhotosFragment.Listener,
-    TopPhotosFragment.Listener,
+class MainActivity : BaseActivity(), BaseViewFragmentHelper, BasePhotosFragment.Listener,
     FilterFragment.Listener {
 
     val SEARCH_PHOTOS_FRAGMENT_TAG = "SEARCH_PHOTOS_FRAGMENT"
@@ -62,7 +62,7 @@ class MainActivity : BaseActivity(), BaseViewFragmentHelper, SearchPhotosFragmen
             false
         }
 
-    override fun onFiltersClick() {
+    override fun onShowFiltersClick() {
         (supportFragmentManager
             .fragmentFactory
             .instantiate(
@@ -88,12 +88,12 @@ class MainActivity : BaseActivity(), BaseViewFragmentHelper, SearchPhotosFragmen
 
     override fun onApplyFilters(request: PhotoRequest) {
         when (mBinding.navigationSwitcher.displayedChild) {
-            0 -> {
+            DisplayedFragment.SEARCH.id -> {
                 fragmentWithTag<SearchPhotosFragment>(SEARCH_PHOTOS_FRAGMENT_TAG)?.onApplyFilters(
                     request
                 )
             }
-            1 -> {
+            DisplayedFragment.TOP.id -> {
                 fragmentWithTag<TopPhotosFragment>(TOP_PHOTOS_FRAGMENT_TAG)?.onApplyFilters(request)
             }
         }
