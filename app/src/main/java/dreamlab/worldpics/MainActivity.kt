@@ -45,15 +45,15 @@ class MainActivity : BaseActivity(), BaseViewFragmentHelper, PhotosFragment.List
                     return@OnNavigationItemSelectedListener true
                 }
                 R.id.hottest -> {
-                    mBinding.navigationSwitcher.displayedChild = 1
+                    //mBinding.navigationSwitcher.displayedChild = 1
                     return@OnNavigationItemSelectedListener true
                 }
                 R.id.favourites -> {
-                    mBinding.navigationSwitcher.displayedChild = 2
+                    //mBinding.navigationSwitcher.displayedChild = 2
                     return@OnNavigationItemSelectedListener true
                 }
                 R.id.settings -> {
-                    mBinding.navigationSwitcher.displayedChild = 3
+                    mBinding.navigationSwitcher.displayedChild = 1
                     return@OnNavigationItemSelectedListener true
                 }
             }
@@ -68,7 +68,7 @@ class MainActivity : BaseActivity(), BaseViewFragmentHelper, PhotosFragment.List
                 FilterFragment::class.java.name
             ) as DialogFragment).show(
             supportFragmentManager,
-            FilterFragment.PreferenceFragment::class.java.name
+            FilterFragment.FilterPreferenceFragment::class.java.name
         )
     }
 

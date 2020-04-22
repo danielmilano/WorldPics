@@ -20,7 +20,7 @@ internal class NetworkLogger {
             Log.e("NetworkError", "${response.raw()}")
         }
 
-        fun  <T> failure(call: Call<T>, t: Throwable) {
+        fun <T> failure(call: Call<T>, t: Throwable) {
             Log.e("NetworkFailure", "${call.request().url} ${t.message.toString()}")
         }
 

@@ -32,26 +32,26 @@
                         android:layout_height="match_parent"
                         android:tag="FRAGMENT_PHOTOS" />
 
-                  <!--  <fragment
-                        android:id="@+id/fragment_illustrations"
-                        android:name="dreamlab.worldpics.fragment.NewPhotosFragment"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:tag="FRAGMENT_ILLUSTRATIONS" />
+                    <!--  <fragment
+                          android:id="@+id/fragment_illustrations"
+                          android:name="dreamlab.worldpics.fragment.NewPhotosFragment"
+                          android:layout_width="match_parent"
+                          android:layout_height="match_parent"
+                          android:tag="FRAGMENT_ILLUSTRATIONS" />
+
+                      <fragment
+                          android:id="@+id/fragment_vector_graphics"
+                          android:name="dreamlab.worldpics.fragment.NewPhotosFragment"
+                          android:layout_width="match_parent"
+                          android:layout_height="match_parent"
+                          android:tag="FRAGMENT_VECTOR_GRAPHICS" />-->
 
                     <fragment
-                        android:id="@+id/fragment_vector_graphics"
-                        android:name="dreamlab.worldpics.fragment.NewPhotosFragment"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:tag="FRAGMENT_VECTOR_GRAPHICS" />-->
-
-                    <!--<fragment
                         android:id="@+id/fragment_settings"
-                        android:name="dreamlab.worldpics.fragment.NewPreferenceFragment"
+                        android:name="dreamlab.worldpics.ui.settings.SettingsFragment"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:tag="FRAGMENT_SETTINGS" />-->
+                        android:tag="FRAGMENT_SETTINGS" />
 
                 </ViewFlipper>
             </FrameLayout>
@@ -62,7 +62,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="bottom"
                 android:background="@android:color/white"
-                app:menu="@menu/navigation"/>
+                app:menu="@menu/navigation" />
         </LinearLayout>
     </FrameLayout>
 </layout>

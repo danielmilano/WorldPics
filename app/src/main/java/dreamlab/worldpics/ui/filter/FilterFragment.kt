@@ -5,15 +5,14 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.appcompat.app.AppCompatDialogFragment
 import androidx.fragment.app.DialogFragment
 import androidx.preference.PreferenceFragmentCompat
 import com.google.android.material.bottomsheet.BottomSheetDialog
+import dagger.android.support.DaggerDialogFragment
 import dreamlab.worldpics.R
 import dreamlab.worldpics.databinding.FragmentFilterBinding
 
-
-class FilterFragment : AppCompatDialogFragment() {
+class FilterFragment : DaggerDialogFragment() {
 
     private lateinit var mBinding: FragmentFilterBinding
 
@@ -30,7 +29,6 @@ class FilterFragment : AppCompatDialogFragment() {
         return mBinding.root
     }
 
-
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         return BottomSheetDialog(requireActivity(), theme)
     }
@@ -40,7 +38,7 @@ class FilterFragment : AppCompatDialogFragment() {
         if (savedInstanceState == null) {
             val fragment = activity?.supportFragmentManager?.fragmentFactory?.instantiate(
                 ClassLoader.getSystemClassLoader(),
-                PreferenceFragment::class.java.name
+                FilterPreferenceFragment::class.java.name
             )
 
             childFragmentManager
@@ -57,7 +55,7 @@ class FilterFragment : AppCompatDialogFragment() {
         }
     }
 
-    class PreferenceFragment : PreferenceFragmentCompat() {
+    class FilterPreferenceFragment : PreferenceFragmentCompat() {
         override fun onCreatePreferences(bundle: Bundle?, s: String?) {
             addPreferencesFromResource(R.xml.filters)
         }

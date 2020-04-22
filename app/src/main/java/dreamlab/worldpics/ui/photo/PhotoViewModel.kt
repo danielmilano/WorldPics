@@ -1,10 +1,8 @@
 package dreamlab.worldpics.ui.photo
 
 import androidx.lifecycle.*
-import androidx.paging.PagedList
 import dreamlab.worldpics.repository.PhotoRepository
 import dreamlab.worldpics.model.Photo
-import dreamlab.worldpics.model.PhotoSearchResult
 import dreamlab.worldpics.repository.Listing
 import javax.inject.Inject
 
