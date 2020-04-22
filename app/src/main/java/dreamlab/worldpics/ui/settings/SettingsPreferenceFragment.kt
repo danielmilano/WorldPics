@@ -11,10 +11,8 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.viewModelScope
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
-import com.bumptech.glide.Glide
 import com.codemybrainsout.ratingdialog.RatingDialog
 import com.google.firebase.database.FirebaseDatabase
 import dagger.android.support.AndroidSupportInjection
@@ -30,9 +28,6 @@ import dreamlab.worldpics.util.SharedPreferenceStorage.Companion.PREFERENCE_REMO
 import dreamlab.worldpics.util.SharedPreferenceStorage.Companion.PREFERENCE_VERSION
 import dreamlab.worldpics.util.SharedPreferenceStorage.Companion.PREFERENCE_VISIT_PIXABAY
 import dreamlab.worldpics.util.viewModelProvider
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import java.text.SimpleDateFormat
 import java.util.*
 import javax.inject.Inject
@@ -93,12 +88,17 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat() {
         val cache: Preference? = findPreference(PREFERENCE_CLEAR_CACHE)
 
         activity?.let {
-            val startCacheSize = FileUtils.initializeCache(it)
+            val startCacheSize = FileUtils.getCacheSize(it)
             cache?.summary = String.format("Cache size: %s", startCacheSize)
         }
 
         cache?.onPreferenceClickListener = Preference.OnPreferenceClickListener {
-            clearCache(activity)
+            viewModel.clearCache(activity)
+            activity?.let {
+                val startCacheSize = FileUtils.getCacheSizeInMB(requireContext())
+                cache?.summary = String.format("Cache size: %d MB", startCacheSize)
+                Toast.makeText(activity, "Cache cleared!", Toast.LENGTH_SHORT).show()
+            }
             true
         }
 
@@ -133,29 +133,5 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat() {
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         setPreferencesFromResource(R.xml.settings, null)
-    }
-
-    private fun clearCache(context: Context?) {
-        context?.let {
-            viewModel.let {
-                it.viewModelScope.launch {
-                    it.asyncAwait {
-                        withContext(Dispatchers.IO) {
-                            Glide.get(context).clearDiskCache()
-                        }
-                        withContext(Dispatchers.Main) {
-                            Glide.get(context).clearMemory()
-                            val cache: Preference? = findPreference(PREFERENCE_CLEAR_CACHE)
-                            activity?.let {
-                                val startCacheSize = FileUtils.getCacheSizeInMB(context)
-                                cache?.summary = String.format("Cache size: %d MB", startCacheSize)
-                                Toast.makeText(activity, "Cache cleared!", Toast.LENGTH_SHORT)
-                                    .show()
-                            }
-                        }
-                    }
-                }
-            }
-        }
     }
 }

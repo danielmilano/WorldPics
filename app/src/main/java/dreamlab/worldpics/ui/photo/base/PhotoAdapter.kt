@@ -18,7 +18,7 @@ import dreamlab.worldpics.repository.Status
  */
 
 class PhotoAdapter(
-    private val onPhotoClicked: (Photo?) -> Unit,
+    private val onPhotoClicked: (Photo) -> Unit,
     private val retryCallback: () -> Unit
 ) : PagedListAdapter<Photo, PhotoAdapter.ItemsViewHolder>(
     ItemsDiffCallback
@@ -54,7 +54,9 @@ class PhotoAdapter(
         when (getItemViewType(position)) {
             R.layout.item_photo -> {
                 val item = getItem(position)
-                (holder as PhotoViewHolder).bind(item, onPhotoClicked)
+                item?.let {
+                    (holder as PhotoViewHolder).bind(item, onPhotoClicked)
+                }
             }
             R.layout.item_loader -> {
                 (holder as LoaderItemHolder).bind(networkState, retryCallback)
@@ -86,7 +88,7 @@ class PhotoAdapter(
 
     inner class PhotoViewHolder(private val binding: ItemPhotoBinding) :
         ItemsViewHolder(binding.root) {
-        fun bind(item: Photo?, onPhotoClicked: (Photo?) -> Unit) {
+        fun bind(item: Photo, onPhotoClicked: (Photo) -> Unit) {
             binding.photo = item
             binding.root.setOnClickListener {
                 onPhotoClicked(item)

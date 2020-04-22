@@ -4,10 +4,13 @@ import android.os.Bundle
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.DialogFragment
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import dreamlab.worldpics.base.Anim
 import dreamlab.worldpics.base.BaseActivity
 import dreamlab.worldpics.base.BaseViewFragmentHelper
 import dreamlab.worldpics.databinding.ActivityMainBinding
+import dreamlab.worldpics.model.Photo
 import dreamlab.worldpics.model.PhotoRequest
+import dreamlab.worldpics.ui.detail.DetailFragment
 import dreamlab.worldpics.ui.filter.FilterFragment
 import dreamlab.worldpics.ui.photo.base.BasePhotosFragment
 import dreamlab.worldpics.ui.photo.search.SearchPhotosFragment
@@ -24,6 +27,7 @@ class MainActivity : BaseActivity(), BaseViewFragmentHelper, BasePhotosFragment.
     private enum class DisplayedFragment(val id: Int) {
         SEARCH(0),
         TOP(1),
+
         //FAVOURITES(2),
         SETTINGS(2)
     }
@@ -71,6 +75,14 @@ class MainActivity : BaseActivity(), BaseViewFragmentHelper, BasePhotosFragment.
             ) as DialogFragment).show(
             supportFragmentManager,
             FilterFragment.FilterPreferenceFragment::class.java.name
+        )
+    }
+
+    override fun onPhotoClicked(photo: Photo) {
+        replacePushFragment(
+            mBinding.container.id,
+            DetailFragment.newInstance(photo),
+            anim = Anim.PUSH
         )
     }
 

@@ -33,8 +33,8 @@ fun bindIsGone(view: FloatingActionButton, isGone: Boolean?) {
     }
 }
 
-@BindingAdapter("imageFromUrl")
-fun bindImageFromUrl(view: ImageView, photo: Photo) {
+@BindingAdapter("webFormatImageFromUrl")
+fun bindWebFormatImageFromUrl(view: ImageView, photo: Photo) {
     val fadeAnimation =
         ViewPropertyTransition.Animator {
             val fadeAnim = ObjectAnimator.ofFloat(it, "alpha", 0f, 1f)
@@ -48,6 +48,22 @@ fun bindImageFromUrl(view: ImageView, photo: Photo) {
         .override(photo.webformatWidth?.toInt()!!, photo.webformatHeight?.toInt()!!)
         .into(view)
 }
+
+@BindingAdapter("largeImageFromUrl")
+fun bindLargeImageFromUrl(view: ImageView, url: String) {
+    val fadeAnimation =
+        ViewPropertyTransition.Animator {
+            val fadeAnim = ObjectAnimator.ofFloat(it, "alpha", 0f, 1f)
+            fadeAnim.duration = 500
+            fadeAnim.start()
+        }
+
+    Glide.with(view)
+        .load(url)
+        .transition(GenericTransitionOptions.with(fadeAnimation))
+        .into(view)
+}
+
 
 @BindingAdapter("renderHtml")
 fun bindRenderHtml(view: TextView, description: String?) {

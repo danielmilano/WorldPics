@@ -27,10 +27,9 @@ abstract class BasePhotosFragment : BaseFragment<BasePhotosFragment.Listener>(
 
     abstract val viewModel: BasePhotoViewModel
 
-    internal lateinit var mBinding: FragmentBasePhotosBinding
-    private  lateinit var mAdapter: PhotoAdapter
-
-    internal lateinit var currentRequest: PhotoRequest
+    private lateinit var mBinding: FragmentBasePhotosBinding
+    private lateinit var mAdapter: PhotoAdapter
+    private lateinit var currentRequest: PhotoRequest
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -86,12 +85,8 @@ abstract class BasePhotosFragment : BaseFragment<BasePhotosFragment.Listener>(
         })
     }
 
-    protected fun initAdapter(
-        viewModel: BasePhotoViewModel,
-        mBinding: FragmentBasePhotosBinding
-    ) {
-        mAdapter =
-            PhotoAdapter(::onPhotoClicked) { viewModel.retry() }
+    private fun initAdapter(viewModel: BasePhotoViewModel, mBinding: FragmentBasePhotosBinding) {
+        mAdapter = PhotoAdapter(::onPhotoClicked) { viewModel.retry() }
         mBinding.recycler.adapter = mAdapter
         viewModel.photos.observe(viewLifecycleOwner, Observer {
             mAdapter.submitList(it)
@@ -160,8 +155,8 @@ abstract class BasePhotosFragment : BaseFragment<BasePhotosFragment.Listener>(
         mBinding.searchToolbar.editText.text.clear()
     }
 
-    private fun onPhotoClicked(photo: Photo?) {
-        //TODO
+    private fun onPhotoClicked(photo: Photo) {
+        mListenerHelper.listener?.onPhotoClicked(photo)
     }
 
     fun onResetFilters() {
@@ -178,6 +173,7 @@ abstract class BasePhotosFragment : BaseFragment<BasePhotosFragment.Listener>(
 
     interface Listener {
         fun onShowFiltersClick()
+        fun onPhotoClicked(photo : Photo)
     }
 
 }

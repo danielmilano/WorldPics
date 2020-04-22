@@ -8,10 +8,10 @@
         android:title="Settings"
         app:iconSpaceReserved="false" />
 
-    <Preference
+    <!--<Preference
         android:key="pref_remove_ads"
         android:title="Remove ads"
-        app:iconSpaceReserved="false" />
+        app:iconSpaceReserved="false" />-->
 
     <Preference
         android:key="pref_clear_cache"

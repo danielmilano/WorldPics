@@ -3,6 +3,7 @@ package dreamlab.worldpics.model
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.google.gson.annotations.SerializedName
+import java.io.Serializable
 
 @Entity(tableName = "photos")
 data class Photo(
@@ -77,4 +78,4 @@ data class Photo(
 
     @SerializedName("userImageURL")
     var userImageURL: String? = null
-)
+) : Serializable

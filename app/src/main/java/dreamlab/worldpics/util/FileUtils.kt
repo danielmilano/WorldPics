@@ -55,12 +55,6 @@ object FileUtils {
         }
     }
 
-    fun getCacheSize(context: Context): Long {
-        var size: Long = 0
-        size += getDirSize(context.cacheDir)
-        return size
-    }
-
     fun getCacheSizeInMB(context: Context): Int {
         var size: Long = 0
         val files = context.cacheDir.listFiles()
@@ -74,7 +68,7 @@ object FileUtils {
         return size.toInt() / 1000000
     }
 
-    fun initializeCache(context: Context): String {
+    fun getCacheSize(context: Context): String {
         var size: Long = 0
         size += getDirSize(context.cacheDir)
         return readableFileSize(size)
