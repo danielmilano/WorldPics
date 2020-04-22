@@ -23,6 +23,12 @@ import dreamlab.worldpics.R
 import dreamlab.worldpics.WorldPics
 import dreamlab.worldpics.model.Feedback
 import dreamlab.worldpics.util.FileUtils
+import dreamlab.worldpics.util.SharedPreferenceStorage.Companion.PREFERENCE_CLEAR_CACHE
+import dreamlab.worldpics.util.SharedPreferenceStorage.Companion.PREFERENCE_PRIVACY
+import dreamlab.worldpics.util.SharedPreferenceStorage.Companion.PREFERENCE_RATE_US
+import dreamlab.worldpics.util.SharedPreferenceStorage.Companion.PREFERENCE_REMOVE_ADS
+import dreamlab.worldpics.util.SharedPreferenceStorage.Companion.PREFERENCE_VERSION
+import dreamlab.worldpics.util.SharedPreferenceStorage.Companion.PREFERENCE_VISIT_PIXABAY
 import dreamlab.worldpics.util.viewModelProvider
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -32,13 +38,6 @@ import java.util.*
 import javax.inject.Inject
 
 class SettingsPreferenceFragment : PreferenceFragmentCompat() {
-
-    val PREFERENCE_REMOVE_ADS = "pref_remove_ads"
-    val PREFERENCE_RATE_US = "pref_rate_us"
-    val PREFERENCE_PRIVACY = "pref_privacy"
-    val PREFERENCE_VERSION = "pref_version"
-    val PREFERENCE_VISIT_PIXABAY = "pref_visit_pixabay"
-    val PREFERENCE_CLEAR_CACHE = "pref_clear_cache"
 
     @Inject
     lateinit var viewModelFactory: ViewModelProvider.Factory
@@ -59,6 +58,7 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat() {
         val removeAds: Preference? = findPreference(PREFERENCE_REMOVE_ADS)
         removeAds?.isVisible = !WorldPics.isPremium
         removeAds?.onPreferenceClickListener = Preference.OnPreferenceClickListener {
+            //TODO
             true
         }
 

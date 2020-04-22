@@ -2,6 +2,7 @@ package dreamlab.worldpics.base
 
 import android.content.Context
 import androidx.fragment.app.Fragment
+import dagger.android.support.DaggerDialogFragment
 import dreamlab.worldpics.R
 import dreamlab.worldpics.util.FragmentListenerHelper
 
@@ -13,26 +14,23 @@ import dreamlab.worldpics.util.FragmentListenerHelper
  * - Loading view
  * - Alert view
  */
-abstract class BaseDialogFragment<L> : androidx.fragment.app.DialogFragment, BaseViewFragmentHelper, BaseViewAlertHelper {
+abstract class BaseDialogFragment<L> : DaggerDialogFragment, BaseViewFragmentHelper,
+    BaseViewAlertHelper {
 
     protected var mListenerHelper: FragmentListenerHelper<L>
 
     constructor() {
-        setStyle(STYLE_NORMAL, R.style.ModalFragment)
         mListenerHelper = FragmentListenerHelper(null)
     }
 
     constructor(listenerClass: Class<L>) {
-        setStyle(STYLE_NORMAL, R.style.ModalFragment)
         mListenerHelper = FragmentListenerHelper(listenerClass)
     }
 
-    override fun getBaseViewContext() = context!!
+    override fun getBaseViewContext() = requireContext()
 
     override val mFragmentManager: androidx.fragment.app.FragmentManager
         get() = childFragmentManager
-
-
 
 
     override fun onAttach(context: Context) {

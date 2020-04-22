@@ -8,7 +8,6 @@ import android.os.Bundle
 import android.text.Editable
 import android.text.TextUtils
 import android.text.TextWatcher
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewAnimationUtils
@@ -16,18 +15,16 @@ import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.google.ads.consent.ConsentInformation
 import com.google.ads.consent.ConsentStatus
 import com.google.ads.mediation.admob.AdMobAdapter
 import com.google.android.gms.ads.AdRequest
 import dagger.android.support.AndroidSupportInjection
-import dagger.android.support.DaggerFragment
 import dreamlab.worldpics.WorldPics
 import dreamlab.worldpics.base.BaseFragment
 import dreamlab.worldpics.databinding.FragmentPhotosBinding
 import dreamlab.worldpics.model.Photo
+import dreamlab.worldpics.model.PhotoRequest
 import dreamlab.worldpics.util.viewModelProvider
 import java.util.*
 import javax.inject.Inject
@@ -41,6 +38,8 @@ class PhotosFragment : BaseFragment<PhotosFragment.Listener>(Listener::class.jav
 
     private lateinit var mBinding: FragmentPhotosBinding
     private lateinit var mAdapter: PhotoAdapter
+
+    private lateinit var currentRequest: PhotoRequest
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -70,6 +69,8 @@ class PhotosFragment : BaseFragment<PhotosFragment.Listener>(Listener::class.jav
 
         initAdapter(builder.build(), viewModel, mBinding)
 
+        currentRequest = PhotoRequest.Builder().build()
+
         viewModel.searchPhotos()
 
         return mBinding.root
@@ -92,8 +93,10 @@ class PhotosFragment : BaseFragment<PhotosFragment.Listener>(Listener::class.jav
                     object : TimerTask() {
                         override fun run() {
                             activity?.runOnUiThread {
-                                if (!TextUtils.isEmpty(s)) {
-                                    viewModel.searchPhotos(s.toString())
+                                if (!TextUtils.isEmpty(s?.trim())) {
+                                    viewModel.searchPhotos(currentRequest.apply {
+                                        q = s.toString()
+                                    })
                                 }
                             }
                         }
@@ -127,14 +130,6 @@ class PhotosFragment : BaseFragment<PhotosFragment.Listener>(Listener::class.jav
         viewModel.networkState.observe(viewLifecycleOwner, Observer {
             mAdapter.setNetworkState(it)
         })
-    }
-
-    fun onPhotoClicked(photo: Photo?) {
-        //TODO
-    }
-
-    fun removeBannerAds() {
-        //TODO
     }
 
     private fun showToolbarSearching() {
@@ -194,6 +189,25 @@ class PhotosFragment : BaseFragment<PhotosFragment.Listener>(Listener::class.jav
 
     private fun clearSearchingText() {
         mBinding.searchToolbar.editText.text.clear()
+    }
+
+    private fun onPhotoClicked(photo: Photo?) {
+        //TODO
+    }
+
+    fun removeBannerAds() {
+        //TODO
+    }
+
+    fun onResetFilters() {
+        currentRequest = PhotoRequest.Builder().build()
+        mAdapter.submitList(null)
+        viewModel.searchPhotos(currentRequest)
+    }
+
+    fun onApplyFilters(request: PhotoRequest) {
+        currentRequest = request.apply { q = currentRequest.q }
+        viewModel.searchPhotos(currentRequest)
     }
 
     interface Listener {

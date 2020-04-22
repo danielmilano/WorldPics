@@ -1,11 +1,11 @@
 package dreamlab.worldpics.repository
 
-import android.util.Log
 import androidx.lifecycle.switchMap
 import androidx.paging.LivePagedListBuilder
 import androidx.paging.PagedList
 import dreamlab.worldpics.api.PhotoApi
 import dreamlab.worldpics.model.Photo
+import dreamlab.worldpics.model.PhotoRequest
 import java.util.concurrent.Executor
 import javax.inject.Inject
 
@@ -17,9 +17,9 @@ class PhotoRepository @Inject constructor(
     private val networkExecutor: Executor
 ) {
 
-    private fun getListingPhoto(query: String? = null): Listing<Photo> {
+    private fun getListingPhoto(request: PhotoRequest? = null): Listing<Photo> {
 
-        val dataSourceFactory = PhotoDataSourceFactory(photoApi, query, networkExecutor)
+        val dataSourceFactory = PhotoDataSourceFactory(photoApi, request, networkExecutor)
 
         val config = PagedList.Config.Builder()
             .setEnablePlaceholders(true)
@@ -42,13 +42,11 @@ class PhotoRepository @Inject constructor(
         )
     }
 
-    fun searchPhotos(query: String): Listing<Photo> {
-        Log.d("PhotoRepository", "New query: $query")
-        return getListingPhoto(query)
+    fun searchPhotos(photoRequest: PhotoRequest?): Listing<Photo> {
+        return getListingPhoto(photoRequest)
     }
 
     fun getPhotos(): Listing<Photo> {
-        Log.d("PhotoRepository", "Getting all photos")
         return getListingPhoto()
     }
 

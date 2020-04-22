@@ -1,65 +1,56 @@
 package dreamlab.worldpics.model
 
-import android.os.Parcel
-import android.os.Parcelable
+import java.io.Serializable
 
-class PhotoRequest(var q: String? = null,
-                   var lang: String? = null,
-                   var image_type: String? = null,
-                   var orientation: String? = null,
-                   var category: String? = null,
-                   var min_width: Int? = null,
-                   var min_height: Int? = null,
-                   var colors: String? = null,
-                   var editors_choice: Boolean? = false,
-                   var order: String? = null,
-                   var page: Int? = 0,
-                   var per_page: Int? = 20) : Parcelable {
+data class PhotoRequest(
+    var q: String? = null,
+    var lang: String? = null,
+    var image_type: String? = null,
+    var orientation: String? = null,
+    var category: String? = null,
+    var min_width: Int? = null,
+    var min_height: Int? = null,
+    var colors: String? = null,
+    var editors_choice: Boolean? = false,
+    var order: String? = null,
+    var page: Int? = 0,
+    var per_page: Int? = 20
+) : Serializable {
 
-    override fun describeContents(): Int {
-        return 0
-    }
+    data class Builder(
+        var q: String? = null,
+        var language: String? = null,
+        var image_type: String? = null,
+        var orientation: String? = null,
+        var category: String? = null,
+        var min_width: Int? = null,
+        var min_height: Int? = null,
+        var colors: String? = null,
+        var editorsChoice: Boolean = false,
+        var order: String? = null,
+        var page: Int? = null,
+        var per_page: Int? = null
+    ) {
+        fun q(q: String) = apply { this.q = q }
+        fun orientation(orientation: String?) = apply { this.orientation = orientation }
+        fun category(category: String?) = apply { this.category = category }
+        fun colors(colors: String?) = apply { this.colors = colors }
 
-    override fun writeToParcel(dest: Parcel, flags: Int) {
-        dest.writeValue(q)
-        dest.writeValue(lang)
-        dest.writeValue(image_type)
-        dest.writeValue(orientation)
-        dest.writeValue(category)
-        dest.writeValue(min_width)
-        dest.writeValue(min_height)
-        dest.writeValue(colors)
-        dest.writeValue(editors_choice)
-        dest.writeValue(order)
-        dest.writeValue(page)
-        dest.writeValue(per_page)
-    }
-
-    companion object {
-
-        @JvmField
-        val CREATOR: Parcelable.Creator<PhotoRequest> = object : Parcelable.Creator<PhotoRequest> {
-            override fun createFromParcel(`in`: Parcel): PhotoRequest {
-                val instance = PhotoRequest()
-                instance.q = `in`.readValue(String::class.java.classLoader) as? String
-                instance.lang = `in`.readValue(String::class.java.classLoader) as?  String
-                instance.image_type = `in`.readValue(String::class.java.classLoader) as?  String
-                instance.orientation = `in`.readValue(String::class.java.classLoader) as?  String
-                instance.category = `in`.readValue(String::class.java.classLoader) as?  String
-                instance.min_width = `in`.readValue(Int::class.java.classLoader) as?  Int
-                instance.min_height = `in`.readValue(Int::class.java.classLoader) as?  Int
-                instance.colors = `in`.readValue(String::class.java.classLoader) as?  String
-                instance.editors_choice = `in`.readValue(Boolean::class.java.classLoader) as?  Boolean
-                instance.order = `in`.readValue(String::class.java.classLoader) as?  String
-                instance.page = `in`.readValue(Int::class.java.classLoader) as?  Int
-                instance.per_page = `in`.readValue(Int::class.java.classLoader) as?  Int
-
-                return instance
-            }
-
-            override fun newArray(size: Int): Array<PhotoRequest?> {
-                return arrayOfNulls(size)
-            }
+        fun build(): PhotoRequest {
+            return PhotoRequest(
+                q,
+                language,
+                image_type,
+                orientation,
+                category,
+                min_width,
+                min_height,
+                colors,
+                editorsChoice,
+                order,
+                page,
+                per_page
+            )
         }
     }
 }

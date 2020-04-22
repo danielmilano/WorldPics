@@ -4,6 +4,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.paging.PageKeyedDataSource
 import dreamlab.worldpics.api.PhotoApi
 import dreamlab.worldpics.model.Photo
+import dreamlab.worldpics.model.PhotoRequest
 import dreamlab.worldpics.util.NetworkLogger
 import retrofit2.Call
 import retrofit2.Response
@@ -17,7 +18,7 @@ import java.util.concurrent.Executor
  */
 class PageKeyedPhotoDataSource(
     private val photoApi: PhotoApi,
-    private val query: String?,
+    private val request: PhotoRequest?,
     private val retryExecutor: Executor
 ) : PageKeyedDataSource<Int, Photo>() {
 
@@ -52,9 +53,12 @@ class PageKeyedPhotoDataSource(
     ) {
         networkState.postValue(NetworkState.LOADING)
         val request = photoApi.searchPhotos(
-            query = query,
             page = 1,
-            per_page = params.requestedLoadSize
+            per_page = params.requestedLoadSize,
+            query = request?.q,
+            orientation = request?.orientation,
+            category = request?.category,
+            colors = request?.colors
         )
         NetworkLogger.debug(request)
 
@@ -75,9 +79,12 @@ class PageKeyedPhotoDataSource(
     override fun loadAfter(params: LoadParams<Int>, callback: LoadCallback<Int, Photo>) {
         networkState.postValue(NetworkState.LOADING)
         val request = photoApi.searchPhotos(
-            query = query,
             page = params.key,
-            per_page = params.requestedLoadSize
+            per_page = params.requestedLoadSize,
+            query = request?.q,
+            orientation = request?.orientation,
+            category = request?.category,
+            colors = request?.colors
         )
         NetworkLogger.debug(request)
 

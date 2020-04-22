@@ -8,11 +8,17 @@ import android.view.ViewGroup
 import androidx.fragment.app.DialogFragment
 import androidx.preference.PreferenceFragmentCompat
 import com.google.android.material.bottomsheet.BottomSheetDialog
-import dagger.android.support.DaggerDialogFragment
 import dreamlab.worldpics.R
+import dreamlab.worldpics.base.BaseDialogFragment
 import dreamlab.worldpics.databinding.FragmentFilterBinding
+import dreamlab.worldpics.model.PhotoRequest
+import dreamlab.worldpics.util.SharedPreferenceStorage
+import javax.inject.Inject
 
-class FilterFragment : DaggerDialogFragment() {
+class FilterFragment : BaseDialogFragment<FilterFragment.Listener>(Listener::class.java) {
+
+    @Inject
+    lateinit var mSharedPreferenceStorage: SharedPreferenceStorage
 
     private lateinit var mBinding: FragmentFilterBinding
 
@@ -47,17 +53,32 @@ class FilterFragment : DaggerDialogFragment() {
                 .commit()
         }
 
-        mBinding.close.setOnClickListener {
+        mBinding.close.setOnClickListener { dismiss() }
+        mBinding.apply.setOnClickListener {
+            val photoRequest = PhotoRequest.Builder()
+                .orientation(mSharedPreferenceStorage.preferenceOrientation)
+                .category(mSharedPreferenceStorage.preferenceCategory)
+                .colors(mSharedPreferenceStorage.preferenceColor)
+                .build()
+            mListenerHelper.listener?.onApplyFilters(photoRequest)
             dismiss()
         }
-        mBinding.apply.setOnClickListener {
+        mBinding.reset.setOnClickListener {
+            mSharedPreferenceStorage.resetPreferences()
+            mListenerHelper.listener?.onResetFilters()
             dismiss()
         }
     }
 
-    class FilterPreferenceFragment : PreferenceFragmentCompat() {
+    internal class FilterPreferenceFragment : PreferenceFragmentCompat() {
         override fun onCreatePreferences(bundle: Bundle?, s: String?) {
             addPreferencesFromResource(R.xml.filters)
         }
     }
+
+    interface Listener {
+        fun onResetFilters()
+        fun onApplyFilters(request: PhotoRequest)
+    }
+
 }

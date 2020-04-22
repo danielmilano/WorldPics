@@ -9,11 +9,13 @@ import dagger.android.DispatchingAndroidInjector
 import dreamlab.worldpics.base.BaseActivity
 import dreamlab.worldpics.base.BaseViewFragmentHelper
 import dreamlab.worldpics.databinding.ActivityMainBinding
+import dreamlab.worldpics.model.PhotoRequest
 import dreamlab.worldpics.ui.filter.FilterFragment
 import dreamlab.worldpics.ui.photo.PhotosFragment
 import javax.inject.Inject
 
-class MainActivity : BaseActivity(), BaseViewFragmentHelper, PhotosFragment.Listener {
+class MainActivity : BaseActivity(), BaseViewFragmentHelper, PhotosFragment.Listener,
+    FilterFragment.Listener {
 
     @Inject
     lateinit var dispatchingAndroidInjector: DispatchingAndroidInjector<Fragment>
@@ -70,6 +72,14 @@ class MainActivity : BaseActivity(), BaseViewFragmentHelper, PhotosFragment.List
             supportFragmentManager,
             FilterFragment.FilterPreferenceFragment::class.java.name
         )
+    }
+
+    override fun onResetFilters() {
+        fragmentWithTag<PhotosFragment>(FRAGMENT_PHOTOS_TAG)?.onResetFilters()
+    }
+
+    override fun onApplyFilters(request: PhotoRequest) {
+        fragmentWithTag<PhotosFragment>(FRAGMENT_PHOTOS_TAG)?.onApplyFilters(request)
     }
 
 }

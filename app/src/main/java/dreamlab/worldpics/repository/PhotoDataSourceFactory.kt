@@ -4,6 +4,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.paging.DataSource
 import dreamlab.worldpics.api.PhotoApi
 import dreamlab.worldpics.model.Photo
+import dreamlab.worldpics.model.PhotoRequest
 import java.util.concurrent.Executor
 
 /**
@@ -13,14 +14,14 @@ import java.util.concurrent.Executor
  */
 class PhotoDataSourceFactory(
     private val photoApi: PhotoApi,
-    private val query: String?,
+    private val request: PhotoRequest?,
     private val retryExecutor: Executor
 ) : DataSource.Factory<Int, Photo>() {
 
     val sourceLiveData = MutableLiveData<PageKeyedPhotoDataSource>()
 
     override fun create(): DataSource<Int, Photo> {
-        val source = PageKeyedPhotoDataSource(photoApi, query, retryExecutor)
+        val source = PageKeyedPhotoDataSource(photoApi, request, retryExecutor)
         sourceLiveData.postValue(source)
         return source
     }

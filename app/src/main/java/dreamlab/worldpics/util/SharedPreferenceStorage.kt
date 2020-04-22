@@ -16,17 +16,8 @@ import kotlin.reflect.KProperty
 @Singleton
 class SharedPreferenceStorage @Inject constructor(private val context: Context) {
 
-    private val prefs: Lazy<SharedPreferences> = lazy { // Lazy to prevent IO access to main thread.
-        context.applicationContext.getSharedPreferences(PREFERENCE_NAME, Context.MODE_PRIVATE)
-            .apply { changeListener }
-    }
-
-    private val observableRemoveAdsResult = MutableLiveData<Boolean>()
-
-    private val changeListener = SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
-        when (key) {
-            PREFERENCE_REMOVE_ADS -> observableRemoveAdsResult.value = preferenceRemoveAds
-        }
+    val prefs: Lazy<SharedPreferences> = lazy { // Lazy to prevent IO access to main thread.
+        PreferenceManager.getDefaultSharedPreferences(context)
     }
 
     var isSettingsEnabled by BooleanPreference(prefs, PREFERENCE_ENABLE_SETTINGS, false)
@@ -39,14 +30,10 @@ class SharedPreferenceStorage @Inject constructor(private val context: Context) 
 
     var preferenceRemoveAds by BooleanPreference(prefs, PREFERENCE_REMOVE_ADS, false)
 
-    fun resetPreference() {
-        //Get this application SharedPreferences editor
+    fun resetPreferences() {
         val preferencesEditor = PreferenceManager.getDefaultSharedPreferences(context).edit()
-        //Clear all the saved preference values.
         preferencesEditor.clear()
-        //Read the default values and set them as the current values.
         PreferenceManager.setDefaultValues(context, R.xml.filters, true)
-        //Commit all changes.
         preferencesEditor.apply()
     }
 
@@ -64,11 +51,6 @@ class SharedPreferenceStorage @Inject constructor(private val context: Context) 
         const val PREFERENCE_VISIT_PIXABAY = "pref_visit_pixabay"
         const val PREFERENCE_CLEAR_CACHE = "pref_clear_cache"
     }
-
-    fun registerOnPreferenceChangeListener(listener: SharedPreferences.OnSharedPreferenceChangeListener) {
-        prefs.value.registerOnSharedPreferenceChangeListener(listener)
-    }
-
 }
 
 class BooleanPreference(

@@ -7,6 +7,8 @@ package dreamlab.worldpics
 import dagger.android.AndroidInjector
 import dagger.android.DaggerApplication
 import dreamlab.worldpics.di.component.DaggerApplicationComponent
+import dreamlab.worldpics.util.SharedPreferenceStorage
+import javax.inject.Inject
 
 class WorldPics : DaggerApplication() {
 
@@ -21,7 +23,15 @@ class WorldPics : DaggerApplication() {
         val MAX_CACHE_SIZE = 30000000L
     }
 
+    @Inject
+    lateinit var mSharedPreferenceStorage: SharedPreferenceStorage
+
     override fun applicationInjector(): AndroidInjector<out DaggerApplication> {
         return DaggerApplicationComponent.factory().create(this)
+    }
+
+    override fun onCreate() {
+        super.onCreate()
+        mSharedPreferenceStorage.resetPreferences()
     }
 }

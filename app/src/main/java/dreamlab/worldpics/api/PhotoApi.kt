@@ -6,40 +6,6 @@ import retrofit2.Call
 import retrofit2.http.GET
 import retrofit2.http.Query
 
-/*
-fun searchPhotos(
-    service: PhotoService,
-    query: String?,
-    page: Int,
-    itemsPerPage: Int,
-    onSuccess: (photos: ArrayList<Photo>) -> Unit,
-    onError: (error: String) -> Unit
-) {
-    Timber.d("query: $query, page: $page, itemsPerPage: $itemsPerPage")
-
-    service.searchPhotos(query = query, page = page, per_page = itemsPerPage).enqueue(
-        object : Callback<PhotoSearchResponse> {
-            override fun onFailure(call: Call<PhotoSearchResponse>?, t: Throwable) {
-                Timber.d("fail to get data")
-                onError(t.message ?: "unknown error")
-            }
-
-            override fun onResponse(
-                call: Call<PhotoSearchResponse>?,
-                response: Response<PhotoSearchResponse>
-            ) {
-                Timber.d("got a response $response")
-                if (response.isSuccessful) {
-                    onSuccess(response.body()?.photos!!)
-                } else {
-                    onError(response.errorBody()?.string() ?: "Unknown error")
-                }
-            }
-        }
-    )
-}
-*/
-
 interface PhotoApi {
 
     @GET("api/?key=8577302-c39c620e7f60e6e6db9dd48d8")
