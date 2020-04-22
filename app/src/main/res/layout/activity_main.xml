@@ -26,26 +26,26 @@
                     android:layout_height="match_parent">
 
                     <fragment
-                        android:id="@+id/fragment_photos"
-                        android:name="dreamlab.worldpics.ui.photo.PhotosFragment"
+                        android:id="@+id/fragment_search_photos"
+                        android:name="dreamlab.worldpics.ui.photo.search.SearchPhotosFragment"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:tag="FRAGMENT_PHOTOS" />
+                        android:tag="SEARCH_PHOTOS_FRAGMENT" />
 
-                    <!--  <fragment
-                          android:id="@+id/fragment_illustrations"
-                          android:name="dreamlab.worldpics.fragment.NewPhotosFragment"
-                          android:layout_width="match_parent"
-                          android:layout_height="match_parent"
-                          android:tag="FRAGMENT_ILLUSTRATIONS" />
+                    <fragment
+                        android:id="@+id/fragment_top_photos"
+                        android:name="dreamlab.worldpics.ui.photo.top.TopPhotosFragment"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:tag="TOP_PHOTOS_FRAGMENT" />
 
-                      <fragment
-                          android:id="@+id/fragment_vector_graphics"
-                          android:name="dreamlab.worldpics.fragment.NewPhotosFragment"
-                          android:layout_width="match_parent"
-                          android:layout_height="match_parent"
-                          android:tag="FRAGMENT_VECTOR_GRAPHICS" />-->
-
+                    <!-- <fragment
+                         android:id="@+id/fragment_vector_graphics"
+                         android:name="dreamlab.worldpics.fragment.NewPhotosFragment"
+                         android:layout_width="match_parent"
+                         android:layout_height="match_parent"
+                         android:tag="FRAGMENT_VECTOR_GRAPHICS" />&ndash;&gt;
+-->
                     <fragment
                         android:id="@+id/fragment_settings"
                         android:name="dreamlab.worldpics.ui.settings.SettingsFragment"

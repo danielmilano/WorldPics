@@ -11,7 +11,7 @@ data class PhotoRequest(
     var min_width: Int? = null,
     var min_height: Int? = null,
     var colors: String? = null,
-    var editors_choice: Boolean? = false,
+    var top: Boolean? = false,
     var order: String? = null,
     var page: Int? = 0,
     var per_page: Int? = 20
@@ -26,7 +26,7 @@ data class PhotoRequest(
         var min_width: Int? = null,
         var min_height: Int? = null,
         var colors: String? = null,
-        var editorsChoice: Boolean = false,
+        var top: Boolean = false,
         var order: String? = null,
         var page: Int? = null,
         var per_page: Int? = null
@@ -35,6 +35,7 @@ data class PhotoRequest(
         fun orientation(orientation: String?) = apply { this.orientation = orientation }
         fun category(category: String?) = apply { this.category = category }
         fun colors(colors: String?) = apply { this.colors = colors }
+        fun top(top: Boolean) = apply { this.top = top }
 
         fun build(): PhotoRequest {
             return PhotoRequest(
@@ -46,7 +47,7 @@ data class PhotoRequest(
                 min_width,
                 min_height,
                 colors,
-                editorsChoice,
+                top,
                 order,
                 page,
                 per_page

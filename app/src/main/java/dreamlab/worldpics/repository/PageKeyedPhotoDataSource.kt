@@ -58,7 +58,8 @@ class PageKeyedPhotoDataSource(
             query = request?.q,
             orientation = request?.orientation,
             category = request?.category,
-            colors = request?.colors
+            colors = request?.colors,
+            editors_choice = request?.top
         )
         NetworkLogger.debug(request)
 
@@ -84,7 +85,8 @@ class PageKeyedPhotoDataSource(
             query = request?.q,
             orientation = request?.orientation,
             category = request?.category,
-            colors = request?.colors
+            colors = request?.colors,
+            editors_choice = request?.top
         )
         NetworkLogger.debug(request)
 

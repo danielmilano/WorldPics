@@ -20,7 +20,9 @@ import dreamlab.worldpics.repository.Status
 class PhotoAdapter(
     private val onPhotoClicked: (Photo?) -> Unit,
     private val retryCallback: () -> Unit
-) : PagedListAdapter<Photo, PhotoAdapter.ItemsViewHolder>(ItemsDiffCallback) {
+) : PagedListAdapter<Photo, PhotoAdapter.ItemsViewHolder>(
+    ItemsDiffCallback
+) {
 
     private var networkState: NetworkState? = null
 

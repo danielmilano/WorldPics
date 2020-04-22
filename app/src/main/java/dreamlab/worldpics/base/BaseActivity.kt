@@ -48,8 +48,6 @@ abstract class BaseActivity : DaggerAppCompatActivity(), BaseViewFragmentHelper 
         }
     }
 
-    abstract fun removeBannerAds()
-
     override fun replacePushFragment(idFrameContainer: Int, baseFragment: BaseFragment<*>, withTag: String, anim: Anim, backStack: String?) {
         super.replacePushFragment(idFrameContainer, baseFragment, withTag, anim, backStack)
     }
@@ -103,7 +101,6 @@ abstract class BaseActivity : DaggerAppCompatActivity(), BaseViewFragmentHelper 
                     when (purchase.sku) {
                         "ad_free" -> {
                             WorldPics.isPremium = true
-                            removeBannerAds()
                         }
                     }
                 }

@@ -3,26 +3,30 @@ package dreamlab.worldpics
 import android.os.Bundle
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.DialogFragment
-import androidx.fragment.app.Fragment
 import com.google.android.material.bottomnavigation.BottomNavigationView
-import dagger.android.DispatchingAndroidInjector
 import dreamlab.worldpics.base.BaseActivity
 import dreamlab.worldpics.base.BaseViewFragmentHelper
 import dreamlab.worldpics.databinding.ActivityMainBinding
 import dreamlab.worldpics.model.PhotoRequest
 import dreamlab.worldpics.ui.filter.FilterFragment
-import dreamlab.worldpics.ui.photo.PhotosFragment
-import javax.inject.Inject
+import dreamlab.worldpics.ui.photo.search.SearchPhotosFragment
+import dreamlab.worldpics.ui.photo.top.TopPhotosFragment
 
-class MainActivity : BaseActivity(), BaseViewFragmentHelper, PhotosFragment.Listener,
+class MainActivity : BaseActivity(), BaseViewFragmentHelper, SearchPhotosFragment.Listener,
+    TopPhotosFragment.Listener,
     FilterFragment.Listener {
 
-    @Inject
-    lateinit var dispatchingAndroidInjector: DispatchingAndroidInjector<Fragment>
+    val SEARCH_PHOTOS_FRAGMENT_TAG = "SEARCH_PHOTOS_FRAGMENT"
+    val TOP_PHOTOS_FRAGMENT_TAG = "TOP_PHOTOS_FRAGMENT"
+    val FAVOURITE_PHOTOS_FRAGMENT_TAG = "TOP_PHOTOS_FRAGMENT"
+    val SETTINGS_FRAGMENT_TAG = "SETTINGS_FRAGMENT"
 
-    val FRAGMENT_PHOTOS_TAG = "FRAGMENT_PHOTOS"
-    val FRAGMENT_DETAIL_TAG = "FRAGMENT_DETAIL"
-    val FRAGMENT_PREFERENCES_TAG = "FRAGMENT_PREFERENCES"
+    private enum class DisplayedFragment(val id: Int) {
+        SEARCH(0),
+        TOP(1),
+        //FAVOURITES(2),
+        SETTINGS(2)
+    }
 
     private lateinit var mBinding: ActivityMainBinding
 
@@ -35,27 +39,23 @@ class MainActivity : BaseActivity(), BaseViewFragmentHelper, PhotosFragment.List
         )
     }
 
-    override fun removeBannerAds() {
-        //fragmentWithTag<PhotosFragment>(FRAGMENT_PHOTOS_TAG)?.removeBannerAds()
-    }
-
     private val mOnNavigationItemSelectedListener =
         BottomNavigationView.OnNavigationItemSelectedListener { item ->
             when (item.itemId) {
                 R.id.photos -> {
-                    mBinding.navigationSwitcher.displayedChild = 0
+                    mBinding.navigationSwitcher.displayedChild = DisplayedFragment.SEARCH.id
                     return@OnNavigationItemSelectedListener true
                 }
                 R.id.hottest -> {
-                    //mBinding.navigationSwitcher.displayedChild = 1
+                    mBinding.navigationSwitcher.displayedChild = DisplayedFragment.TOP.id
                     return@OnNavigationItemSelectedListener true
                 }
                 R.id.favourites -> {
-                    //mBinding.navigationSwitcher.displayedChild = 2
+                    //mBinding.navigationSwitcher.displayedChild = DisplayedFragment.FAVOURITES.id
                     return@OnNavigationItemSelectedListener true
                 }
                 R.id.settings -> {
-                    mBinding.navigationSwitcher.displayedChild = 1
+                    mBinding.navigationSwitcher.displayedChild = DisplayedFragment.SETTINGS.id
                     return@OnNavigationItemSelectedListener true
                 }
             }
@@ -75,11 +75,28 @@ class MainActivity : BaseActivity(), BaseViewFragmentHelper, PhotosFragment.List
     }
 
     override fun onResetFilters() {
-        fragmentWithTag<PhotosFragment>(FRAGMENT_PHOTOS_TAG)?.onResetFilters()
+        when (mBinding.navigationSwitcher.displayedChild) {
+            DisplayedFragment.SEARCH.id -> {
+                fragmentWithTag<SearchPhotosFragment>(SEARCH_PHOTOS_FRAGMENT_TAG)?.onResetFilters()
+            }
+            DisplayedFragment.TOP.id -> {
+                fragmentWithTag<TopPhotosFragment>(TOP_PHOTOS_FRAGMENT_TAG)?.onResetFilters()
+            }
+        }
+
     }
 
     override fun onApplyFilters(request: PhotoRequest) {
-        fragmentWithTag<PhotosFragment>(FRAGMENT_PHOTOS_TAG)?.onApplyFilters(request)
+        when (mBinding.navigationSwitcher.displayedChild) {
+            0 -> {
+                fragmentWithTag<SearchPhotosFragment>(SEARCH_PHOTOS_FRAGMENT_TAG)?.onApplyFilters(
+                    request
+                )
+            }
+            1 -> {
+                fragmentWithTag<TopPhotosFragment>(TOP_PHOTOS_FRAGMENT_TAG)?.onApplyFilters(request)
+            }
+        }
     }
 
 }

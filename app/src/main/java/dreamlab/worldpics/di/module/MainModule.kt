@@ -9,8 +9,10 @@ import dagger.multibindings.IntoMap
 import dreamlab.worldpics.di.ViewModelKey
 import dreamlab.worldpics.di.scope.FragmentScoped
 import dreamlab.worldpics.ui.filter.FilterFragment
-import dreamlab.worldpics.ui.photo.PhotoViewModel
-import dreamlab.worldpics.ui.photo.PhotosFragment
+import dreamlab.worldpics.ui.photo.search.SearchPhotoViewModel
+import dreamlab.worldpics.ui.photo.search.SearchPhotosFragment
+import dreamlab.worldpics.ui.photo.top.TopPhotoViewModel
+import dreamlab.worldpics.ui.photo.top.TopPhotosFragment
 import dreamlab.worldpics.ui.settings.SettingsFragment
 import dreamlab.worldpics.ui.settings.SettingsPreferenceFragment
 import dreamlab.worldpics.ui.settings.SettingsViewModel
@@ -20,20 +22,36 @@ import dreamlab.worldpics.ui.settings.SettingsViewModel
 abstract class MainModule {
 
     /**
-     * Generates an [AndroidInjector] for the [PhotosFragment].
+     * Generates an [AndroidInjector] for the [SearchPhotosFragment].
      */
     @FragmentScoped
     @ContributesAndroidInjector
-    abstract fun contributePhotosFragment(): PhotosFragment
+    abstract fun contributeSearchPhotosFragment(): SearchPhotosFragment
 
     /**
      * The ViewModels are created by Dagger in a map. Via the @ViewModelKey, we define that we
-     * want to get a [PhotoViewModel] class.
+     * want to get a [SearchPhotoViewModel] class.
      */
     @Binds
     @IntoMap
-    @ViewModelKey(PhotoViewModel::class)
-    abstract fun bindPhotoViewModel(viewModel: PhotoViewModel): ViewModel
+    @ViewModelKey(SearchPhotoViewModel::class)
+    abstract fun bindSearchPhotoViewModel(viewModel: SearchPhotoViewModel): ViewModel
+
+    /**
+     * Generates an [AndroidInjector] for the [TopPhotosFragment].
+     */
+    @FragmentScoped
+    @ContributesAndroidInjector
+    abstract fun contributeTopPhotosFragment(): TopPhotosFragment
+
+    /**
+     * The ViewModels are created by Dagger in a map. Via the @ViewModelKey, we define that we
+     * want to get a [TopPhotoViewModel] class.
+     */
+    @Binds
+    @IntoMap
+    @ViewModelKey(TopPhotoViewModel::class)
+    abstract fun bindTopPhotoViewModel(viewModel: TopPhotoViewModel): ViewModel
 
     /**
      * Generates an [AndroidInjector] for the [FilterFragment].
