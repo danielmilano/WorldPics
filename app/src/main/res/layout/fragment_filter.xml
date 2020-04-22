@@ -19,9 +19,9 @@
                 android:layout_height="32dp"
                 android:layout_marginStart="8dp"
                 android:padding="4dp"
-                app:layout_constraintBottom_toBottomOf="@id/apply"
+                app:layout_constraintBottom_toBottomOf="@id/reset"
                 app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintTop_toTopOf="@id/apply"
+                app:layout_constraintTop_toTopOf="@id/reset"
                 app:srcCompat="@drawable/ic_close_white" />
 
             <TextView
@@ -40,11 +40,11 @@
                 app:layout_constraintTop_toTopOf="parent" />
 
             <TextView
-                android:id="@+id/apply"
+                android:id="@+id/reset"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="16dp"
-                android:text="@string/apply"
+                android:text="@string/reset_filters"
                 android:textColor="@color/white"
                 android:textSize="18sp"
                 app:layout_constraintBottom_toBottomOf="parent"
@@ -61,16 +61,17 @@
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:background="@color/black" />
+            android:background="@color/colorPrimary" />
 
         <TextView
-            android:id="@+id/reset"
+            android:id="@+id/apply"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:padding="16dp"
-            android:text="@string/reset_filters"
+            android:text="@string/apply"
             android:textAlignment="center"
-            android:textColor="@color/black"
+            android:textAllCaps="true"
+            android:textColor="@color/colorPrimary"
             android:textSize="18sp"
             android:textStyle="bold" />
 

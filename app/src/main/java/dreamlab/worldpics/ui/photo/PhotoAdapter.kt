@@ -1,20 +1,12 @@
 package dreamlab.worldpics.ui.photo
 
-import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.databinding.DataBindingUtil
 import androidx.paging.PagedListAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
-import androidx.recyclerview.widget.StaggeredGridLayoutManager
-import com.google.android.gms.ads.AdRequest
-import com.google.android.gms.ads.AdSize
-import com.google.android.gms.ads.AdView
-import dreamlab.worldpics.BuildConfig
 import dreamlab.worldpics.R
-import dreamlab.worldpics.databinding.ItemBannerBinding
 import dreamlab.worldpics.databinding.ItemLoaderBinding
 import dreamlab.worldpics.databinding.ItemPhotoBinding
 import dreamlab.worldpics.model.Photo
@@ -26,7 +18,6 @@ import dreamlab.worldpics.repository.Status
  */
 
 class PhotoAdapter(
-    private val adRequest: AdRequest?,
     private val onPhotoClicked: (Photo?) -> Unit,
     private val retryCallback: () -> Unit
 ) : PagedListAdapter<Photo, PhotoAdapter.ItemsViewHolder>(ItemsDiffCallback) {
@@ -49,11 +40,6 @@ class PhotoAdapter(
             R.layout.item_photo ->
                 PhotoViewHolder(
                     ItemPhotoBinding.inflate(inflater, parent, false)
-                )
-            R.layout.item_banner ->
-                BannerItemHolder(
-                    ItemBannerBinding.inflate(inflater, parent, false),
-                    adRequest
                 )
             R.layout.item_loader -> LoaderItemHolder(
                 ItemLoaderBinding.inflate(inflater, parent, false)
@@ -123,23 +109,6 @@ class PhotoAdapter(
                 View.VISIBLE
             } else {
                 View.GONE
-            }
-        }
-    }
-
-    inner class BannerItemHolder(binding: ItemBannerBinding, private val adRequest: AdRequest?) :
-        ItemsViewHolder(binding.root) {
-
-        init {
-            val layoutParams = itemView.layoutParams as StaggeredGridLayoutManager.LayoutParams
-            layoutParams.isFullSpan = true
-            binding.adView.adUnitId = BuildConfig.banner_item_id
-            binding.adView.adSize = AdSize.SMART_BANNER
-        }
-
-        fun bind(item: AdView) {
-            adRequest?.let {
-                item.loadAd(it)
             }
         }
     }

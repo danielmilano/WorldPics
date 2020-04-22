@@ -5,7 +5,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.fragment.app.DialogFragment
 import androidx.preference.PreferenceFragmentCompat
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import dreamlab.worldpics.R
@@ -30,8 +29,6 @@ class FilterFragment : BaseDialogFragment<FilterFragment.Listener>(Listener::cla
         super.onCreateView(inflater, container, savedInstanceState)
         mBinding = FragmentFilterBinding.inflate(inflater, container, false)
 
-        dialog!!.requestWindowFeature(DialogFragment.STYLE_NO_TITLE)
-        isCancelable = false
         return mBinding.root
     }
 

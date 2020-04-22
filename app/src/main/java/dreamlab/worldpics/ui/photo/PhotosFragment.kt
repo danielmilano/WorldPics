@@ -54,20 +54,9 @@ class PhotosFragment : BaseFragment<PhotosFragment.Listener>(Listener::class.jav
         super.onCreateView(inflater, container, savedInstanceState)
         viewModel = viewModelProvider(viewModelFactory)
 
-        val builder = AdRequest.Builder()
-        if (!WorldPics.isPremium) {
-            val extras = Bundle()
-            extras.putBoolean("is_designed_for_families", true)
-
-            if (ConsentInformation.getInstance(context).consentStatus == ConsentStatus.NON_PERSONALIZED) {
-                extras.putString("npa", "1")
-                builder.addNetworkExtrasBundle(AdMobAdapter::class.java, extras)
-            }
-        }
-
         mBinding = FragmentPhotosBinding.inflate(inflater, container, false)
 
-        initAdapter(builder.build(), viewModel, mBinding)
+        initAdapter(viewModel, mBinding)
 
         currentRequest = PhotoRequest.Builder().build()
 
@@ -118,11 +107,10 @@ class PhotosFragment : BaseFragment<PhotosFragment.Listener>(Listener::class.jav
     }
 
     private fun initAdapter(
-        adRequest: AdRequest,
         viewModel: PhotoViewModel,
         mBinding: FragmentPhotosBinding
     ) {
-        mAdapter = PhotoAdapter(adRequest, ::onPhotoClicked) { viewModel.retry() }
+        mAdapter = PhotoAdapter(::onPhotoClicked) { viewModel.retry() }
         mBinding.recycler.adapter = mAdapter
         viewModel.photos.observe(viewLifecycleOwner, Observer {
             mAdapter.submitList(it)
@@ -195,10 +183,6 @@ class PhotosFragment : BaseFragment<PhotosFragment.Listener>(Listener::class.jav
         //TODO
     }
 
-    fun removeBannerAds() {
-        //TODO
-    }
-
     fun onResetFilters() {
         currentRequest = PhotoRequest.Builder().build()
         mAdapter.submitList(null)
@@ -207,6 +191,7 @@ class PhotosFragment : BaseFragment<PhotosFragment.Listener>(Listener::class.jav
 
     fun onApplyFilters(request: PhotoRequest) {
         currentRequest = request.apply { q = currentRequest.q }
+        mAdapter.submitList(null)
         viewModel.searchPhotos(currentRequest)
     }
 
