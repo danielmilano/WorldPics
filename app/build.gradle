@@ -76,7 +76,7 @@ dependencies {
     implementation 'com.google.android.ads.consent:consent-library:1.0.8'
     implementation 'com.google.android.gms:play-services-ads:19.0.1'
     implementation 'com.google.android.gms:play-services-analytics:17.0.0'
-    implementation 'com.google.android.material:material:1.2.0-alpha05'
+    implementation 'com.google.android.material:material:1.1.0'
     implementation 'com.google.code.gson:gson:2.8.6'
     implementation 'com.google.firebase:firebase-core:17.3.0'
     implementation 'com.google.firebase:firebase-database:19.2.1'
