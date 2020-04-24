@@ -75,34 +75,46 @@ object FileUtils {
         return DecimalFormat("#,##0.#").format(size / Math.pow(1024.0, digitGroups.toDouble())) + " " + units[digitGroups]
     }
 
-    fun setAsWallpaper(context: Context, url: String): Intent? {
+    fun setAsWallpaper(context: Context, url: String): Pair<Intent?, Uri?> {
         context.let {
             val values = ContentValues()
             values.put(MediaStore.Images.Media.TITLE, "title")
             values.put(MediaStore.Images.Media.MIME_TYPE, "image/*")
-            val uri = context.contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values)
+            val uri =
+                context.contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values)
 
             uri?.let {
-                val outstream: OutputStream?
+                val outStream: OutputStream?
                 try {
-                    outstream = context.contentResolver.openOutputStream(uri)
-                    Glide.with(context).asBitmap().load(url).submit(Target.SIZE_ORIGINAL, Target.SIZE_ORIGINAL).get().compress(Bitmap.CompressFormat.JPEG, 100, outstream)
-                    outstream?.close()
+                    outStream = context.contentResolver.openOutputStream(uri)
+                    Glide.with(context).asBitmap().load(url)
+                        .submit(Target.SIZE_ORIGINAL, Target.SIZE_ORIGINAL).get()
+                        .compress(Bitmap.CompressFormat.JPEG, 100, outStream)
+                    outStream?.close()
                 } catch (e: Exception) {
-                    return null
+                    return Pair(null, null)
                 }
-            } ?: return null
+            } ?: return Pair(null, null)
 
             val intent = Intent(Intent.ACTION_ATTACH_DATA)
             intent.addCategory(Intent.CATEGORY_DEFAULT)
             intent.setDataAndType(uri, "image/*")
             intent.putExtra("mimeType", "image/*")
 
-            return intent
+            return Pair(intent, uri)
         }
     }
 
-    fun saveImageInGallery(context: Context, url: String): Boolean {
+    fun setAsWallpaper(uri: Uri): Intent? {
+        val intent = Intent(Intent.ACTION_ATTACH_DATA)
+        intent.addCategory(Intent.CATEGORY_DEFAULT)
+        intent.setDataAndType(uri, "image/*")
+        intent.putExtra("mimeType", "image/*")
+        return intent
+
+    }
+
+    fun saveImageInGallery(context: Context, url: String): Pair<Boolean, Uri?> {
         var n = 10000
         n = Random().nextInt(n)
         val filename = "Image-$n.jpg"
@@ -111,19 +123,49 @@ object FileUtils {
             val downloadUri = Uri.parse(url)
             val request = DownloadManager.Request(downloadUri)
             request.setAllowedNetworkTypes(DownloadManager.Request.NETWORK_WIFI or DownloadManager.Request.NETWORK_MOBILE)
-                    .setAllowedOverRoaming(false)
-                    .setTitle(filename)
-                    .setMimeType("image/jpeg")
-                    .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
-                    .setDestinationInExternalPublicDir(Environment.DIRECTORY_PICTURES,
-                            File.separator + WorldPics.TAG + File.separator + filename)
-            
-            dm.enqueue(request)
+                .setAllowedOverRoaming(false)
+                .setTitle(filename)
+                .setMimeType("image/jpeg")
+                .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
+                .setDestinationInExternalPublicDir(
+                    Environment.DIRECTORY_PICTURES,
+                    File.separator + WorldPics.TAG + File.separator + filename
+                )
 
-            return true
-        } catch (e : Exception){
-            return false
+            val id = dm.enqueue(request)
+
+            return Pair(true, dm.getUriForDownloadedFile(id))
+        } catch (e: Exception) {
+            return Pair(false, null)
         }
+    }
+
+    //TODO use saveImageInGallery() and then share
+    fun shareImage(context: Context, url: String): Pair<Intent?, Uri?> {
+        val imageUrl: URL
+        val bitmap: Bitmap
+        val intent = Intent(Intent.ACTION_SEND)
+        val path: String
+        try {
+            imageUrl = URL(url)
+            bitmap = BitmapFactory.decodeStream(imageUrl.openConnection().getInputStream())
+
+            intent.type = "image/jpeg"
+            val bytes = ByteArrayOutputStream()
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, bytes)
+            path = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES)
+                .toString() + File.separator + "temporary_file.jpg"
+            val f = File(path)
+            f.createNewFile()
+            val fo = FileOutputStream(f)
+            fo.write(bytes.toByteArray())
+        } catch (e: IOException) {
+            Log.e(TAG, "Error occurred while retrieving image url")
+            return Pair(null, null)
+        }
+
+        intent.putExtra(Intent.EXTRA_STREAM, Uri.parse(path))
+        return Pair(intent, Uri.parse(path))
     }
 
     fun saveImageToStorage(context: Context, url: String): String? {
@@ -156,31 +198,4 @@ object FileUtils {
 
         return f.absolutePath
     }
-
-    fun shareImage(context: Context, url: String): Intent? {
-        val imageUrl: URL
-        val bitmap: Bitmap
-        val share = Intent(Intent.ACTION_SEND)
-        val path: String
-        try {
-            imageUrl = URL(url)
-            bitmap = BitmapFactory.decodeStream(imageUrl.openConnection().getInputStream())
-
-            share.type = "image/jpeg"
-            val bytes = ByteArrayOutputStream()
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, bytes)
-            path = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES).toString() + File.separator + "temporary_file.jpg"
-            val f = File(path)
-            f.createNewFile()
-            val fo = FileOutputStream(f)
-            fo.write(bytes.toByteArray())
-        } catch (e: IOException) {
-            Log.e(TAG, "Error occurred while retrieving image url")
-            return null
-        }
-
-        share.putExtra(Intent.EXTRA_STREAM, Uri.parse(path))
-        return share
-    }
-
 }

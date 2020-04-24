@@ -11,19 +11,18 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.animation.Animation
 import android.view.animation.RotateAnimation
+import android.widget.Toast
 import androidx.constraintlayout.widget.ConstraintSet
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.transition.AutoTransition
 import androidx.transition.TransitionManager
-import dreamlab.worldpics.R
 import dreamlab.worldpics.base.BaseFragment
 import dreamlab.worldpics.databinding.FragmentDetailBinding
 import dreamlab.worldpics.model.Photo
 import dreamlab.worldpics.util.PermissionUtils
 import dreamlab.worldpics.util.viewModelProvider
-import kotlinx.android.synthetic.main.fragment_filter.*
 import javax.inject.Inject
-
 
 class DetailFragment : BaseFragment<DetailFragment.Listener>(Listener::class.java) {
 
@@ -32,6 +31,7 @@ class DetailFragment : BaseFragment<DetailFragment.Listener>(Listener::class.jav
     private var viewModel: DetailViewModel? = null
 
     private lateinit var mBinding: FragmentDetailBinding
+    private var downloadedFileUri: Uri? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -47,17 +47,33 @@ class DetailFragment : BaseFragment<DetailFragment.Listener>(Listener::class.jav
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        mBinding.detailToolbar.back.setOnClickListener { mListenerHelper.listener!!.onBackPressed() }
-        mBinding.detailToolbar.share.setOnClickListener {
-            if (PermissionUtils.isStoragePermissionGranted(
-                    requireActivity(),
-                    this,
-                    PermissionUtils.RequestCodeType.SHARE_REQUEST_CODE
-                )
-            ) {
-                viewModel?.share(requireContext(), mBinding.photo!!.fullHDURL)
+
+        viewModel?.isInProgress?.observe(viewLifecycleOwner, Observer {
+            if (it) {
+                Toast.makeText(requireContext(), "Downloading image...", Toast.LENGTH_SHORT).show()
+            } else {
+                Toast.makeText(requireContext(), "Download completed!", Toast.LENGTH_SHORT).show()
             }
-        }
+        })
+        viewModel?.isError?.observe(viewLifecycleOwner,
+            Observer {
+                if (it) {
+                    Toast.makeText(
+                        requireContext(),
+                        "Error while downloading the image. Please try again later.",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            }
+        )
+        viewModel?.downloadedFileUri?.observe(
+            viewLifecycleOwner,
+            Observer {
+                downloadedFileUri = it
+            }
+        )
+
+        mBinding.detailToolbar.back.setOnClickListener { mListenerHelper.listener!!.onBackPressed() }
         mBinding.detailToolbar.website.setOnClickListener {
             val userProfileUrl =
                 "https://pixabay.com/en/users/${mBinding.photo!!.user}-${mBinding.photo!!.user_id}/"
@@ -65,9 +81,32 @@ class DetailFragment : BaseFragment<DetailFragment.Listener>(Listener::class.jav
             startActivity(intent)
         }
         mBinding.fab.setOnClickListener { toggleFab() }
-        mBinding.fabItemDownloadWallpaper.setOnClickListener { }
-        mBinding.fabItemSetWallpaper.setOnClickListener { }
-        mBinding.fabItemInfo.setOnClickListener { }
+        mBinding.detailToolbar.share.setOnClickListener {
+            if (hasWriteExternalStoragePermission(PermissionUtils.RequestCodeType.SHARE_IMAGE_REQUEST_CODE)) {
+                shareImage()
+            }
+        }
+        mBinding.fabItemDownloadWallpaper.setOnClickListener {
+            if (hasWriteExternalStoragePermission(PermissionUtils.RequestCodeType.DOWNLOAD_IMAGE_REQUEST_CODE)) {
+                downloadImage()
+            }
+        }
+        mBinding.fabItemSetWallpaper.setOnClickListener {
+            if (hasWriteExternalStoragePermission(PermissionUtils.RequestCodeType.SET_IMAGE_AS_REQUEST_CODE)) {
+                setImageAs()
+            }
+        }
+        mBinding.fabItemInfo.setOnClickListener {
+            //TODO
+        }
+    }
+
+    private fun hasWriteExternalStoragePermission(requestCode: PermissionUtils.RequestCodeType): Boolean {
+        return PermissionUtils.isStoragePermissionGranted(
+            requireActivity(),
+            this,
+            requestCode
+        )
     }
 
     /**
@@ -125,26 +164,53 @@ class DetailFragment : BaseFragment<DetailFragment.Listener>(Listener::class.jav
         ).toInt()
     }
 
+    private fun shareImage() {
+        downloadedFileUri?.let {
+            viewModel?.share(requireContext(), it)
+        } ?: run {
+            viewModel?.share(requireContext(), mBinding.photo!!.fullHDURL!!)
+        }
+    }
+
+    private fun downloadImage() {
+        downloadedFileUri?.let {
+            Toast.makeText(context, "Image already downloaded!", Toast.LENGTH_SHORT).show()
+        } ?: run {
+            viewModel?.downloadFile(requireContext(), mBinding.photo!!.fullHDURL!!)
+        }
+    }
+
+    private fun setImageAs() {
+        downloadedFileUri?.let {
+            viewModel?.setAsWallpaper(requireContext(), it)
+        } ?: run {
+            viewModel?.setAsWallpaper(requireContext(), mBinding.photo!!.fullHDURL!!)
+        }
+    }
+
     override fun onRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<String>,
         grantResults: IntArray
     ) {
         when (requestCode) {
-            PermissionUtils.RequestCodeType.SHARE_REQUEST_CODE.id -> {
+            PermissionUtils.RequestCodeType.SHARE_IMAGE_REQUEST_CODE.id -> {
                 if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    viewModel?.share(requireContext(), mBinding.photo!!.fullHDURL)
+                    shareImage()
                 }
             }
-            PermissionUtils.RequestCodeType.DOWNLOAD_REQUEST_CODE.id -> {
-                //TODO
+            PermissionUtils.RequestCodeType.DOWNLOAD_IMAGE_REQUEST_CODE.id -> {
+                if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    downloadImage()
+                }
             }
-            PermissionUtils.RequestCodeType.SET_AS_WALLPAPER_REQUEST_CODE.id -> {
-                //TODO
+            PermissionUtils.RequestCodeType.SET_IMAGE_AS_REQUEST_CODE.id -> {
+                if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    setImageAs()
+                }
             }
         }
     }
-
 
     companion object {
         private const val ARG_PHOTO = "ARG_PHOTO"
