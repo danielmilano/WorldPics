@@ -81,19 +81,11 @@ class DetailFragment : BaseFragment<DetailFragment.Listener>(Listener::class.jav
         val constraintSet = ConstraintSet()
         constraintSet.clone(mBinding.constraintLayoutOfFabs)
         if (mBinding.fab.tag == 1) {
-            // è aperto, chiudi
+            // close
             mBinding.fab.tag = null
             val rotateAnimation = RotateAnimation(180.0f, 0.0f, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f)
             rotateAnimation.fillAfter = true
             rotateAnimation.duration = duration
-            rotateAnimation.setAnimationListener(object : Animation.AnimationListener {
-                override fun onAnimationEnd(animation: Animation?) {
-                    mBinding.fab.rotation = 0f
-                }
-
-                override fun onAnimationRepeat(animation: Animation?) {}
-                override fun onAnimationStart(animation: Animation?) {}
-            })
             mBinding.fab.startAnimation(rotateAnimation)
             constraintSet.connect(mBinding.fabItemDownloadWallpaper.id, ConstraintSet.BOTTOM, mBinding.fab.id, ConstraintSet.BOTTOM)
             constraintSet.connect(mBinding.fabItemSetWallpaper.id, ConstraintSet.BOTTOM, mBinding.fab.id, ConstraintSet.BOTTOM)
@@ -103,26 +95,19 @@ class DetailFragment : BaseFragment<DetailFragment.Listener>(Listener::class.jav
             mBinding.fabItemSetWallpaper.animate().alpha(0f).setDuration(duration).withEndAction { mBinding.fabItemSetWallpaper.visibility = View.INVISIBLE }.start()
             mBinding.fabItemInfo.animate().alpha(0f).setDuration(duration).withEndAction { mBinding.fabItemInfo.visibility = View.INVISIBLE }.start()
         } else {
-            // è chiuso, apri
+            // open
             mBinding.fab.tag = 1
-            mBinding.fab.rotation = 1f //to prevent double click
-            mBinding.fabItemDownloadWallpaper.visibility = View.VISIBLE
-            mBinding.fabItemSetWallpaper.visibility = View.VISIBLE
-            mBinding.fabItemInfo.visibility = View.VISIBLE
             val rotateAnimation = RotateAnimation(0.0f, 180.0f, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f)
             rotateAnimation.fillAfter = true
             rotateAnimation.duration = duration
             mBinding.fab.startAnimation(rotateAnimation)
-            mBinding.fabItemDownloadWallpaper.animate().alpha(1f).setDuration(duration / 2).start()
-            mBinding.fabItemSetWallpaper.animate().alpha(1f).setDuration(duration / 2).start()
-            mBinding.fabItemInfo.animate().alpha(1f).setDuration(duration / 2).start()
             constraintSet.connect(mBinding.fabItemDownloadWallpaper.id, ConstraintSet.BOTTOM, mBinding.fab.id, ConstraintSet.TOP, requireContext().dpToPx(16f))
             constraintSet.connect(mBinding.fabItemSetWallpaper.id, ConstraintSet.BOTTOM, mBinding.fabItemDownloadWallpaper.id, ConstraintSet.TOP, requireContext().dpToPx(16f))
             constraintSet.connect(mBinding.fabItemInfo.id, ConstraintSet.BOTTOM, mBinding.fabItemSetWallpaper.id, ConstraintSet.TOP, requireContext().dpToPx(16f))
-            constraintSet.setVisibility(mBinding.fabItemDownloadWallpaper.id, View.VISIBLE)
-            constraintSet.setVisibility(mBinding.fabItemSetWallpaper.id, View.VISIBLE)
-            constraintSet.setVisibility(mBinding.fabItemInfo.id, View.VISIBLE)
             constraintSet.applyTo(mBinding.constraintLayoutOfFabs)
+            mBinding.fabItemDownloadWallpaper.animate().alpha(1f).setDuration(duration / 2).withEndAction { mBinding.fabItemDownloadWallpaper.visibility = View.VISIBLE }.start()
+            mBinding.fabItemSetWallpaper.animate().alpha(1f).setDuration(duration / 2).withEndAction { mBinding.fabItemSetWallpaper.visibility = View.VISIBLE }.start()
+            mBinding.fabItemInfo.animate().alpha(1f).setDuration(duration / 2).withEndAction { mBinding.fabItemInfo.visibility = View.VISIBLE }.start()
         }
     }
 
