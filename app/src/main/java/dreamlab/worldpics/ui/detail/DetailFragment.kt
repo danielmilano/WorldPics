@@ -43,6 +43,9 @@ class DetailFragment : BaseFragment<DetailFragment.Listener>(Listener::class.jav
     private lateinit var mBinding: FragmentDetailBinding
     private var downloadedFileUri: Uri? = null
 
+    private val CAN_REMOVE_FAVOURITE = 0
+    private val CAN_ADD_FAVOURITE = 1
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -106,35 +109,11 @@ class DetailFragment : BaseFragment<DetailFragment.Listener>(Listener::class.jav
                 setImageAs()
             }
         }
-        mBinding.fabItemAddFavourite.tag = 0
-        mBinding.fabItemAddFavourite.setOnClickListener {
-            when (mBinding.fabItemAddFavourite.tag) {
-                0 -> {
-                    viewModel?.viewModelScope?.launch {
-                        withContext(Dispatchers.IO){
-                            photoDao.insert(mBinding.photo!!)
-                        }
-                    }
-                    mBinding.fabItemAddFavourite.text.text =
-                        requireContext().getString(R.string.add_to_favourites)
-                    mBinding.fabItemAddFavourite.icon.setImageDrawable(
-                        requireContext().getDrawable(
-                            R.drawable.ic_favorite_white
-                        )
-                    )
-                    mBinding.fabItemAddFavourite.tag = 1
-                    Toast.makeText(
-                        requireContext(),
-                        "Added to favourites",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                }
-                1 -> {
-                    viewModel?.viewModelScope?.launch {
-                        withContext(Dispatchers.IO){
-                            photoDao.deletePhoto(mBinding.photo!!.id)
-                        }
-                    }
+
+        viewModel?.viewModelScope?.launch {
+            viewModel?.getPhotoById(mBinding.photo!!.id)?.await()?.let {
+                withContext(Dispatchers.Main) {
+                    mBinding.fabItemAddFavourite.tag = CAN_REMOVE_FAVOURITE
                     mBinding.fabItemAddFavourite.text.text =
                         requireContext().getString(R.string.remove_from_favourites)
                     mBinding.fabItemAddFavourite.icon.setImageDrawable(
@@ -142,10 +121,60 @@ class DetailFragment : BaseFragment<DetailFragment.Listener>(Listener::class.jav
                             R.drawable.ic_favorite_border_white
                         )
                     )
-                    mBinding.fabItemAddFavourite.tag = 0
+                }
+            } ?: kotlin.run {
+                withContext(Dispatchers.Main) {
+                    mBinding.fabItemAddFavourite.tag = CAN_ADD_FAVOURITE
+                    mBinding.fabItemAddFavourite.text.text =
+                        requireContext().getString(R.string.add_to_favourites)
+                    mBinding.fabItemAddFavourite.icon.setImageDrawable(
+                        requireContext().getDrawable(
+                            R.drawable.ic_favorite_white
+                        )
+                    )
+                }
+            }
+        }
+
+        mBinding.fabItemAddFavourite.setOnClickListener {
+            when (mBinding.fabItemAddFavourite.tag) {
+                CAN_REMOVE_FAVOURITE -> {
+                    viewModel?.viewModelScope?.launch {
+                        withContext(Dispatchers.IO) {
+                            photoDao.deletePhoto(mBinding.photo!!.id)
+                        }
+                    }
+                    mBinding.fabItemAddFavourite.tag = CAN_ADD_FAVOURITE
+                    mBinding.fabItemAddFavourite.text.text =
+                        requireContext().getString(R.string.add_to_favourites)
+                    mBinding.fabItemAddFavourite.icon.setImageDrawable(
+                        requireContext().getDrawable(
+                            R.drawable.ic_favorite_white
+                        )
+                    )
                     Toast.makeText(
                         requireContext(),
                         "Removed from favourites",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+                CAN_ADD_FAVOURITE -> {
+                    viewModel?.viewModelScope?.launch {
+                        withContext(Dispatchers.IO) {
+                            photoDao.insert(mBinding.photo!!)
+                        }
+                    }
+                    mBinding.fabItemAddFavourite.tag = CAN_REMOVE_FAVOURITE
+                    mBinding.fabItemAddFavourite.text.text =
+                        requireContext().getString(R.string.remove_from_favourites)
+                    mBinding.fabItemAddFavourite.icon.setImageDrawable(
+                        requireContext().getDrawable(
+                            R.drawable.ic_favorite_border_white
+                        )
+                    )
+                    Toast.makeText(
+                        requireContext(),
+                        "Added to favourites",
                         Toast.LENGTH_SHORT
                     ).show()
                 }
@@ -174,37 +203,92 @@ class DetailFragment : BaseFragment<DetailFragment.Listener>(Listener::class.jav
         if (mBinding.fab.tag == 1) {
             // close
             mBinding.fab.tag = null
-            val rotateAnimation = RotateAnimation(180.0f, 0.0f, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f)
+            val rotateAnimation = RotateAnimation(
+                180.0f,
+                0.0f,
+                Animation.RELATIVE_TO_SELF,
+                0.5f,
+                Animation.RELATIVE_TO_SELF,
+                0.5f
+            )
             rotateAnimation.fillAfter = true
             rotateAnimation.duration = duration
             mBinding.fab.startAnimation(rotateAnimation)
-            constraintSet.connect(mBinding.fabItemDownloadWallpaper.id, ConstraintSet.BOTTOM, mBinding.fab.id, ConstraintSet.BOTTOM)
-            constraintSet.connect(mBinding.fabItemSetWallpaper.id, ConstraintSet.BOTTOM, mBinding.fab.id, ConstraintSet.BOTTOM)
-            constraintSet.connect(mBinding.fabItemAddFavourite.id, ConstraintSet.BOTTOM, mBinding.fab.id, ConstraintSet.BOTTOM)
+            constraintSet.connect(
+                mBinding.fabItemDownloadWallpaper.id,
+                ConstraintSet.BOTTOM,
+                mBinding.fab.id,
+                ConstraintSet.BOTTOM
+            )
+            constraintSet.connect(
+                mBinding.fabItemSetWallpaper.id,
+                ConstraintSet.BOTTOM,
+                mBinding.fab.id,
+                ConstraintSet.BOTTOM
+            )
+            constraintSet.connect(
+                mBinding.fabItemAddFavourite.id,
+                ConstraintSet.BOTTOM,
+                mBinding.fab.id,
+                ConstraintSet.BOTTOM
+            )
             constraintSet.applyTo(mBinding.constraintLayoutOfFabs)
             constraintSet.setVisibility(mBinding.fabItemDownloadWallpaper.id, View.INVISIBLE)
             constraintSet.setVisibility(mBinding.fabItemSetWallpaper.id, View.INVISIBLE)
             constraintSet.setVisibility(mBinding.fabItemAddFavourite.id, View.INVISIBLE)
-            mBinding.fabItemDownloadWallpaper.animate().alpha(0f).setDuration(duration).withEndAction { mBinding.fabItemDownloadWallpaper.visibility = View.INVISIBLE }.start()
-            mBinding.fabItemSetWallpaper.animate().alpha(0f).setDuration(duration).withEndAction { mBinding.fabItemSetWallpaper.visibility = View.INVISIBLE }.start()
-            mBinding.fabItemAddFavourite.animate().alpha(0f).setDuration(duration).withEndAction { mBinding.fabItemAddFavourite.visibility = View.INVISIBLE }.start()
+            mBinding.fabItemDownloadWallpaper.animate().alpha(0f).setDuration(duration)
+                .withEndAction { mBinding.fabItemDownloadWallpaper.visibility = View.INVISIBLE }
+                .start()
+            mBinding.fabItemSetWallpaper.animate().alpha(0f).setDuration(duration)
+                .withEndAction { mBinding.fabItemSetWallpaper.visibility = View.INVISIBLE }.start()
+            mBinding.fabItemAddFavourite.animate().alpha(0f).setDuration(duration)
+                .withEndAction { mBinding.fabItemAddFavourite.visibility = View.INVISIBLE }.start()
         } else {
             // open
             mBinding.fab.tag = 1
-            val rotateAnimation = RotateAnimation(0.0f, 180.0f, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f)
+            val rotateAnimation = RotateAnimation(
+                0.0f,
+                180.0f,
+                Animation.RELATIVE_TO_SELF,
+                0.5f,
+                Animation.RELATIVE_TO_SELF,
+                0.5f
+            )
             rotateAnimation.fillAfter = true
             rotateAnimation.duration = duration
             mBinding.fab.startAnimation(rotateAnimation)
-            constraintSet.connect(mBinding.fabItemDownloadWallpaper.id, ConstraintSet.BOTTOM, mBinding.fab.id, ConstraintSet.TOP, requireContext().dpToPx(16f))
-            constraintSet.connect(mBinding.fabItemSetWallpaper.id, ConstraintSet.BOTTOM, mBinding.fabItemDownloadWallpaper.id, ConstraintSet.TOP, requireContext().dpToPx(16f))
-            constraintSet.connect(mBinding.fabItemAddFavourite.id, ConstraintSet.BOTTOM, mBinding.fabItemSetWallpaper.id, ConstraintSet.TOP, requireContext().dpToPx(16f))
+            constraintSet.connect(
+                mBinding.fabItemDownloadWallpaper.id,
+                ConstraintSet.BOTTOM,
+                mBinding.fab.id,
+                ConstraintSet.TOP,
+                requireContext().dpToPx(16f)
+            )
+            constraintSet.connect(
+                mBinding.fabItemSetWallpaper.id,
+                ConstraintSet.BOTTOM,
+                mBinding.fabItemDownloadWallpaper.id,
+                ConstraintSet.TOP,
+                requireContext().dpToPx(16f)
+            )
+            constraintSet.connect(
+                mBinding.fabItemAddFavourite.id,
+                ConstraintSet.BOTTOM,
+                mBinding.fabItemSetWallpaper.id,
+                ConstraintSet.TOP,
+                requireContext().dpToPx(16f)
+            )
             constraintSet.applyTo(mBinding.constraintLayoutOfFabs)
             constraintSet.setVisibility(mBinding.fabItemDownloadWallpaper.id, View.VISIBLE)
             constraintSet.setVisibility(mBinding.fabItemSetWallpaper.id, View.VISIBLE)
             constraintSet.setVisibility(mBinding.fabItemAddFavourite.id, View.VISIBLE)
-            mBinding.fabItemDownloadWallpaper.animate().alpha(1f).setDuration(duration / 2).withEndAction { mBinding.fabItemDownloadWallpaper.visibility = View.VISIBLE }.start()
-            mBinding.fabItemSetWallpaper.animate().alpha(1f).setDuration(duration / 2).withEndAction { mBinding.fabItemSetWallpaper.visibility = View.VISIBLE }.start()
-            mBinding.fabItemAddFavourite.animate().alpha(1f).setDuration(duration / 2).withEndAction { mBinding.fabItemAddFavourite.visibility = View.VISIBLE }.start()
+            mBinding.fabItemDownloadWallpaper.animate().alpha(1f).setDuration(duration / 2)
+                .withEndAction { mBinding.fabItemDownloadWallpaper.visibility = View.VISIBLE }
+                .start()
+            mBinding.fabItemSetWallpaper.animate().alpha(1f).setDuration(duration / 2)
+                .withEndAction { mBinding.fabItemSetWallpaper.visibility = View.VISIBLE }.start()
+            mBinding.fabItemAddFavourite.animate().alpha(1f).setDuration(duration / 2)
+                .withEndAction { mBinding.fabItemAddFavourite.visibility = View.VISIBLE }.start()
         }
     }
 

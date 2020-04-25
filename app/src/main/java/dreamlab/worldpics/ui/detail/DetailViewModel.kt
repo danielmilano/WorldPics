@@ -7,11 +7,13 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dreamlab.worldpics.R
+import dreamlab.worldpics.db.PhotoDao
+import dreamlab.worldpics.model.Photo
 import dreamlab.worldpics.util.FileUtils
 import kotlinx.coroutines.*
 import javax.inject.Inject
 
-class DetailViewModel @Inject constructor() : ViewModel() {
+class DetailViewModel @Inject constructor(val photoDao: PhotoDao) : ViewModel() {
     val isInProgress: MutableLiveData<Boolean> by lazy {
         MutableLiveData<Boolean>()
     }
@@ -22,6 +24,12 @@ class DetailViewModel @Inject constructor() : ViewModel() {
 
     val downloadedFileUri: MutableLiveData<Uri> by lazy {
         MutableLiveData<Uri>()
+    }
+
+    suspend fun getPhotoById(id: String): Deferred<Photo?> {
+        return async {
+            photoDao.getPhotoById(id)
+        }
     }
 
     fun downloadFile(context: Context, url: String) {

@@ -33,9 +33,11 @@ class FavouritePhotosFragment :
         viewModel = viewModelProvider(viewModelFactory)
         mAdapter = FavouritePhotoAdapter(::onPhotoClicked)
         mBinding.recycler.adapter = mAdapter
-        viewModel?.getFavouritePhotos()?.observe(viewLifecycleOwner, Observer {
-            mAdapter.setPhotos(ArrayList(it))
-        })
+        viewModel?.getFavouritePhotos()?.observe(
+            viewLifecycleOwner, Observer {
+                mAdapter.setPhotos(ArrayList(it))
+            }
+        )
 
         return mBinding.root
     }
