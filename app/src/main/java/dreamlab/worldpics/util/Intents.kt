@@ -32,3 +32,18 @@ fun intentOpenWebsite(activity: Activity, url: String) {
     openURL.data = Uri.parse(url)
     activity.startActivity(openURL)
 }
+
+fun intentShareImage(uri: Uri): Intent {
+    val intent = Intent(Intent.ACTION_SEND)
+    intent.type = "image/jpeg"
+    intent.putExtra(Intent.EXTRA_STREAM, uri)
+    return intent
+}
+
+fun intentSetImageAs(uri: Uri): Intent? {
+    val intent = Intent(Intent.ACTION_ATTACH_DATA)
+    intent.addCategory(Intent.CATEGORY_DEFAULT)
+    intent.setDataAndType(uri, "image/*")
+    intent.putExtra("mimeType", "image/*")
+    return intent
+}

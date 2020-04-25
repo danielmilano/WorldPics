@@ -10,6 +10,8 @@ import dreamlab.worldpics.R
 import dreamlab.worldpics.db.PhotoDao
 import dreamlab.worldpics.model.Photo
 import dreamlab.worldpics.util.FileUtils
+import dreamlab.worldpics.util.intentSetImageAs
+import dreamlab.worldpics.util.intentShareImage
 import kotlinx.coroutines.*
 import javax.inject.Inject
 
@@ -26,7 +28,7 @@ class DetailViewModel @Inject constructor(val photoDao: PhotoDao) : ViewModel() 
         MutableLiveData<Uri>()
     }
 
-    suspend fun getPhotoById(id: String): Deferred<Photo?> {
+    suspend fun getPhotoByIdAsync(id: String): Deferred<Photo?> {
         return async {
             photoDao.getPhotoById(id)
         }
@@ -35,11 +37,11 @@ class DetailViewModel @Inject constructor(val photoDao: PhotoDao) : ViewModel() 
     fun downloadFile(context: Context, url: String) {
         launchDataLoad {
             isInProgress.postValue(true)
-            val pair = FileUtils.saveImageInGallery(context, url)
-            if (pair.first) {
-                downloadedFileUri.postValue(pair.second)
+            val uri = FileUtils.saveImageInGallery(context, url)
+            uri?.let {
+                downloadedFileUri.postValue(it)
                 isInProgress.postValue(false)
-            } else {
+            } ?: run {
                 isError.postValue(true)
             }
         }
@@ -61,9 +63,15 @@ class DetailViewModel @Inject constructor(val photoDao: PhotoDao) : ViewModel() 
         }
     }
 
+    suspend fun setAsWallpaperAsync(context: Context, url: String): Deferred<Uri?> {
+        return async {
+            FileUtils.setAsWallpaper(context, url).second
+        }
+    }
+
     fun setAsWallpaper(context: Context, uri: Uri) {
         launchDataLoad {
-            val intent = FileUtils.setAsWallpaper(uri)
+            val intent = intentSetImageAs(uri)
             intent?.let {
                 context.startActivity(
                     Intent.createChooser(
@@ -80,15 +88,11 @@ class DetailViewModel @Inject constructor(val photoDao: PhotoDao) : ViewModel() 
     fun share(context: Context, url: String) {
         launchDataLoad {
             isInProgress.postValue(true)
-            val pair = FileUtils.shareImage(context, url)
-            pair.first?.let {
-                downloadedFileUri.postValue(pair.second)
-                context.startActivity(
-                    Intent.createChooser(
-                        it,
-                        context.resources.getString(R.string.share_image)
-                    )
-                )
+            setAsWallpaperAsync(context, url).await()?.let {
+                withContext(Dispatchers.Main) {
+                    downloadedFileUri.postValue(it)
+                    share(context, it)
+                }
             } ?: run {
                 isError.postValue(true)
             }
@@ -96,9 +100,7 @@ class DetailViewModel @Inject constructor(val photoDao: PhotoDao) : ViewModel() 
     }
 
     fun share(context: Context, uri: Uri) {
-        val intent = Intent(Intent.ACTION_SEND)
-        intent.type = "image/jpeg"
-        intent.putExtra(Intent.EXTRA_STREAM, uri)
+        val intent = intentShareImage(uri)
         context.startActivity(
             Intent.createChooser(
                 intent,

@@ -24,6 +24,7 @@ import java.text.DecimalFormat
 import java.util.Random
 import dreamlab.worldpics.R
 import dreamlab.worldpics.WorldPics
+import kotlinx.coroutines.Deferred
 import java.io.*
 import java.lang.Exception
 
@@ -96,25 +97,13 @@ object FileUtils {
                 }
             } ?: return Pair(null, null)
 
-            val intent = Intent(Intent.ACTION_ATTACH_DATA)
-            intent.addCategory(Intent.CATEGORY_DEFAULT)
-            intent.setDataAndType(uri, "image/*")
-            intent.putExtra("mimeType", "image/*")
+            val intent = intentSetImageAs(uri)
 
             return Pair(intent, uri)
         }
     }
 
-    fun setAsWallpaper(uri: Uri): Intent? {
-        val intent = Intent(Intent.ACTION_ATTACH_DATA)
-        intent.addCategory(Intent.CATEGORY_DEFAULT)
-        intent.setDataAndType(uri, "image/*")
-        intent.putExtra("mimeType", "image/*")
-        return intent
-
-    }
-
-    fun saveImageInGallery(context: Context, url: String): Pair<Boolean, Uri?> {
+    fun saveImageInGallery(context: Context, url: String): Uri? {
         var n = 10000
         n = Random().nextInt(n)
         val filename = "Image-$n.jpg"
@@ -134,38 +123,10 @@ object FileUtils {
 
             val id = dm.enqueue(request)
 
-            return Pair(true, dm.getUriForDownloadedFile(id))
+            return dm.getUriForDownloadedFile(id)
         } catch (e: Exception) {
-            return Pair(false, null)
+            return null
         }
-    }
-
-    //TODO use saveImageInGallery() and then share
-    fun shareImage(context: Context, url: String): Pair<Intent?, Uri?> {
-        val imageUrl: URL
-        val bitmap: Bitmap
-        val intent = Intent(Intent.ACTION_SEND)
-        val path: String
-        try {
-            imageUrl = URL(url)
-            bitmap = BitmapFactory.decodeStream(imageUrl.openConnection().getInputStream())
-
-            intent.type = "image/jpeg"
-            val bytes = ByteArrayOutputStream()
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, bytes)
-            path = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES)
-                .toString() + File.separator + "temporary_file.jpg"
-            val f = File(path)
-            f.createNewFile()
-            val fo = FileOutputStream(f)
-            fo.write(bytes.toByteArray())
-        } catch (e: IOException) {
-            Log.e(TAG, "Error occurred while retrieving image url")
-            return Pair(null, null)
-        }
-
-        intent.putExtra(Intent.EXTRA_STREAM, Uri.parse(path))
-        return Pair(intent, Uri.parse(path))
     }
 
     fun saveImageToStorage(context: Context, url: String): String? {

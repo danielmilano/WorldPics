@@ -111,7 +111,7 @@ class DetailFragment : BaseFragment<DetailFragment.Listener>(Listener::class.jav
         }
 
         viewModel?.viewModelScope?.launch {
-            viewModel?.getPhotoById(mBinding.photo!!.id)?.await()?.let {
+            viewModel?.getPhotoByIdAsync(mBinding.photo!!.id)?.await()?.let {
                 withContext(Dispatchers.Main) {
                     mBinding.fabItemAddFavourite.tag = CAN_REMOVE_FAVOURITE
                     mBinding.fabItemAddFavourite.text.text =
