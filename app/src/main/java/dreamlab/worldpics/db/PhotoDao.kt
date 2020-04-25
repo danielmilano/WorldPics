@@ -1,18 +1,15 @@
 package dreamlab.worldpics.db
 
+import androidx.lifecycle.LiveData
 import androidx.paging.DataSource
 import androidx.room.*
 import dreamlab.worldpics.model.Photo
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.withContext
 
-/**
- * The Data Access Object for the LegoSet class.
- */
 @Dao
 interface PhotoDao {
-
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertAll(photos: ArrayList<Photo>)
-
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insert(photo: Photo)
 
@@ -20,12 +17,5 @@ interface PhotoDao {
     fun deletePhoto(id: String)
 
     @Query("SELECT * FROM photos")
-    fun photos(): DataSource.Factory<Int, Photo>
-
-    @Query("SELECT * FROM photos WHERE (color LIKE :color)")
-    fun photosByColor(color: String): DataSource.Factory<Int, Photo>
-
-    @Query("SELECT * FROM photos WHERE (tags LIKE :query)")
-    fun photosByQuery(query: String): DataSource.Factory<Int, Photo>
-
+    fun photos(): LiveData<List<Photo>>?
 }

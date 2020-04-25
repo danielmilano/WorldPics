@@ -39,13 +39,13 @@
                         android:layout_height="match_parent"
                         android:tag="TOP_PHOTOS_FRAGMENT" />
 
-                    <!-- <fragment
-                         android:id="@+id/fragment_vector_graphics"
-                         android:name="dreamlab.worldpics.fragment.NewPhotosFragment"
-                         android:layout_width="match_parent"
-                         android:layout_height="match_parent"
-                         android:tag="FRAGMENT_VECTOR_GRAPHICS" />&ndash;&gt;
--->
+                    <fragment
+                        android:id="@+id/fragment_favourite_photos"
+                        android:name="dreamlab.worldpics.ui.photo.favourites.FavouritePhotosFragment"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:tag="FAVOURITE_PHOTOS_FRAGMENT" />
+
                     <fragment
                         android:id="@+id/fragment_settings"
                         android:name="dreamlab.worldpics.ui.settings.SettingsFragment"

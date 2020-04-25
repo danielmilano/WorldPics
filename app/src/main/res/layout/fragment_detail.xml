@@ -38,12 +38,12 @@
             android:id="@+id/constraint_layout_of_fabs"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:clipToPadding="false"
             android:clipChildren="false"
+            android:clipToPadding="false"
             android:padding="16dp">
 
             <LinearLayout
-                android:id="@+id/fab_item_info"
+                android:id="@+id/fab_item_add_favourite"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="8dp"
@@ -54,22 +54,24 @@
                 app:layout_constraintRight_toRightOf="parent">
 
                 <TextView
+                    android:id="@+id/text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="start|center_vertical"
                     android:layout_marginEnd="24dp"
                     android:background="@drawable/background_black_rounded"
                     android:padding="4dp"
-                    android:text="@string/info"
-                    android:textColor="@color/colorPrimary" />
+                    android:text="@string/add_to_favourites"
+                    android:textColor="@color/white" />
 
                 <com.google.android.material.floatingactionbutton.FloatingActionButton
+                    android:id="@+id/icon"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     app:backgroundTint="@color/colorPrimary"
                     app:fabSize="mini"
                     app:rippleColor="@android:color/white"
-                    app:srcCompat="@drawable/ic_info_outline_black" />
+                    app:srcCompat="@drawable/ic_favorite_border_white" />
             </LinearLayout>
 
             <LinearLayout
@@ -91,7 +93,7 @@
                     android:background="@drawable/background_black_rounded"
                     android:padding="4dp"
                     android:text="@string/set_photo_as"
-                    android:textColor="@color/colorPrimary" />
+                    android:textColor="@color/white" />
 
                 <com.google.android.material.floatingactionbutton.FloatingActionButton
                     android:layout_width="wrap_content"
@@ -99,7 +101,7 @@
                     app:backgroundTint="@color/colorPrimary"
                     app:fabSize="mini"
                     app:rippleColor="@android:color/white"
-                    app:srcCompat="@drawable/ic_photo_black" />
+                    app:srcCompat="@drawable/ic_photo_white" />
             </LinearLayout>
 
             <LinearLayout
@@ -121,7 +123,7 @@
                     android:background="@drawable/background_black_rounded"
                     android:padding="4dp"
                     android:text="@string/download"
-                    android:textColor="@color/colorPrimary" />
+                    android:textColor="@color/white" />
 
                 <com.google.android.material.floatingactionbutton.FloatingActionButton
                     android:layout_width="wrap_content"
@@ -129,7 +131,7 @@
                     app:backgroundTint="@color/colorPrimary"
                     app:fabSize="mini"
                     app:rippleColor="@android:color/white"
-                    app:srcCompat="@drawable/ic_file_download_black" />
+                    app:srcCompat="@drawable/ic_file_download_white" />
             </LinearLayout>
 
             <com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -141,7 +143,7 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintRight_toRightOf="parent"
                 app:rippleColor="@android:color/white"
-                app:srcCompat="@drawable/ic_arrow_up_black" />
+                app:srcCompat="@drawable/ic_arrow_up_white" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 

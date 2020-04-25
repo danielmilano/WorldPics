@@ -17,7 +17,7 @@ import dreamlab.worldpics.repository.Status
  * Created by danielm on 10/02/2018.
  */
 
-class PhotoAdapter(
+class  PhotoAdapter(
     private val onPhotoClicked: (Photo) -> Unit,
     private val retryCallback: () -> Unit
 ) : PagedListAdapter<Photo, PhotoAdapter.ItemsViewHolder>(

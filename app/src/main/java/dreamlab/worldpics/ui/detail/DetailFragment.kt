@@ -15,13 +15,20 @@ import android.widget.Toast
 import androidx.constraintlayout.widget.ConstraintSet
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
 import androidx.transition.AutoTransition
 import androidx.transition.TransitionManager
+import dreamlab.worldpics.R
 import dreamlab.worldpics.base.BaseFragment
 import dreamlab.worldpics.databinding.FragmentDetailBinding
+import dreamlab.worldpics.db.PhotoDao
 import dreamlab.worldpics.model.Photo
 import dreamlab.worldpics.util.PermissionUtils
 import dreamlab.worldpics.util.viewModelProvider
+import kotlinx.android.synthetic.main.fragment_detail.view.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 class DetailFragment : BaseFragment<DetailFragment.Listener>(Listener::class.java) {
@@ -29,6 +36,9 @@ class DetailFragment : BaseFragment<DetailFragment.Listener>(Listener::class.jav
     @Inject
     lateinit var viewModelFactory: ViewModelProvider.Factory
     private var viewModel: DetailViewModel? = null
+
+    @Inject
+    lateinit var photoDao: PhotoDao
 
     private lateinit var mBinding: FragmentDetailBinding
     private var downloadedFileUri: Uri? = null
@@ -96,8 +106,50 @@ class DetailFragment : BaseFragment<DetailFragment.Listener>(Listener::class.jav
                 setImageAs()
             }
         }
-        mBinding.fabItemInfo.setOnClickListener {
-            //TODO
+        mBinding.fabItemAddFavourite.tag = 0
+        mBinding.fabItemAddFavourite.setOnClickListener {
+            when (mBinding.fabItemAddFavourite.tag) {
+                0 -> {
+                    viewModel?.viewModelScope?.launch {
+                        withContext(Dispatchers.IO){
+                            photoDao.insert(mBinding.photo!!)
+                        }
+                    }
+                    mBinding.fabItemAddFavourite.text.text =
+                        requireContext().getString(R.string.add_to_favourites)
+                    mBinding.fabItemAddFavourite.icon.setImageDrawable(
+                        requireContext().getDrawable(
+                            R.drawable.ic_favorite_white
+                        )
+                    )
+                    mBinding.fabItemAddFavourite.tag = 1
+                    Toast.makeText(
+                        requireContext(),
+                        "Added to favourites",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+                1 -> {
+                    viewModel?.viewModelScope?.launch {
+                        withContext(Dispatchers.IO){
+                            photoDao.deletePhoto(mBinding.photo!!.id)
+                        }
+                    }
+                    mBinding.fabItemAddFavourite.text.text =
+                        requireContext().getString(R.string.remove_from_favourites)
+                    mBinding.fabItemAddFavourite.icon.setImageDrawable(
+                        requireContext().getDrawable(
+                            R.drawable.ic_favorite_border_white
+                        )
+                    )
+                    mBinding.fabItemAddFavourite.tag = 0
+                    Toast.makeText(
+                        requireContext(),
+                        "Removed from favourites",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            }
         }
     }
 
@@ -128,14 +180,14 @@ class DetailFragment : BaseFragment<DetailFragment.Listener>(Listener::class.jav
             mBinding.fab.startAnimation(rotateAnimation)
             constraintSet.connect(mBinding.fabItemDownloadWallpaper.id, ConstraintSet.BOTTOM, mBinding.fab.id, ConstraintSet.BOTTOM)
             constraintSet.connect(mBinding.fabItemSetWallpaper.id, ConstraintSet.BOTTOM, mBinding.fab.id, ConstraintSet.BOTTOM)
-            constraintSet.connect(mBinding.fabItemInfo.id, ConstraintSet.BOTTOM, mBinding.fab.id, ConstraintSet.BOTTOM)
+            constraintSet.connect(mBinding.fabItemAddFavourite.id, ConstraintSet.BOTTOM, mBinding.fab.id, ConstraintSet.BOTTOM)
             constraintSet.applyTo(mBinding.constraintLayoutOfFabs)
             constraintSet.setVisibility(mBinding.fabItemDownloadWallpaper.id, View.INVISIBLE)
             constraintSet.setVisibility(mBinding.fabItemSetWallpaper.id, View.INVISIBLE)
-            constraintSet.setVisibility(mBinding.fabItemInfo.id, View.INVISIBLE)
+            constraintSet.setVisibility(mBinding.fabItemAddFavourite.id, View.INVISIBLE)
             mBinding.fabItemDownloadWallpaper.animate().alpha(0f).setDuration(duration).withEndAction { mBinding.fabItemDownloadWallpaper.visibility = View.INVISIBLE }.start()
             mBinding.fabItemSetWallpaper.animate().alpha(0f).setDuration(duration).withEndAction { mBinding.fabItemSetWallpaper.visibility = View.INVISIBLE }.start()
-            mBinding.fabItemInfo.animate().alpha(0f).setDuration(duration).withEndAction { mBinding.fabItemInfo.visibility = View.INVISIBLE }.start()
+            mBinding.fabItemAddFavourite.animate().alpha(0f).setDuration(duration).withEndAction { mBinding.fabItemAddFavourite.visibility = View.INVISIBLE }.start()
         } else {
             // open
             mBinding.fab.tag = 1
@@ -145,14 +197,14 @@ class DetailFragment : BaseFragment<DetailFragment.Listener>(Listener::class.jav
             mBinding.fab.startAnimation(rotateAnimation)
             constraintSet.connect(mBinding.fabItemDownloadWallpaper.id, ConstraintSet.BOTTOM, mBinding.fab.id, ConstraintSet.TOP, requireContext().dpToPx(16f))
             constraintSet.connect(mBinding.fabItemSetWallpaper.id, ConstraintSet.BOTTOM, mBinding.fabItemDownloadWallpaper.id, ConstraintSet.TOP, requireContext().dpToPx(16f))
-            constraintSet.connect(mBinding.fabItemInfo.id, ConstraintSet.BOTTOM, mBinding.fabItemSetWallpaper.id, ConstraintSet.TOP, requireContext().dpToPx(16f))
+            constraintSet.connect(mBinding.fabItemAddFavourite.id, ConstraintSet.BOTTOM, mBinding.fabItemSetWallpaper.id, ConstraintSet.TOP, requireContext().dpToPx(16f))
             constraintSet.applyTo(mBinding.constraintLayoutOfFabs)
             constraintSet.setVisibility(mBinding.fabItemDownloadWallpaper.id, View.VISIBLE)
             constraintSet.setVisibility(mBinding.fabItemSetWallpaper.id, View.VISIBLE)
-            constraintSet.setVisibility(mBinding.fabItemInfo.id, View.VISIBLE)
+            constraintSet.setVisibility(mBinding.fabItemAddFavourite.id, View.VISIBLE)
             mBinding.fabItemDownloadWallpaper.animate().alpha(1f).setDuration(duration / 2).withEndAction { mBinding.fabItemDownloadWallpaper.visibility = View.VISIBLE }.start()
             mBinding.fabItemSetWallpaper.animate().alpha(1f).setDuration(duration / 2).withEndAction { mBinding.fabItemSetWallpaper.visibility = View.VISIBLE }.start()
-            mBinding.fabItemInfo.animate().alpha(1f).setDuration(duration / 2).withEndAction { mBinding.fabItemInfo.visibility = View.VISIBLE }.start()
+            mBinding.fabItemAddFavourite.animate().alpha(1f).setDuration(duration / 2).withEndAction { mBinding.fabItemAddFavourite.visibility = View.VISIBLE }.start()
         }
     }
 

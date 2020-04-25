@@ -13,23 +13,23 @@ import dreamlab.worldpics.model.PhotoRequest
 import dreamlab.worldpics.ui.detail.DetailFragment
 import dreamlab.worldpics.ui.filter.FilterFragment
 import dreamlab.worldpics.ui.photo.base.BasePhotosFragment
+import dreamlab.worldpics.ui.photo.favourites.FavouritePhotosFragment
 import dreamlab.worldpics.ui.photo.search.SearchPhotosFragment
 import dreamlab.worldpics.ui.photo.top.TopPhotosFragment
 
 class MainActivity : BaseActivity(), BaseViewFragmentHelper, BasePhotosFragment.Listener,
-    FilterFragment.Listener, DetailFragment.Listener {
+    FilterFragment.Listener, DetailFragment.Listener, FavouritePhotosFragment.Listener {
 
     val SEARCH_PHOTOS_FRAGMENT_TAG = "SEARCH_PHOTOS_FRAGMENT"
     val TOP_PHOTOS_FRAGMENT_TAG = "TOP_PHOTOS_FRAGMENT"
-    val FAVOURITE_PHOTOS_FRAGMENT_TAG = "TOP_PHOTOS_FRAGMENT"
+    val FAVOURITE_PHOTOS_FRAGMENT_TAG = "FAVOURITE_PHOTOS_FRAGMENT"
     val SETTINGS_FRAGMENT_TAG = "SETTINGS_FRAGMENT"
 
     private enum class DisplayedFragment(val id: Int) {
         SEARCH(0),
         TOP(1),
-
-        //FAVOURITES(2), //TODO
-        SETTINGS(2)
+        FAVOURITES(2),
+        SETTINGS(3)
     }
 
     private lateinit var mBinding: ActivityMainBinding
@@ -55,8 +55,7 @@ class MainActivity : BaseActivity(), BaseViewFragmentHelper, BasePhotosFragment.
                     return@OnNavigationItemSelectedListener true
                 }
                 R.id.favourites -> {
-                    //TODO
-                    //mBinding.navigationSwitcher.displayedChild = DisplayedFragment.FAVOURITES.id
+                    mBinding.navigationSwitcher.displayedChild = DisplayedFragment.FAVOURITES.id
                     return@OnNavigationItemSelectedListener true
                 }
                 R.id.settings -> {
@@ -110,13 +109,5 @@ class MainActivity : BaseActivity(), BaseViewFragmentHelper, BasePhotosFragment.
                 fragmentWithTag<TopPhotosFragment>(TOP_PHOTOS_FRAGMENT_TAG)?.onApplyFilters(request)
             }
         }
-    }
-
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<String>,
-        grantResults: IntArray
-    ) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
     }
 }

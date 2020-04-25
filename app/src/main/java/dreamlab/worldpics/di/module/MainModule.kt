@@ -17,6 +17,8 @@ import dreamlab.worldpics.ui.photo.top.TopPhotosFragment
 import dreamlab.worldpics.ui.settings.SettingsFragment
 import dreamlab.worldpics.ui.settings.SettingsPreferenceFragment
 import dreamlab.worldpics.ui.detail.DetailViewModel
+import dreamlab.worldpics.ui.photo.favourites.FavouritePhotosFragment
+import dreamlab.worldpics.ui.photo.favourites.FavouritePhotosViewModel
 import dreamlab.worldpics.ui.settings.SettingsViewModel
 
 @Suppress("UNUSED")
@@ -100,5 +102,21 @@ abstract class MainModule {
     @IntoMap
     @ViewModelKey(DetailViewModel::class)
     abstract fun bindDetailViewModel(viewModel: DetailViewModel): ViewModel
+
+    /**
+     * Generates an [AndroidInjector] for the [FavouritePhotosFragment].
+     */
+    @FragmentScoped
+    @ContributesAndroidInjector
+    abstract fun contributeFavouritePhotosFragment(): FavouritePhotosFragment
+
+    /**
+     * The ViewModels are created by Dagger in a map. Via the @ViewModelKey, we define that we
+     * want to get a [FavouritePhotosViewModel] class.
+     */
+    @Binds
+    @IntoMap
+    @ViewModelKey(FavouritePhotosViewModel::class)
+    abstract fun bindFavouritePhotosViewModel(viewModel: FavouritePhotosViewModel): ViewModel
 
 }
