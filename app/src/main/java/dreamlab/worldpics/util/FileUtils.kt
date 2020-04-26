@@ -1,22 +1,16 @@
 package dreamlab.worldpics.util
 
-import android.Manifest
-import android.app.Activity
 import android.app.DownloadManager
 import android.content.ContentValues
 import android.content.Context
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
-import android.os.Build
 import android.os.Environment
 import android.provider.MediaStore
 import android.util.Log
 import android.widget.Toast
-import androidx.core.app.ActivityCompat
-import androidx.fragment.app.FragmentActivity
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.Target
 import java.net.URL
@@ -24,7 +18,6 @@ import java.text.DecimalFormat
 import java.util.Random
 import dreamlab.worldpics.R
 import dreamlab.worldpics.WorldPics
-import kotlinx.coroutines.Deferred
 import java.io.*
 import java.lang.Exception
 
@@ -76,34 +69,59 @@ object FileUtils {
         return DecimalFormat("#,##0.#").format(size / Math.pow(1024.0, digitGroups.toDouble())) + " " + units[digitGroups]
     }
 
-    fun setAsWallpaper(context: Context, url: String): Pair<Intent?, Uri?> {
-        context.let {
-            val values = ContentValues()
-            values.put(MediaStore.Images.Media.TITLE, "title")
-            values.put(MediaStore.Images.Media.MIME_TYPE, "image/*")
-            val uri =
-                context.contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values)
+    fun setPhotoAs(context: Context, url: String): Pair<Intent?, Uri?> {
 
-            uri?.let {
-                val outStream: OutputStream?
-                try {
-                    outStream = context.contentResolver.openOutputStream(uri)
-                    Glide.with(context).asBitmap().load(url)
-                        .submit(Target.SIZE_ORIGINAL, Target.SIZE_ORIGINAL).get()
-                        .compress(Bitmap.CompressFormat.JPEG, 100, outStream)
-                    outStream?.close()
-                } catch (e: Exception) {
-                    return Pair(null, null)
-                }
-            } ?: return Pair(null, null)
+        val values = ContentValues()
+        values.put(MediaStore.Images.Media.TITLE, "title")
+        values.put(MediaStore.Images.Media.MIME_TYPE, "image/*")
+        val uri =
+            context.contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values)
 
-            val intent = intentSetImageAs(uri)
+        uri?.let {
+            val outStream: OutputStream?
+            try {
+                outStream = context.contentResolver.openOutputStream(uri)
+                Glide.with(context).asBitmap().load(url)
+                    .submit(Target.SIZE_ORIGINAL, Target.SIZE_ORIGINAL).get()
+                    .compress(Bitmap.CompressFormat.JPEG, 100, outStream)
+                outStream?.close()
+            } catch (e: Exception) {
+                return Pair(null, null)
+            }
+        } ?: return Pair(null, null)
 
-            return Pair(intent, uri)
-        }
+        val intent = intentSetPhotoAs(uri)
+
+        return Pair(intent, uri)
+
     }
 
-    fun saveImageInGallery(context: Context, url: String): Uri? {
+    fun downloadPhoto(context: Context, url: String): Uri? {
+
+        val values = ContentValues()
+        values.put(MediaStore.Images.Media.TITLE, "title")
+        values.put(MediaStore.Images.Media.MIME_TYPE, "image/*")
+        val uri =
+            context.contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values)
+
+        uri?.let {
+            val outStream: OutputStream?
+            try {
+                outStream = context.contentResolver.openOutputStream(uri)
+                Glide.with(context).asBitmap().load(url)
+                    .submit(Target.SIZE_ORIGINAL, Target.SIZE_ORIGINAL).get()
+                    .compress(Bitmap.CompressFormat.JPEG, 100, outStream)
+                outStream?.close()
+            } catch (e: Exception) {
+                return null
+            }
+        } ?: return null
+
+        return uri
+
+    }
+
+    fun savePhotoInGallery(context: Context, url: String): Uri? {
         var n = 10000
         n = Random().nextInt(n)
         val filename = "Image-$n.jpg"
@@ -127,36 +145,5 @@ object FileUtils {
         } catch (e: Exception) {
             return null
         }
-    }
-
-    fun saveImageToStorage(context: Context, url: String): String? {
-        val imageUrl: URL
-        val bitmap: Bitmap
-
-        try {
-            imageUrl = URL(url)
-            bitmap = BitmapFactory.decodeStream(imageUrl.openConnection().getInputStream())
-        } catch (e: IOException) {
-            Log.e(TAG, "Error occurred while retrieving image url")
-            Toast.makeText(context, context.getString(R.string.network_error), Toast.LENGTH_SHORT).show()
-            return null
-        }
-
-        var n = 10000
-        n = Random().nextInt(n)
-        val filename = "Image-$n.jpg"
-
-        val bytes = ByteArrayOutputStream()
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, bytes)
-        val f = File(context.getExternalFilesDir(Environment.DIRECTORY_PICTURES).toString() + File.separator + filename)
-        try {
-            f.createNewFile()
-            val fo = FileOutputStream(f)
-            fo.write(bytes.toByteArray())
-        } catch (e: IOException) {
-            Log.e(TAG, "Error occurred while creating file to save")
-        }
-
-        return f.absolutePath
     }
 }

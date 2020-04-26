@@ -9,9 +9,10 @@ import androidx.fragment.app.Fragment
 
 object PermissionUtils {
     enum class RequestCodeType(val id: Int) {
-        DOWNLOAD_IMAGE_REQUEST_CODE(1),
-        SET_IMAGE_AS_REQUEST_CODE(2),
-        SHARE_IMAGE_REQUEST_CODE(3)
+        DOWNLOAD_PHOTO_REQUEST_CODE(1),
+        SET_PHOTO_AS_REQUEST_CODE(2),
+        SHARE_PHOTO_REQUEST_CODE(3),
+        EDIT_PHOTO_REQUEST_CODE(4)
     }
 
     fun isStoragePermissionGranted(activity: Activity, requestCode: RequestCodeType): Boolean {

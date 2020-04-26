@@ -1,10 +1,15 @@
 package dreamlab.worldpics.util
 
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
+import android.provider.MediaStore
 import androidx.core.app.ShareCompat
+import androidx.core.content.FileProvider
+import java.io.File
+
 
 /**
  * Android system intents
@@ -33,17 +38,25 @@ fun intentOpenWebsite(activity: Activity, url: String) {
     activity.startActivity(openURL)
 }
 
-fun intentShareImage(uri: Uri): Intent {
+fun intentSharePhoto(uri: Uri): Intent {
     val intent = Intent(Intent.ACTION_SEND)
     intent.type = "image/jpeg"
     intent.putExtra(Intent.EXTRA_STREAM, uri)
     return intent
 }
 
-fun intentSetImageAs(uri: Uri): Intent? {
+fun intentSetPhotoAs(uri: Uri): Intent {
     val intent = Intent(Intent.ACTION_ATTACH_DATA)
     intent.addCategory(Intent.CATEGORY_DEFAULT)
     intent.setDataAndType(uri, "image/*")
     intent.putExtra("mimeType", "image/*")
     return intent
+}
+
+fun intentEditPhoto(uri: Uri): Intent {
+    val editIntent = Intent(Intent.ACTION_EDIT)
+    editIntent.setDataAndType(uri, "image/*")
+    editIntent.putExtra(MediaStore.EXTRA_OUTPUT, uri)
+    editIntent.flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
+    return editIntent
 }

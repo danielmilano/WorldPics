@@ -63,7 +63,8 @@
     <string name="title_activity_detail">DetailActivity</string>
     <string name="download">Download</string>
     <string name="share">Share</string>
-    <string name="share_image">Share image</string>
+    <string name="share_photo">Share photo</string>
+    <string name="edit_photo">Edit photo</string>
     <string name="add_to_gallery">Add to gallery</string>
     <string name="confirm_logout">Are you sure you want to logout?</string>
     <string name="confirm">Yes</string>

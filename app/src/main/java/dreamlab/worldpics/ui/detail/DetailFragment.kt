@@ -25,7 +25,7 @@ import dreamlab.worldpics.db.PhotoDao
 import dreamlab.worldpics.model.Photo
 import dreamlab.worldpics.util.PermissionUtils
 import dreamlab.worldpics.util.viewModelProvider
-import kotlinx.android.synthetic.main.fragment_detail.view.*
+import kotlinx.android.synthetic.main.fab_menu.view.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -93,30 +93,35 @@ class DetailFragment : BaseFragment<DetailFragment.Listener>(Listener::class.jav
             val intent = Intent(Intent.ACTION_VIEW, Uri.parse(userProfileUrl))
             startActivity(intent)
         }
-        mBinding.fab.setOnClickListener { toggleFab() }
+        mBinding.fabMenu.fab.setOnClickListener { toggleFab() }
         mBinding.detailToolbar.share.setOnClickListener {
-            if (hasWriteExternalStoragePermission(PermissionUtils.RequestCodeType.SHARE_IMAGE_REQUEST_CODE)) {
-                shareImage()
+            if (hasWriteExternalStoragePermission(PermissionUtils.RequestCodeType.SHARE_PHOTO_REQUEST_CODE)) {
+                sharePhoto()
             }
         }
-        mBinding.fabItemDownloadWallpaper.setOnClickListener {
-            if (hasWriteExternalStoragePermission(PermissionUtils.RequestCodeType.DOWNLOAD_IMAGE_REQUEST_CODE)) {
-                downloadImage()
+        mBinding.fabMenu.fabItemDownloadWallpaper.setOnClickListener {
+            if (hasWriteExternalStoragePermission(PermissionUtils.RequestCodeType.DOWNLOAD_PHOTO_REQUEST_CODE)) {
+                downloadPhoto()
             }
         }
-        mBinding.fabItemSetWallpaper.setOnClickListener {
-            if (hasWriteExternalStoragePermission(PermissionUtils.RequestCodeType.SET_IMAGE_AS_REQUEST_CODE)) {
-                setImageAs()
+        mBinding.fabMenu.fabItemSetWallpaper.setOnClickListener {
+            if (hasWriteExternalStoragePermission(PermissionUtils.RequestCodeType.SET_PHOTO_AS_REQUEST_CODE)) {
+                setPhotoAs()
+            }
+        }
+        mBinding.fabMenu.fabItemEditPhoto.setOnClickListener {
+            if (hasWriteExternalStoragePermission(PermissionUtils.RequestCodeType.EDIT_PHOTO_REQUEST_CODE)) {
+                editPhoto()
             }
         }
 
         viewModel?.viewModelScope?.launch {
             viewModel?.getPhotoByIdAsync(mBinding.photo!!.id)?.await()?.let {
                 withContext(Dispatchers.Main) {
-                    mBinding.fabItemAddFavourite.tag = CAN_REMOVE_FAVOURITE
-                    mBinding.fabItemAddFavourite.text.text =
+                    mBinding.fabMenu.fabItemAddFavourite.tag = CAN_REMOVE_FAVOURITE
+                    mBinding.fabMenu.fabItemAddFavourite.text.text =
                         requireContext().getString(R.string.remove_from_favourites)
-                    mBinding.fabItemAddFavourite.icon.setImageDrawable(
+                    mBinding.fabMenu.fabItemAddFavourite.icon.setImageDrawable(
                         requireContext().getDrawable(
                             R.drawable.ic_favorite_border_white
                         )
@@ -124,10 +129,10 @@ class DetailFragment : BaseFragment<DetailFragment.Listener>(Listener::class.jav
                 }
             } ?: kotlin.run {
                 withContext(Dispatchers.Main) {
-                    mBinding.fabItemAddFavourite.tag = CAN_ADD_FAVOURITE
-                    mBinding.fabItemAddFavourite.text.text =
+                    mBinding.fabMenu.fabItemAddFavourite.tag = CAN_ADD_FAVOURITE
+                    mBinding.fabMenu.fabItemAddFavourite.text.text =
                         requireContext().getString(R.string.add_to_favourites)
-                    mBinding.fabItemAddFavourite.icon.setImageDrawable(
+                    mBinding.fabMenu.fabItemAddFavourite.icon.setImageDrawable(
                         requireContext().getDrawable(
                             R.drawable.ic_favorite_white
                         )
@@ -136,18 +141,18 @@ class DetailFragment : BaseFragment<DetailFragment.Listener>(Listener::class.jav
             }
         }
 
-        mBinding.fabItemAddFavourite.setOnClickListener {
-            when (mBinding.fabItemAddFavourite.tag) {
+        mBinding.fabMenu.fabItemAddFavourite.setOnClickListener {
+            when (mBinding.fabMenu.fabItemAddFavourite.tag) {
                 CAN_REMOVE_FAVOURITE -> {
                     viewModel?.viewModelScope?.launch {
                         withContext(Dispatchers.IO) {
                             photoDao.deletePhoto(mBinding.photo!!.id)
                         }
                     }
-                    mBinding.fabItemAddFavourite.tag = CAN_ADD_FAVOURITE
-                    mBinding.fabItemAddFavourite.text.text =
+                    mBinding.fabMenu.fabItemAddFavourite.tag = CAN_ADD_FAVOURITE
+                    mBinding.fabMenu.fabItemAddFavourite.text.text =
                         requireContext().getString(R.string.add_to_favourites)
-                    mBinding.fabItemAddFavourite.icon.setImageDrawable(
+                    mBinding.fabMenu.fabItemAddFavourite.icon.setImageDrawable(
                         requireContext().getDrawable(
                             R.drawable.ic_favorite_white
                         )
@@ -164,10 +169,10 @@ class DetailFragment : BaseFragment<DetailFragment.Listener>(Listener::class.jav
                             photoDao.insert(mBinding.photo!!)
                         }
                     }
-                    mBinding.fabItemAddFavourite.tag = CAN_REMOVE_FAVOURITE
-                    mBinding.fabItemAddFavourite.text.text =
+                    mBinding.fabMenu.fabItemAddFavourite.tag = CAN_REMOVE_FAVOURITE
+                    mBinding.fabMenu.fabItemAddFavourite.text.text =
                         requireContext().getString(R.string.remove_from_favourites)
-                    mBinding.fabItemAddFavourite.icon.setImageDrawable(
+                    mBinding.fabMenu.fabItemAddFavourite.icon.setImageDrawable(
                         requireContext().getDrawable(
                             R.drawable.ic_favorite_border_white
                         )
@@ -197,12 +202,12 @@ class DetailFragment : BaseFragment<DetailFragment.Listener>(Listener::class.jav
         val duration = 200L
         val transitionMove = AutoTransition()
         transitionMove.duration = duration
-        TransitionManager.beginDelayedTransition(mBinding.constraintLayoutOfFabs, transitionMove)
+        TransitionManager.beginDelayedTransition(mBinding.fabMenu.root, transitionMove)
         val constraintSet = ConstraintSet()
-        constraintSet.clone(mBinding.constraintLayoutOfFabs)
-        if (mBinding.fab.tag == 1) {
+        constraintSet.clone(mBinding.fabMenu.root)
+        if (mBinding.fabMenu.fab.tag == 1) {
             // close
-            mBinding.fab.tag = null
+            mBinding.fabMenu.fab.tag = null
             val rotateAnimation = RotateAnimation(
                 180.0f,
                 0.0f,
@@ -213,39 +218,56 @@ class DetailFragment : BaseFragment<DetailFragment.Listener>(Listener::class.jav
             )
             rotateAnimation.fillAfter = true
             rotateAnimation.duration = duration
-            mBinding.fab.startAnimation(rotateAnimation)
+            mBinding.fabMenu.fab.startAnimation(rotateAnimation)
             constraintSet.connect(
-                mBinding.fabItemDownloadWallpaper.id,
+                mBinding.fabMenu.fabItemDownloadWallpaper.id,
                 ConstraintSet.BOTTOM,
-                mBinding.fab.id,
+                mBinding.fabMenu.fab.id,
                 ConstraintSet.BOTTOM
             )
             constraintSet.connect(
-                mBinding.fabItemSetWallpaper.id,
+                mBinding.fabMenu.fabItemSetWallpaper.id,
                 ConstraintSet.BOTTOM,
-                mBinding.fab.id,
+                mBinding.fabMenu.fab.id,
                 ConstraintSet.BOTTOM
             )
             constraintSet.connect(
-                mBinding.fabItemAddFavourite.id,
+                mBinding.fabMenu.fabItemAddFavourite.id,
                 ConstraintSet.BOTTOM,
-                mBinding.fab.id,
+                mBinding.fabMenu.fab.id,
                 ConstraintSet.BOTTOM
             )
-            constraintSet.applyTo(mBinding.constraintLayoutOfFabs)
-            constraintSet.setVisibility(mBinding.fabItemDownloadWallpaper.id, View.INVISIBLE)
-            constraintSet.setVisibility(mBinding.fabItemSetWallpaper.id, View.INVISIBLE)
-            constraintSet.setVisibility(mBinding.fabItemAddFavourite.id, View.INVISIBLE)
-            mBinding.fabItemDownloadWallpaper.animate().alpha(0f).setDuration(duration)
-                .withEndAction { mBinding.fabItemDownloadWallpaper.visibility = View.INVISIBLE }
+            constraintSet.connect(
+                mBinding.fabMenu.fabItemEditPhoto.id,
+                ConstraintSet.BOTTOM,
+                mBinding.fabMenu.fab.id,
+                ConstraintSet.BOTTOM
+            )
+            constraintSet.applyTo(mBinding.fabMenu.root)
+            constraintSet.setVisibility(
+                mBinding.fabMenu.fabItemDownloadWallpaper.id,
+                View.INVISIBLE
+            )
+            constraintSet.setVisibility(mBinding.fabMenu.fabItemSetWallpaper.id, View.INVISIBLE)
+            constraintSet.setVisibility(mBinding.fabMenu.fabItemAddFavourite.id, View.INVISIBLE)
+            constraintSet.setVisibility(mBinding.fabMenu.fabItemEditPhoto.id, View.INVISIBLE)
+            mBinding.fabMenu.fabItemDownloadWallpaper.animate().alpha(0f).setDuration(duration)
+                .withEndAction {
+                    mBinding.fabMenu.fabItemDownloadWallpaper.visibility = View.INVISIBLE
+                }
                 .start()
-            mBinding.fabItemSetWallpaper.animate().alpha(0f).setDuration(duration)
-                .withEndAction { mBinding.fabItemSetWallpaper.visibility = View.INVISIBLE }.start()
-            mBinding.fabItemAddFavourite.animate().alpha(0f).setDuration(duration)
-                .withEndAction { mBinding.fabItemAddFavourite.visibility = View.INVISIBLE }.start()
+            mBinding.fabMenu.fabItemSetWallpaper.animate().alpha(0f).setDuration(duration)
+                .withEndAction { mBinding.fabMenu.fabItemSetWallpaper.visibility = View.INVISIBLE }
+                .start()
+            mBinding.fabMenu.fabItemAddFavourite.animate().alpha(0f).setDuration(duration)
+                .withEndAction { mBinding.fabMenu.fabItemAddFavourite.visibility = View.INVISIBLE }
+                .start()
+            mBinding.fabMenu.fabItemEditPhoto.animate().alpha(0f).setDuration(duration)
+                .withEndAction { mBinding.fabMenu.fabItemEditPhoto.visibility = View.INVISIBLE }
+                .start()
         } else {
             // open
-            mBinding.fab.tag = 1
+            mBinding.fabMenu.fab.tag = 1
             val rotateAnimation = RotateAnimation(
                 0.0f,
                 180.0f,
@@ -256,39 +278,53 @@ class DetailFragment : BaseFragment<DetailFragment.Listener>(Listener::class.jav
             )
             rotateAnimation.fillAfter = true
             rotateAnimation.duration = duration
-            mBinding.fab.startAnimation(rotateAnimation)
+            mBinding.fabMenu.fab.startAnimation(rotateAnimation)
             constraintSet.connect(
-                mBinding.fabItemDownloadWallpaper.id,
+                mBinding.fabMenu.fabItemDownloadWallpaper.id,
                 ConstraintSet.BOTTOM,
-                mBinding.fab.id,
+                mBinding.fabMenu.fab.id,
                 ConstraintSet.TOP,
                 requireContext().dpToPx(16f)
             )
             constraintSet.connect(
-                mBinding.fabItemSetWallpaper.id,
+                mBinding.fabMenu.fabItemSetWallpaper.id,
                 ConstraintSet.BOTTOM,
-                mBinding.fabItemDownloadWallpaper.id,
+                mBinding.fabMenu.fabItemDownloadWallpaper.id,
                 ConstraintSet.TOP,
                 requireContext().dpToPx(16f)
             )
             constraintSet.connect(
-                mBinding.fabItemAddFavourite.id,
+                mBinding.fabMenu.fabItemAddFavourite.id,
                 ConstraintSet.BOTTOM,
-                mBinding.fabItemSetWallpaper.id,
+                mBinding.fabMenu.fabItemSetWallpaper.id,
                 ConstraintSet.TOP,
                 requireContext().dpToPx(16f)
             )
-            constraintSet.applyTo(mBinding.constraintLayoutOfFabs)
-            constraintSet.setVisibility(mBinding.fabItemDownloadWallpaper.id, View.VISIBLE)
-            constraintSet.setVisibility(mBinding.fabItemSetWallpaper.id, View.VISIBLE)
-            constraintSet.setVisibility(mBinding.fabItemAddFavourite.id, View.VISIBLE)
-            mBinding.fabItemDownloadWallpaper.animate().alpha(1f).setDuration(duration / 2)
-                .withEndAction { mBinding.fabItemDownloadWallpaper.visibility = View.VISIBLE }
+            constraintSet.connect(
+                mBinding.fabMenu.fabItemEditPhoto.id,
+                ConstraintSet.BOTTOM,
+                mBinding.fabMenu.fabItemAddFavourite.id,
+                ConstraintSet.TOP,
+                requireContext().dpToPx(16f)
+            )
+            constraintSet.applyTo(mBinding.fabMenu.root)
+            constraintSet.setVisibility(mBinding.fabMenu.fabItemDownloadWallpaper.id, View.VISIBLE)
+            constraintSet.setVisibility(mBinding.fabMenu.fabItemSetWallpaper.id, View.VISIBLE)
+            constraintSet.setVisibility(mBinding.fabMenu.fabItemAddFavourite.id, View.VISIBLE)
+            constraintSet.setVisibility(mBinding.fabMenu.fabItemEditPhoto.id, View.VISIBLE)
+            mBinding.fabMenu.fabItemDownloadWallpaper.animate().alpha(1f).setDuration(duration / 2)
+                .withEndAction {
+                    mBinding.fabMenu.fabItemDownloadWallpaper.visibility = View.VISIBLE
+                }.start()
+            mBinding.fabMenu.fabItemSetWallpaper.animate().alpha(1f).setDuration(duration / 2)
+                .withEndAction { mBinding.fabMenu.fabItemSetWallpaper.visibility = View.VISIBLE }
                 .start()
-            mBinding.fabItemSetWallpaper.animate().alpha(1f).setDuration(duration / 2)
-                .withEndAction { mBinding.fabItemSetWallpaper.visibility = View.VISIBLE }.start()
-            mBinding.fabItemAddFavourite.animate().alpha(1f).setDuration(duration / 2)
-                .withEndAction { mBinding.fabItemAddFavourite.visibility = View.VISIBLE }.start()
+            mBinding.fabMenu.fabItemAddFavourite.animate().alpha(1f).setDuration(duration / 2)
+                .withEndAction { mBinding.fabMenu.fabItemAddFavourite.visibility = View.VISIBLE }
+                .start()
+            mBinding.fabMenu.fabItemEditPhoto.animate().alpha(1f).setDuration(duration / 2)
+                .withEndAction { mBinding.fabMenu.fabItemEditPhoto.visibility = View.VISIBLE }
+                .start()
         }
     }
 
@@ -300,7 +336,15 @@ class DetailFragment : BaseFragment<DetailFragment.Listener>(Listener::class.jav
         ).toInt()
     }
 
-    private fun shareImage() {
+    private fun editPhoto() {
+        downloadedFileUri?.let {
+            viewModel?.editPhoto(requireContext(), it)
+        } ?: run {
+            viewModel?.editPhoto(requireContext(), mBinding.photo!!.fullHDURL!!)
+        }
+    }
+
+    private fun sharePhoto() {
         downloadedFileUri?.let {
             viewModel?.share(requireContext(), it)
         } ?: run {
@@ -308,19 +352,19 @@ class DetailFragment : BaseFragment<DetailFragment.Listener>(Listener::class.jav
         }
     }
 
-    private fun downloadImage() {
+    private fun downloadPhoto() {
         downloadedFileUri?.let {
             Toast.makeText(context, "Image already downloaded!", Toast.LENGTH_SHORT).show()
         } ?: run {
-            viewModel?.downloadFile(requireContext(), mBinding.photo!!.fullHDURL!!)
+            viewModel?.downloadPhoto(requireContext(), mBinding.photo!!.fullHDURL!!)
         }
     }
 
-    private fun setImageAs() {
+    private fun setPhotoAs() {
         downloadedFileUri?.let {
-            viewModel?.setAsWallpaper(requireContext(), it)
+            viewModel?.setPhotoAs(requireContext(), it)
         } ?: run {
-            viewModel?.setAsWallpaper(requireContext(), mBinding.photo!!.fullHDURL!!)
+            viewModel?.setPhotoAs(requireContext(), mBinding.photo!!.fullHDURL!!)
         }
     }
 
@@ -330,19 +374,24 @@ class DetailFragment : BaseFragment<DetailFragment.Listener>(Listener::class.jav
         grantResults: IntArray
     ) {
         when (requestCode) {
-            PermissionUtils.RequestCodeType.SHARE_IMAGE_REQUEST_CODE.id -> {
+            PermissionUtils.RequestCodeType.SHARE_PHOTO_REQUEST_CODE.id -> {
                 if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    shareImage()
+                    sharePhoto()
                 }
             }
-            PermissionUtils.RequestCodeType.DOWNLOAD_IMAGE_REQUEST_CODE.id -> {
+            PermissionUtils.RequestCodeType.DOWNLOAD_PHOTO_REQUEST_CODE.id -> {
                 if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    downloadImage()
+                    downloadPhoto()
                 }
             }
-            PermissionUtils.RequestCodeType.SET_IMAGE_AS_REQUEST_CODE.id -> {
+            PermissionUtils.RequestCodeType.SET_PHOTO_AS_REQUEST_CODE.id -> {
                 if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    setImageAs()
+                    setPhotoAs()
+                }
+            }
+            PermissionUtils.RequestCodeType.EDIT_PHOTO_REQUEST_CODE.id -> {
+                if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    editPhoto()
                 }
             }
         }
