@@ -18,6 +18,7 @@ import dreamlab.worldpics.base.BaseFragment
 import dreamlab.worldpics.databinding.FragmentBasePhotosBinding
 import dreamlab.worldpics.model.Photo
 import dreamlab.worldpics.model.PhotoRequest
+import dreamlab.worldpics.util.NetworkUtil
 import java.util.*
 import kotlin.math.hypot
 
@@ -90,9 +91,16 @@ abstract class BasePhotosFragment : BaseFragment<BasePhotosFragment.Listener>(
         mBinding.recycler.adapter = mAdapter
         viewModel.photos.observe(viewLifecycleOwner, Observer {
             if (it.isEmpty()) {
-                mBinding.emptyPlaceholder.visibility = View.VISIBLE
+                if (!NetworkUtil.networkAvailable(requireContext())) {
+                    mBinding.emptyPlaceholder.visibility = View.GONE
+                    mBinding.noNetworkConnectionPlaceholder.visibility = View.VISIBLE
+                } else {
+                    mBinding.noNetworkConnectionPlaceholder.visibility = View.GONE
+                    mBinding.emptyPlaceholder.visibility = View.VISIBLE
+                }
             } else {
                 mBinding.emptyPlaceholder.visibility = View.GONE
+                mBinding.noNetworkConnectionPlaceholder.visibility = View.GONE
             }
             mAdapter.submitList(it)
         })

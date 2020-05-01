@@ -100,16 +100,16 @@ class  PhotoAdapter(
         private val binding: ItemLoaderBinding
     ) : ItemsViewHolder(binding.root) {
 
-        fun bind(networkState: NetworkState?, retryCallback: () -> Unit) {
-            binding.progressBar.visibility = toVisibility(networkState?.status == Status.RUNNING)
-            binding.retry.visibility = toVisibility(networkState?.status == Status.FAILED)
-            binding.error.visibility = toVisibility(networkState?.msg != null)
-            binding.error.text = networkState?.msg
-            binding.retry.setOnClickListener { retryCallback() }
-        }
+            fun bind(networkState: NetworkState?, retryCallback: () -> Unit) {
+                binding.progressBar.visibility = toVisibility(networkState?.status == Status.RUNNING)
+                binding.retry.visibility = toVisibility(networkState?.status == Status.FAILED)
+                binding.error.visibility = toVisibility(networkState?.msg != null)
+                binding.error.text = binding.error.context.getString(R.string.network_not_available)
+                binding.retry.setOnClickListener { retryCallback() }
+            }
 
-        private fun toVisibility(constraint: Boolean): Int {
-            return if (constraint) {
+            private fun toVisibility(constraint: Boolean): Int {
+                return if (constraint) {
                 View.VISIBLE
             } else {
                 View.GONE
