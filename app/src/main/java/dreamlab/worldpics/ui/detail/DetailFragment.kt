@@ -17,6 +17,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import androidx.transition.AutoTransition
+import androidx.transition.TransitionInflater
 import androidx.transition.TransitionManager
 import dreamlab.worldpics.R
 import dreamlab.worldpics.base.BaseFragment
@@ -46,6 +47,10 @@ class DetailFragment : BaseFragment<DetailFragment.Listener>(Listener::class.jav
     private val CAN_REMOVE_FAVOURITE = 0
     private val CAN_ADD_FAVOURITE = 1
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        sharedElementEnterTransition = TransitionInflater.from(context).inflateTransition(android.R.transition.move)
+    }
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -109,11 +114,11 @@ class DetailFragment : BaseFragment<DetailFragment.Listener>(Listener::class.jav
                 setPhotoAs()
             }
         }
-        mBinding.fabMenu.fabItemEditPhoto.setOnClickListener {
+        /*mBinding.fabMenu.fabItemEditPhoto.setOnClickListener {
             if (hasWriteExternalStoragePermission(PermissionUtils.RequestCodeType.EDIT_PHOTO_REQUEST_CODE)) {
                 editPhoto()
             }
-        }
+        }*/
 
         viewModel?.viewModelScope?.launch {
             viewModel?.getPhotoByIdAsync(mBinding.photo!!.id)?.await()?.let {
@@ -237,20 +242,17 @@ class DetailFragment : BaseFragment<DetailFragment.Listener>(Listener::class.jav
                 mBinding.fabMenu.fab.id,
                 ConstraintSet.BOTTOM
             )
-            constraintSet.connect(
+            /*constraintSet.connect(
                 mBinding.fabMenu.fabItemEditPhoto.id,
                 ConstraintSet.BOTTOM,
                 mBinding.fabMenu.fab.id,
                 ConstraintSet.BOTTOM
-            )
+            )*/
             constraintSet.applyTo(mBinding.fabMenu.root)
-            constraintSet.setVisibility(
-                mBinding.fabMenu.fabItemDownloadWallpaper.id,
-                View.INVISIBLE
-            )
+            constraintSet.setVisibility(mBinding.fabMenu.fabItemDownloadWallpaper.id, View.INVISIBLE)
             constraintSet.setVisibility(mBinding.fabMenu.fabItemSetWallpaper.id, View.INVISIBLE)
             constraintSet.setVisibility(mBinding.fabMenu.fabItemAddFavourite.id, View.INVISIBLE)
-            constraintSet.setVisibility(mBinding.fabMenu.fabItemEditPhoto.id, View.INVISIBLE)
+            //constraintSet.setVisibility(mBinding.fabMenu.fabItemEditPhoto.id, View.INVISIBLE)
             mBinding.fabMenu.fabItemDownloadWallpaper.animate().alpha(0f).setDuration(duration)
                 .withEndAction {
                     mBinding.fabMenu.fabItemDownloadWallpaper.visibility = View.INVISIBLE
@@ -262,9 +264,9 @@ class DetailFragment : BaseFragment<DetailFragment.Listener>(Listener::class.jav
             mBinding.fabMenu.fabItemAddFavourite.animate().alpha(0f).setDuration(duration)
                 .withEndAction { mBinding.fabMenu.fabItemAddFavourite.visibility = View.INVISIBLE }
                 .start()
-            mBinding.fabMenu.fabItemEditPhoto.animate().alpha(0f).setDuration(duration)
+            /*mBinding.fabMenu.fabItemEditPhoto.animate().alpha(0f).setDuration(duration)
                 .withEndAction { mBinding.fabMenu.fabItemEditPhoto.visibility = View.INVISIBLE }
-                .start()
+                .start()*/
         } else {
             // open
             mBinding.fabMenu.fab.tag = 1
@@ -300,18 +302,18 @@ class DetailFragment : BaseFragment<DetailFragment.Listener>(Listener::class.jav
                 ConstraintSet.TOP,
                 requireContext().dpToPx(16f)
             )
-            constraintSet.connect(
+            /*constraintSet.connect(
                 mBinding.fabMenu.fabItemEditPhoto.id,
                 ConstraintSet.BOTTOM,
                 mBinding.fabMenu.fabItemAddFavourite.id,
                 ConstraintSet.TOP,
                 requireContext().dpToPx(16f)
-            )
+            )*/
             constraintSet.applyTo(mBinding.fabMenu.root)
             constraintSet.setVisibility(mBinding.fabMenu.fabItemDownloadWallpaper.id, View.VISIBLE)
             constraintSet.setVisibility(mBinding.fabMenu.fabItemSetWallpaper.id, View.VISIBLE)
             constraintSet.setVisibility(mBinding.fabMenu.fabItemAddFavourite.id, View.VISIBLE)
-            constraintSet.setVisibility(mBinding.fabMenu.fabItemEditPhoto.id, View.VISIBLE)
+            //constraintSet.setVisibility(mBinding.fabMenu.fabItemEditPhoto.id, View.VISIBLE)
             mBinding.fabMenu.fabItemDownloadWallpaper.animate().alpha(1f).setDuration(duration / 2)
                 .withEndAction {
                     mBinding.fabMenu.fabItemDownloadWallpaper.visibility = View.VISIBLE
@@ -322,9 +324,9 @@ class DetailFragment : BaseFragment<DetailFragment.Listener>(Listener::class.jav
             mBinding.fabMenu.fabItemAddFavourite.animate().alpha(1f).setDuration(duration / 2)
                 .withEndAction { mBinding.fabMenu.fabItemAddFavourite.visibility = View.VISIBLE }
                 .start()
-            mBinding.fabMenu.fabItemEditPhoto.animate().alpha(1f).setDuration(duration / 2)
+           /* mBinding.fabMenu.fabItemEditPhoto.animate().alpha(1f).setDuration(duration / 2)
                 .withEndAction { mBinding.fabMenu.fabItemEditPhoto.visibility = View.VISIBLE }
-                .start()
+                .start()*/
         }
     }
 
