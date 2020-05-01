@@ -89,6 +89,11 @@ abstract class BasePhotosFragment : BaseFragment<BasePhotosFragment.Listener>(
         mAdapter = PhotoAdapter(::onPhotoClicked) { viewModel.retry() }
         mBinding.recycler.adapter = mAdapter
         viewModel.photos.observe(viewLifecycleOwner, Observer {
+            if (it.isEmpty()) {
+                mBinding.emptyPlaceholder.visibility = View.VISIBLE
+            } else {
+                mBinding.emptyPlaceholder.visibility = View.GONE
+            }
             mAdapter.submitList(it)
         })
         viewModel.networkState.observe(viewLifecycleOwner, Observer {

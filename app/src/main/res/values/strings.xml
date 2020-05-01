@@ -77,5 +77,7 @@
     <string name="remove_from_favourites">Remove from favourites</string>
     <string name="visit_pixabay">Visit Pixabay</string>
     <string name="by">By</string>
+    <string name="favourite_photos_placeholder">Your favourite photos will be added here</string>
+    <string name="no_results_placeholder">No results found…</string>
 
 </resources>

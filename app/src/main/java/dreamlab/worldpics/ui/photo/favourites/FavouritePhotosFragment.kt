@@ -36,6 +36,11 @@ class FavouritePhotosFragment :
         viewModel?.getFavouritePhotos()?.observe(
             viewLifecycleOwner, Observer {
                 mAdapter.setPhotos(ArrayList(it))
+                if (it.isEmpty()) {
+                    mBinding.emptyPlaceholder.visibility = View.VISIBLE
+                } else {
+                    mBinding.emptyPlaceholder.visibility = View.GONE
+                }
             }
         )
 
@@ -50,4 +55,5 @@ class FavouritePhotosFragment :
     interface Listener {
         fun onPhotoClicked(photo: Photo)
     }
+
 }
