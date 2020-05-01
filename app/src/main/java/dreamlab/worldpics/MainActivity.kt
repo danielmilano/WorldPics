@@ -16,6 +16,7 @@ import dreamlab.worldpics.ui.photo.base.BasePhotosFragment
 import dreamlab.worldpics.ui.photo.favourites.FavouritePhotosFragment
 import dreamlab.worldpics.ui.photo.search.SearchPhotosFragment
 import dreamlab.worldpics.ui.photo.top.TopPhotosFragment
+import dreamlab.worldpics.ui.settings.SettingsFragment
 
 class MainActivity : BaseActivity(), BaseViewFragmentHelper, BasePhotosFragment.Listener,
     FilterFragment.Listener, DetailFragment.Listener, FavouritePhotosFragment.Listener {
@@ -59,6 +60,7 @@ class MainActivity : BaseActivity(), BaseViewFragmentHelper, BasePhotosFragment.
                     return@OnNavigationItemSelectedListener true
                 }
                 R.id.settings -> {
+                    fragmentWithTag<SettingsFragment>(SETTINGS_FRAGMENT_TAG)?.updateCacheSummary()
                     mBinding.navigationSwitcher.displayedChild = DisplayedFragment.SETTINGS.id
                     return@OnNavigationItemSelectedListener true
                 }

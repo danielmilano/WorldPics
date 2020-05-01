@@ -51,7 +51,7 @@
                         android:name="dreamlab.worldpics.ui.settings.SettingsFragment"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:tag="FRAGMENT_SETTINGS" />
+                        android:tag="SETTINGS_FRAGMENT" />
 
                 </ViewFlipper>
             </FrameLayout>

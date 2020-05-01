@@ -34,6 +34,9 @@ import javax.inject.Inject
 
 class SettingsPreferenceFragment : PreferenceFragmentCompat() {
 
+    companion object{
+        val SETTINGS_PREFERENCE_FRAGMENT_TAG = "SETTINGS_PREFERENCE_FRAGMENT"
+    }
     @Inject
     lateinit var viewModelFactory: ViewModelProvider.Factory
     private lateinit var viewModel: SettingsViewModel
@@ -117,6 +120,12 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat() {
         }
 
         return super.onCreateView(inflater, container, savedInstanceState)
+    }
+
+    fun updateCacheSummary() {
+        val startCacheSize = FileUtils.getCacheSize(requireContext())
+        val cache: Preference? = findPreference(PREFERENCE_CLEAR_CACHE)
+        cache?.summary = String.format("Cache size: %s", startCacheSize)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
