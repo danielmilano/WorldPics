@@ -6,6 +6,7 @@
     <string name="hottest">Hottest</string>
     <string name="favourites">Favourites</string>
     <string name="settings">Settings</string>
+    <string name="info">Info</string>
     <string name="filters">Filters</string>
     <string name="apply">Apply</string>
     <string name="reset_filters">Reset</string>
@@ -72,7 +73,6 @@
     <string name="portfolio">Portfolio</string>
     <string name="set_photo_as">Set photo as…</string>
     <string name="pixabay_profile">Pixabay profile</string>
-    <string name="info">Info</string>
     <string name="add_to_favourites">Add to favourites</string>
     <string name="remove_from_favourites">Remove from favourites</string>
     <string name="visit_pixabay">Visit Pixabay</string>

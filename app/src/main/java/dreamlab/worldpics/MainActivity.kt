@@ -59,7 +59,7 @@ class MainActivity : BaseActivity(), BaseViewFragmentHelper, BasePhotosFragment.
                     mBinding.navigationSwitcher.displayedChild = DisplayedFragment.FAVOURITES.id
                     return@OnNavigationItemSelectedListener true
                 }
-                R.id.settings -> {
+                R.id.info -> {
                     fragmentWithTag<SettingsFragment>(SETTINGS_FRAGMENT_TAG)?.updateCacheSummary()
                     mBinding.navigationSwitcher.displayedChild = DisplayedFragment.SETTINGS.id
                     return@OnNavigationItemSelectedListener true

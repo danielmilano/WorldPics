@@ -19,12 +19,14 @@ import dagger.android.support.AndroidSupportInjection
 import dreamlab.worldpics.BuildConfig
 import dreamlab.worldpics.R
 import dreamlab.worldpics.WorldPics
+import dreamlab.worldpics.billing.BillingManager
 import dreamlab.worldpics.model.Feedback
 import dreamlab.worldpics.util.FileUtils
+import dreamlab.worldpics.util.SharedPreferenceStorage.Companion.PREFERENCE_ABOUT_ME
 import dreamlab.worldpics.util.SharedPreferenceStorage.Companion.PREFERENCE_CLEAR_CACHE
+import dreamlab.worldpics.util.SharedPreferenceStorage.Companion.PREFERENCE_DONATE
 import dreamlab.worldpics.util.SharedPreferenceStorage.Companion.PREFERENCE_PRIVACY
 import dreamlab.worldpics.util.SharedPreferenceStorage.Companion.PREFERENCE_RATE_US
-import dreamlab.worldpics.util.SharedPreferenceStorage.Companion.PREFERENCE_REMOVE_ADS
 import dreamlab.worldpics.util.SharedPreferenceStorage.Companion.PREFERENCE_VERSION
 import dreamlab.worldpics.util.SharedPreferenceStorage.Companion.PREFERENCE_VISIT_PIXABAY
 import dreamlab.worldpics.util.viewModelProvider
@@ -34,16 +36,38 @@ import javax.inject.Inject
 
 class SettingsPreferenceFragment : PreferenceFragmentCompat() {
 
-    companion object{
+    companion object {
         val SETTINGS_PREFERENCE_FRAGMENT_TAG = "SETTINGS_PREFERENCE_FRAGMENT"
     }
+
     @Inject
     lateinit var viewModelFactory: ViewModelProvider.Factory
     private lateinit var viewModel: SettingsViewModel
 
+    private lateinit var billingManager: BillingManager
+
     override fun onAttach(context: Context) {
         AndroidSupportInjection.inject(this)
         super.onAttach(context)
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        billingManager = BillingManager(requireActivity())
+
+        activity?.let {
+            view.setBackgroundColor(
+                ContextCompat.getColor(
+                    it,
+                    R.color.background_material_light
+                )
+            ) //REMIND: fix al problema tra ripple effect al click e background
+        }
+    }
+
+    override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
+        setPreferencesFromResource(R.xml.info, null)
     }
 
     override fun onCreateView(
@@ -52,13 +76,6 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat() {
         savedInstanceState: Bundle?
     ): View? {
         viewModel = viewModelProvider(viewModelFactory)
-
-        val removeAds: Preference? = findPreference(PREFERENCE_REMOVE_ADS)
-        removeAds?.isVisible = !WorldPics.isPremium
-        removeAds?.onPreferenceClickListener = Preference.OnPreferenceClickListener {
-            //TODO
-            true
-        }
 
         val buttonRateUs: Preference? = findPreference(PREFERENCE_RATE_US)
         buttonRateUs?.onPreferenceClickListener = Preference.OnPreferenceClickListener {
@@ -119,6 +136,22 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat() {
             true
         }
 
+        val donate: Preference? = findPreference(PREFERENCE_DONATE)
+        donate?.onPreferenceClickListener = Preference.OnPreferenceClickListener {
+            billingManager.launchBillingFlow()
+            true
+        }
+
+        val about: Preference? = findPreference(PREFERENCE_ABOUT_ME)
+        about?.onPreferenceClickListener = Preference.OnPreferenceClickListener {
+            val intent = Intent(
+                Intent.ACTION_VIEW,
+                Uri.parse("https://it.linkedin.com/in/daniel-milano-6b9a42134")
+            )
+            startActivity(intent)
+            true
+        }
+
         return super.onCreateView(inflater, container, savedInstanceState)
     }
 
@@ -126,21 +159,5 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat() {
         val startCacheSize = FileUtils.getCacheSize(requireContext())
         val cache: Preference? = findPreference(PREFERENCE_CLEAR_CACHE)
         cache?.summary = String.format("Cache size: %s", startCacheSize)
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        activity?.let {
-            view.setBackgroundColor(
-                ContextCompat.getColor(
-                    it,
-                    R.color.background_material_light
-                )
-            ) //REMIND: fix al problema tra ripple effect al click e background
-        }
-    }
-
-    override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
-        setPreferencesFromResource(R.xml.settings, null)
     }
 }

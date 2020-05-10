@@ -20,15 +20,11 @@ class SharedPreferenceStorage @Inject constructor(private val context: Context) 
         PreferenceManager.getDefaultSharedPreferences(context)
     }
 
-    var isSettingsEnabled by BooleanPreference(prefs, PREFERENCE_ENABLE_SETTINGS, false)
-
     var preferenceOrientation by StringPreference(prefs, PREFERENCE_ORIENTATION, "all")
 
     var preferenceCategory by StringPreference(prefs, PREFERENCE_CATEGORIES, "")
 
     var preferenceColor by StringPreference(prefs, PREFERENCE_COLOR, "")
-
-    var preferenceRemoveAds by BooleanPreference(prefs, PREFERENCE_REMOVE_ADS, false)
 
     fun resetPreferences() {
         val preferencesEditor = PreferenceManager.getDefaultSharedPreferences(context).edit()
@@ -39,17 +35,16 @@ class SharedPreferenceStorage @Inject constructor(private val context: Context) 
 
     companion object {
         const val PREFERENCE_NAME = "worldpics"
-        const val PREFERENCE_ENABLE_SETTINGS = "pref_enable_settings"
         const val PREFERENCE_ORIENTATION = "pref_orientation"
         const val PREFERENCE_CATEGORIES = "pref_categories"
         const val PREFERENCE_COLOR = "pref_color"
-        const val PREFERENCE_RESET_SETTINGS = "pref_reset"
-        const val PREFERENCE_REMOVE_ADS = "pref_remove_ads"
         const val PREFERENCE_RATE_US = "pref_rate_us"
         const val PREFERENCE_PRIVACY = "pref_privacy"
         const val PREFERENCE_VERSION = "pref_version"
         const val PREFERENCE_VISIT_PIXABAY = "pref_visit_pixabay"
         const val PREFERENCE_CLEAR_CACHE = "pref_clear_cache"
+        const val PREFERENCE_DONATE = "pref_donate"
+        const val PREFERENCE_ABOUT_ME = "pref_about_me"
     }
 }
 
