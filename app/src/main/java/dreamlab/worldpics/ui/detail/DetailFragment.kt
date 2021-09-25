@@ -11,6 +11,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.animation.Animation
 import android.view.animation.RotateAnimation
+import android.widget.TextView
 import android.widget.Toast
 import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.content.ContextCompat
@@ -20,6 +21,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.transition.AutoTransition
 import androidx.transition.TransitionInflater
 import androidx.transition.TransitionManager
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import dreamlab.worldpics.R
 import dreamlab.worldpics.base.BaseFragment
 import dreamlab.worldpics.databinding.FragmentDetailBinding
@@ -27,7 +29,6 @@ import dreamlab.worldpics.db.PhotoDao
 import dreamlab.worldpics.model.Photo
 import dreamlab.worldpics.util.PermissionUtils
 import dreamlab.worldpics.util.viewModelProvider
-import kotlinx.android.synthetic.main.fab_menu.view.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -121,18 +122,18 @@ class DetailFragment : BaseFragment<DetailFragment.Listener>(Listener::class.jav
             viewModel?.getPhotoByIdAsync(mBinding.photo!!.id)?.await()?.let {
                 withContext(Dispatchers.Main) {
                     mBinding.fabMenu.fabItemAddFavourite.tag = CAN_REMOVE_FAVOURITE
-                    mBinding.fabMenu.fabItemAddFavourite.text.text =
+                    mBinding.fabMenu.fabItemAddFavourite.findViewById<TextView>(R.id.text).text =
                         requireContext().getString(R.string.remove_from_favourites)
-                    mBinding.fabMenu.fabItemAddFavourite.icon.setImageDrawable(
+                    mBinding.fabMenu.fabItemAddFavourite.findViewById<FloatingActionButton>(R.id.icon).setImageDrawable(
                         ContextCompat.getDrawable(requireContext(), R.drawable.ic_favorite_border_white)
                     )
                 }
             } ?: kotlin.run {
                 withContext(Dispatchers.Main) {
                     mBinding.fabMenu.fabItemAddFavourite.tag = CAN_ADD_FAVOURITE
-                    mBinding.fabMenu.fabItemAddFavourite.text.text =
+                    mBinding.fabMenu.fabItemAddFavourite.findViewById<TextView>(R.id.text).text =
                         requireContext().getString(R.string.add_to_favourites)
-                    mBinding.fabMenu.fabItemAddFavourite.icon.setImageDrawable(
+                    mBinding.fabMenu.fabItemAddFavourite.findViewById<FloatingActionButton>(R.id.icon).setImageDrawable(
                         ContextCompat.getDrawable(requireContext(), R.drawable.ic_favorite_white)
                     )
                 }
@@ -148,9 +149,9 @@ class DetailFragment : BaseFragment<DetailFragment.Listener>(Listener::class.jav
                         }
                     }
                     mBinding.fabMenu.fabItemAddFavourite.tag = CAN_ADD_FAVOURITE
-                    mBinding.fabMenu.fabItemAddFavourite.text.text =
+                    mBinding.fabMenu.fabItemAddFavourite.findViewById<TextView>(R.id.text).text =
                         requireContext().getString(R.string.add_to_favourites)
-                    mBinding.fabMenu.fabItemAddFavourite.icon.setImageDrawable(
+                    mBinding.fabMenu.fabItemAddFavourite.findViewById<FloatingActionButton>(R.id.icon).setImageDrawable(
                         ContextCompat.getDrawable(requireContext(), R.drawable.ic_favorite_white)
                     )
                     Toast.makeText(
@@ -166,9 +167,9 @@ class DetailFragment : BaseFragment<DetailFragment.Listener>(Listener::class.jav
                         }
                     }
                     mBinding.fabMenu.fabItemAddFavourite.tag = CAN_REMOVE_FAVOURITE
-                    mBinding.fabMenu.fabItemAddFavourite.text.text =
+                    mBinding.fabMenu.fabItemAddFavourite.findViewById<TextView>(R.id.text).text =
                         requireContext().getString(R.string.remove_from_favourites)
-                    mBinding.fabMenu.fabItemAddFavourite.icon.setImageDrawable(
+                    mBinding.fabMenu.fabItemAddFavourite.findViewById<FloatingActionButton>(R.id.icon).setImageDrawable(
                         ContextCompat.getDrawable(requireContext(), R.drawable.ic_favorite_border_white)
                     )
                     Toast.makeText(

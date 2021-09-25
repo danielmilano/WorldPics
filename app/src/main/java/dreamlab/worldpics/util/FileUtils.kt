@@ -73,7 +73,7 @@ object FileUtils {
 
         val values = ContentValues()
         values.put(MediaStore.Images.Media.TITLE, "title")
-        values.put(MediaStore.Images.Media.MIME_TYPE, "image/*")
+        values.put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg")
         val uri =
             context.contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values)
 
@@ -100,7 +100,7 @@ object FileUtils {
 
         val values = ContentValues()
         values.put(MediaStore.Images.Media.TITLE, "title")
-        values.put(MediaStore.Images.Media.MIME_TYPE, "image/*")
+        values.put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg")
         val uri =
             context.contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values)
 

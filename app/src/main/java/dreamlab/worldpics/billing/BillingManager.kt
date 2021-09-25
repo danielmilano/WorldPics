@@ -48,7 +48,7 @@ class BillingManager(val activity: Activity) : PurchasesUpdatedListener {
                 .setType(BillingClient.SkuType.INAPP)
                 .build()
             billingClient.querySkuDetailsAsync(params) { billingResult, skuDetailsList ->
-                if (billingResult.responseCode == BillingClient.BillingResponseCode.OK && skuDetailsList.isNotEmpty()) {
+                if (billingResult.responseCode == BillingClient.BillingResponseCode.OK && !skuDetailsList.isNullOrEmpty()) {
                     for (skuDetails in skuDetailsList) {
                         if (skuDetails.sku == SKU_AD_FREE) {
                             skuAdFreeBillingFlowParams = BillingFlowParams
@@ -70,14 +70,14 @@ class BillingManager(val activity: Activity) : PurchasesUpdatedListener {
     }
 
     override fun onPurchasesUpdated(
-        billingResult: BillingResult?,
+        billingResult: BillingResult,
         purchases: MutableList<Purchase>?
     ) {
         purchases?.let {
             for (purchase in it) {
-                if (billingResult?.responseCode == BillingClient.BillingResponseCode.OK) {
+                if (billingResult.responseCode == BillingClient.BillingResponseCode.OK) {
                     acknowledgePurchase(purchase)
-                } else if (billingResult?.responseCode == BillingClient.BillingResponseCode.ITEM_ALREADY_OWNED) {
+                } else if (billingResult.responseCode == BillingClient.BillingResponseCode.ITEM_ALREADY_OWNED) {
                     Toast.makeText(
                         activity,
                         "You have already donated, thank you!",
@@ -107,7 +107,6 @@ class BillingManager(val activity: Activity) : PurchasesUpdatedListener {
     private fun consumePurchaseParams(purchase: Purchase): ConsumeParams {
         return ConsumeParams.newBuilder()
             .setPurchaseToken(purchase.purchaseToken)
-            .setDeveloperPayload(purchase.developerPayload)
             .build()
     }
 
@@ -131,7 +130,7 @@ class BillingManager(val activity: Activity) : PurchasesUpdatedListener {
         } else {
             Log.w(
                 "BillingClient",
-                "queryPurchases() got an error response code: " + purchasesResult?.responseCode
+                "queryPurchases() got an error response code: " + purchasesResult.responseCode
             )
         }
         onQueryPurchasesFinished(purchasesResult)
