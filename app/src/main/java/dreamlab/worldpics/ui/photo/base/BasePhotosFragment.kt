@@ -3,7 +3,6 @@ package dreamlab.worldpics.ui.photo.base
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
 import android.content.Context
-import android.os.Build
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextUtils
@@ -28,7 +27,8 @@ abstract class BasePhotosFragment : BaseFragment<BasePhotosFragment.Listener>(
 
     abstract val viewModel: BasePhotoViewModel
 
-    private lateinit var mBinding: FragmentBasePhotosBinding
+    private var _mBinding: FragmentBasePhotosBinding? = null
+    private val mBinding get() = _mBinding!!
     private lateinit var mAdapter: PhotoAdapter
     private lateinit var currentRequest: PhotoRequest
 
@@ -38,7 +38,7 @@ abstract class BasePhotosFragment : BaseFragment<BasePhotosFragment.Listener>(
         savedInstanceState: Bundle?
     ): View? {
         super.onCreateView(inflater, container, savedInstanceState)
-        mBinding = FragmentBasePhotosBinding.inflate(inflater, container, false)
+        _mBinding = FragmentBasePhotosBinding.inflate(inflater, container, false)
         initAdapter(viewModel, mBinding)
         currentRequest = PhotoRequest.Builder().build()
         viewModel.searchPhotos(currentRequest)
@@ -86,6 +86,11 @@ abstract class BasePhotosFragment : BaseFragment<BasePhotosFragment.Listener>(
         })
     }
 
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _mBinding = null
+    }
+
     private fun initAdapter(viewModel: BasePhotoViewModel, mBinding: FragmentBasePhotosBinding) {
         mAdapter = PhotoAdapter(::onPhotoClicked) { viewModel.retry() }
         mBinding.recycler.adapter = mAdapter
@@ -117,23 +122,20 @@ abstract class BasePhotosFragment : BaseFragment<BasePhotosFragment.Listener>(
                 viewToAppear.context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
             imm.showSoftInput(mBinding.searchToolbar.editText, InputMethodManager.SHOW_IMPLICIT)
         }
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            val cx = viewToAppear.width / 2
-            val cy = viewToAppear.height / 2
-            val finalRadius = hypot(cx.toDouble(), cy.toDouble()).toFloat()
-            val animator =
-                ViewAnimationUtils.createCircularReveal(viewToAppear, cx, cy, 0f, finalRadius)
-            viewToAppear.visibility = View.VISIBLE
-            animator.addListener(object : AnimatorListenerAdapter() {
-                override fun onAnimationEnd(animation: Animator?) {
-                    showSearchKeyboard()
-                }
-            })
-            animator.start()
-        } else {
-            viewToAppear.visibility = View.VISIBLE
-            showSearchKeyboard()
-        }
+
+        val cx = viewToAppear.width / 2
+        val cy = viewToAppear.height / 2
+        val finalRadius = hypot(cx.toDouble(), cy.toDouble()).toFloat()
+        val animator =
+            ViewAnimationUtils.createCircularReveal(viewToAppear, cx, cy, 0f, finalRadius)
+        viewToAppear.visibility = View.VISIBLE
+        animator.addListener(object : AnimatorListenerAdapter() {
+            override fun onAnimationEnd(animation: Animator?) {
+                showSearchKeyboard()
+            }
+        })
+        animator.start()
+
     }
 
     private fun hideToolbarSearching() {
@@ -145,23 +147,19 @@ abstract class BasePhotosFragment : BaseFragment<BasePhotosFragment.Listener>(
                 viewToDisappear.context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
             imm.toggleSoftInput(0, InputMethodManager.HIDE_IMPLICIT_ONLY)
         }
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            val cx = viewToDisappear.width / 2
-            val cy = viewToDisappear.height / 2
-            val initialRadius = hypot(cx.toDouble(), cy.toDouble()).toFloat()
-            val anim =
-                ViewAnimationUtils.createCircularReveal(viewToDisappear, cx, cy, initialRadius, 0f)
-            anim.addListener(object : AnimatorListenerAdapter() {
-                override fun onAnimationEnd(animation: Animator) {
-                    hideSearchKeyboard()
-                    viewToDisappear.visibility = View.INVISIBLE
-                }
-            })
-            anim.start()
-        } else {
-            hideSearchKeyboard()
-            viewToDisappear.visibility = View.INVISIBLE
-        }
+
+        val cx = viewToDisappear.width / 2
+        val cy = viewToDisappear.height / 2
+        val initialRadius = hypot(cx.toDouble(), cy.toDouble()).toFloat()
+        val anim =
+            ViewAnimationUtils.createCircularReveal(viewToDisappear, cx, cy, initialRadius, 0f)
+        anim.addListener(object : AnimatorListenerAdapter() {
+            override fun onAnimationEnd(animation: Animator) {
+                hideSearchKeyboard()
+                viewToDisappear.visibility = View.INVISIBLE
+            }
+        })
+        anim.start()
     }
 
     private fun clearSearchingText() {

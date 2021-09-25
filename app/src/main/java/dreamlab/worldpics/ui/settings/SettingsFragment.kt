@@ -4,8 +4,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import dagger.android.support.DaggerFragment
-import dreamlab.worldpics.MainActivity
 import dreamlab.worldpics.R
 import dreamlab.worldpics.base.BaseFragment
 import dreamlab.worldpics.databinding.FragmentSettingsBinding
@@ -13,16 +11,22 @@ import dreamlab.worldpics.ui.settings.SettingsPreferenceFragment.Companion.SETTI
 
 class SettingsFragment : BaseFragment<Void>() {
 
-    private lateinit var mBinding: FragmentSettingsBinding
+    private var _mBinding: FragmentSettingsBinding? = null
+    private val mBinding get() = _mBinding!!
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         super.onCreateView(inflater, container, savedInstanceState)
-        mBinding = FragmentSettingsBinding.inflate(inflater, container, false)
+        _mBinding = FragmentSettingsBinding.inflate(inflater, container, false)
         return mBinding.root
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _mBinding = null
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

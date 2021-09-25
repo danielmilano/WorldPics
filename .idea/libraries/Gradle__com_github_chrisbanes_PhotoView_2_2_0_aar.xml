@@ -3,6 +3,7 @@
     <CLASSES>
       <root url="jar://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/40bcadda909e3c75919b1459fb081bcc/jetified-PhotoView-2.2.0/jars/classes.jar!/" />
       <root url="file://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/40bcadda909e3c75919b1459fb081bcc/jetified-PhotoView-2.2.0/res" />
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/40bcadda909e3c75919b1459fb081bcc/jetified-PhotoView-2.2.0/AndroidManifest.xml" />
     </CLASSES>
     <JAVADOC>
       <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.github.chrisbanes/PhotoView/2.2.0/b5fd89bc80601e16c62698aa8af45c8fee512854/PhotoView-2.2.0-javadoc.jar!/" />

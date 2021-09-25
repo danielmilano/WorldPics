@@ -13,6 +13,7 @@ import android.view.animation.Animation
 import android.view.animation.RotateAnimation
 import android.widget.Toast
 import androidx.constraintlayout.widget.ConstraintSet
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
@@ -41,7 +42,8 @@ class DetailFragment : BaseFragment<DetailFragment.Listener>(Listener::class.jav
     @Inject
     lateinit var photoDao: PhotoDao
 
-    private lateinit var mBinding: FragmentDetailBinding
+    private var _mBinding: FragmentDetailBinding? = null
+    private val mBinding get() = _mBinding!!
     private var downloadedFileUri: Uri? = null
 
     private val CAN_REMOVE_FAVOURITE = 0
@@ -55,9 +57,9 @@ class DetailFragment : BaseFragment<DetailFragment.Listener>(Listener::class.jav
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         super.onCreateView(inflater, container, savedInstanceState)
-        mBinding = FragmentDetailBinding.inflate(inflater, container, false)
+        _mBinding = FragmentDetailBinding.inflate(inflater, container, false)
         mBinding.photo = requireArguments().getSerializable(ARG_PHOTO) as Photo
         viewModel = viewModelProvider(viewModelFactory)
         return mBinding.root
@@ -114,11 +116,6 @@ class DetailFragment : BaseFragment<DetailFragment.Listener>(Listener::class.jav
                 setPhotoAs()
             }
         }
-        /*mBinding.fabMenu.fabItemEditPhoto.setOnClickListener {
-            if (hasWriteExternalStoragePermission(PermissionUtils.RequestCodeType.EDIT_PHOTO_REQUEST_CODE)) {
-                editPhoto()
-            }
-        }*/
 
         viewModel?.viewModelScope?.launch {
             viewModel?.getPhotoByIdAsync(mBinding.photo!!.id)?.await()?.let {
@@ -127,9 +124,7 @@ class DetailFragment : BaseFragment<DetailFragment.Listener>(Listener::class.jav
                     mBinding.fabMenu.fabItemAddFavourite.text.text =
                         requireContext().getString(R.string.remove_from_favourites)
                     mBinding.fabMenu.fabItemAddFavourite.icon.setImageDrawable(
-                        requireContext().getDrawable(
-                            R.drawable.ic_favorite_border_white
-                        )
+                        ContextCompat.getDrawable(requireContext(), R.drawable.ic_favorite_border_white)
                     )
                 }
             } ?: kotlin.run {
@@ -138,9 +133,7 @@ class DetailFragment : BaseFragment<DetailFragment.Listener>(Listener::class.jav
                     mBinding.fabMenu.fabItemAddFavourite.text.text =
                         requireContext().getString(R.string.add_to_favourites)
                     mBinding.fabMenu.fabItemAddFavourite.icon.setImageDrawable(
-                        requireContext().getDrawable(
-                            R.drawable.ic_favorite_white
-                        )
+                        ContextCompat.getDrawable(requireContext(), R.drawable.ic_favorite_white)
                     )
                 }
             }
@@ -158,9 +151,7 @@ class DetailFragment : BaseFragment<DetailFragment.Listener>(Listener::class.jav
                     mBinding.fabMenu.fabItemAddFavourite.text.text =
                         requireContext().getString(R.string.add_to_favourites)
                     mBinding.fabMenu.fabItemAddFavourite.icon.setImageDrawable(
-                        requireContext().getDrawable(
-                            R.drawable.ic_favorite_white
-                        )
+                        ContextCompat.getDrawable(requireContext(), R.drawable.ic_favorite_white)
                     )
                     Toast.makeText(
                         requireContext(),
@@ -178,9 +169,7 @@ class DetailFragment : BaseFragment<DetailFragment.Listener>(Listener::class.jav
                     mBinding.fabMenu.fabItemAddFavourite.text.text =
                         requireContext().getString(R.string.remove_from_favourites)
                     mBinding.fabMenu.fabItemAddFavourite.icon.setImageDrawable(
-                        requireContext().getDrawable(
-                            R.drawable.ic_favorite_border_white
-                        )
+                        ContextCompat.getDrawable(requireContext(), R.drawable.ic_favorite_border_white)
                     )
                     Toast.makeText(
                         requireContext(),
@@ -190,6 +179,11 @@ class DetailFragment : BaseFragment<DetailFragment.Listener>(Listener::class.jav
                 }
             }
         }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _mBinding = null
     }
 
     private fun hasWriteExternalStoragePermission(requestCode: PermissionUtils.RequestCodeType): Boolean {

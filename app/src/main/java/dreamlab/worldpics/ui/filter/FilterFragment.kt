@@ -9,6 +9,7 @@ import androidx.preference.PreferenceFragmentCompat
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import dreamlab.worldpics.R
 import dreamlab.worldpics.base.BaseDialogFragment
+import dreamlab.worldpics.databinding.FragmentDetailBinding
 import dreamlab.worldpics.databinding.FragmentFilterBinding
 import dreamlab.worldpics.model.PhotoRequest
 import dreamlab.worldpics.util.SharedPreferenceStorage
@@ -19,17 +20,23 @@ class FilterFragment : BaseDialogFragment<FilterFragment.Listener>(Listener::cla
     @Inject
     lateinit var mSharedPreferenceStorage: SharedPreferenceStorage
 
-    private lateinit var mBinding: FragmentFilterBinding
+    private var _mBinding: FragmentFilterBinding? = null
+    private val mBinding get() = _mBinding!!
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         super.onCreateView(inflater, container, savedInstanceState)
-        mBinding = FragmentFilterBinding.inflate(inflater, container, false)
+        _mBinding = FragmentFilterBinding.inflate(inflater, container, false)
 
         return mBinding.root
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _mBinding = null
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {

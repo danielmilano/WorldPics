@@ -3,6 +3,7 @@
     <CLASSES>
       <root url="jar://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/e2d048b176690d41d8dfa54cb8e96755/jetified-appcompat-resources-1.2.0-beta01/jars/classes.jar!/" />
       <root url="file://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/e2d048b176690d41d8dfa54cb8e96755/jetified-appcompat-resources-1.2.0-beta01/res" />
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/e2d048b176690d41d8dfa54cb8e96755/jetified-appcompat-resources-1.2.0-beta01/AndroidManifest.xml" />
     </CLASSES>
     <JAVADOC />
     <SOURCES>
