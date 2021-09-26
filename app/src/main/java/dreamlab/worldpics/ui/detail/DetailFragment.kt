@@ -103,7 +103,7 @@ class DetailFragment : BaseFragment<DetailFragment.Listener>(Listener::class.jav
         mBinding.fabMenu.fabItemAddFavourite.setOnClickListener {
             when (mBinding.fabMenu.fabItemAddFavourite.tag) {
                 CAN_REMOVE_FAVOURITE -> {
-                    viewModel?.deletePhoto(mBinding.photo!!.id)
+                    viewModel?.removePhotoFromFavourites(mBinding.photo!!.id)
                     canAddToFavourites()
                     Toast.makeText(
                         requireContext(),

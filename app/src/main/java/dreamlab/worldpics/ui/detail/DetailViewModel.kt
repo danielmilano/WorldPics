@@ -28,7 +28,7 @@ class DetailViewModel @Inject constructor(val photoDao: PhotoDao) : ViewModel() 
         }
     }
 
-    fun deletePhoto(id: String) {
+    fun removePhotoFromFavourites(id: String) {
         viewModelScope.launch(Dispatchers.IO) {
             photoDao.deletePhoto(id)
         }

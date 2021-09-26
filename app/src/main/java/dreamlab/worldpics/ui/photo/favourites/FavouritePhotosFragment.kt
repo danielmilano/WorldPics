@@ -49,6 +49,11 @@ class FavouritePhotosFragment :
         return mBinding.root
     }
 
+    override fun onResume() {
+        super.onResume()
+        viewModel?.getFavouritePhotos()
+    }
+
     override fun onDestroyView() {
         super.onDestroyView()
         _mBinding = null
