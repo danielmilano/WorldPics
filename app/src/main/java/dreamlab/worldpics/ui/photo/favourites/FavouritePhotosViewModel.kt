@@ -11,25 +11,11 @@ import javax.inject.Inject
 
 class FavouritePhotosViewModel @Inject constructor(val photoDao: PhotoDao): ViewModel() {
 
-    private var mPhotos: LiveData<List<Photo>>? = null
+    var photoList: MutableLiveData<List<Photo>> = MutableLiveData()
 
     init {
         viewModelScope.launch {
-            mPhotos = photoDao.photos()
-        }
-    }
-
-    fun getFavouritePhotos(): LiveData<List<Photo>>? = mPhotos
-
-    fun insert(photo: Photo): Job {
-        return viewModelScope.launch {
-            photoDao.insert(photo)
-        }
-    }
-
-    fun delete(photo: Photo): Job {
-        return viewModelScope.launch {
-            photoDao.deletePhoto(photo.id)
+            photoList.postValue(photoDao.photos())
         }
     }
 }

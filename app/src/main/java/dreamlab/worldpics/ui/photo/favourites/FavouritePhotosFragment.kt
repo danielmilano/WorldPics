@@ -35,8 +35,8 @@ class FavouritePhotosFragment :
         viewModel = viewModelProvider(viewModelFactory)
         mAdapter = FavouritePhotoAdapter(::onPhotoClicked)
         mBinding.recycler.adapter = mAdapter
-        viewModel?.getFavouritePhotos()?.observe(
-            viewLifecycleOwner, Observer {
+        viewModel?.photoList?.observe(
+            viewLifecycleOwner, {
                 mAdapter.setPhotos(ArrayList(it))
                 if (it.isEmpty()) {
                     mBinding.emptyPlaceholder.visibility = View.VISIBLE

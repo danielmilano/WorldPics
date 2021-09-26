@@ -16,7 +16,6 @@ import android.widget.Toast
 import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.viewModelScope
 import androidx.transition.AutoTransition
 import androidx.transition.TransitionInflater
 import androidx.transition.TransitionManager
@@ -27,9 +26,6 @@ import dreamlab.worldpics.databinding.FragmentDetailBinding
 import dreamlab.worldpics.db.PhotoDao
 import dreamlab.worldpics.model.Photo
 import dreamlab.worldpics.util.*
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 class DetailFragment : BaseFragment<DetailFragment.Listener>(Listener::class.java) {
@@ -66,6 +62,19 @@ class DetailFragment : BaseFragment<DetailFragment.Listener>(Listener::class.jav
         return mBinding.root
     }
 
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        setClickListeners()
+        setupObservers()
+        viewModel?.getPhotoById(mBinding.photo!!.id)
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _mBinding = null
+    }
+
     private fun setClickListeners() {
         mBinding.detailToolbar.back.setOnClickListener { mListenerHelper.listener!!.onBackPressed() }
         mBinding.detailToolbar.website.setOnClickListener {
@@ -90,24 +99,12 @@ class DetailFragment : BaseFragment<DetailFragment.Listener>(Listener::class.jav
                 setPhotoAs()
             }
         }
+        mBinding.fabMenu.fabItemAddFavourite.tag = CAN_ADD_FAVOURITE
         mBinding.fabMenu.fabItemAddFavourite.setOnClickListener {
             when (mBinding.fabMenu.fabItemAddFavourite.tag) {
                 CAN_REMOVE_FAVOURITE -> {
-                    viewModel?.viewModelScope?.launch {
-                        withContext(Dispatchers.IO) {
-                            photoDao.deletePhoto(mBinding.photo!!.id)
-                        }
-                    }
-                    mBinding.fabMenu.fabItemAddFavourite.tag = CAN_ADD_FAVOURITE
-                    mBinding.fabMenu.fabItemAddFavourite.findViewById<TextView>(R.id.text).text =
-                        requireContext().getString(R.string.add_to_favourites)
-                    mBinding.fabMenu.fabItemAddFavourite.findViewById<FloatingActionButton>(R.id.icon)
-                        .setImageDrawable(
-                            ContextCompat.getDrawable(
-                                requireContext(),
-                                R.drawable.ic_favorite_white
-                            )
-                        )
+                    viewModel?.deletePhoto(mBinding.photo!!.id)
+                    canAddToFavourites()
                     Toast.makeText(
                         requireContext(),
                         "Removed from favourites",
@@ -115,26 +112,10 @@ class DetailFragment : BaseFragment<DetailFragment.Listener>(Listener::class.jav
                     ).show()
                 }
                 CAN_ADD_FAVOURITE -> {
-                    viewModel?.viewModelScope?.launch {
-                        withContext(Dispatchers.IO) {
-                            photoDao.insert(mBinding.photo!!)
-                        }
-                    }
-                    mBinding.fabMenu.fabItemAddFavourite.tag = CAN_REMOVE_FAVOURITE
-                    mBinding.fabMenu.fabItemAddFavourite.findViewById<TextView>(R.id.text).text =
-                        requireContext().getString(R.string.remove_from_favourites)
-                    mBinding.fabMenu.fabItemAddFavourite.findViewById<FloatingActionButton>(R.id.icon)
-                        .setImageDrawable(
-                            ContextCompat.getDrawable(
-                                requireContext(),
-                                R.drawable.ic_favorite_border_white
-                            )
-                        )
-                    Toast.makeText(
-                        requireContext(),
-                        "Added to favourites",
-                        Toast.LENGTH_SHORT
-                    ).show()
+                    viewModel?.addPhotoToFavourites(mBinding.photo!!)
+                    canRemoveToFavourites()
+                    Toast.makeText(requireContext(), "Added to favourites", Toast.LENGTH_SHORT)
+                        .show()
                 }
             }
         }
@@ -143,40 +124,71 @@ class DetailFragment : BaseFragment<DetailFragment.Listener>(Listener::class.jav
     private fun setupObservers() {
         viewModel?.detailEvent?.observe(viewLifecycleOwner) {
             when (it) {
-                PhotoDetailEvent.Loading -> Toast.makeText(requireContext(), "Downloading image...", Toast.LENGTH_SHORT).show()
-                PhotoDetailEvent.Completed -> Toast.makeText(requireContext(), "Download completed!", Toast.LENGTH_SHORT).show()
-                PhotoDetailEvent.Error -> { Toast.makeText(requireContext(), "Error while downloading the image. Please try again later.", Toast.LENGTH_SHORT).show() }
-                is PhotoDetailEvent.Download -> downloadedFileUri = it.uri
-                is PhotoDetailEvent.Edit -> sendEditPhotoIntent(it.uri)
-                is PhotoDetailEvent.SetPhotoDetail -> sendSetPhotoIntent(it.uri)
-                is PhotoDetailEvent.Share -> sendShareIntent(it.uri)
-                is PhotoDetailEvent.OnPhotoDetailAlreadyFavourite -> {
-                    mBinding.fabMenu.fabItemAddFavourite.tag = CAN_REMOVE_FAVOURITE
-                    mBinding.fabMenu.fabItemAddFavourite.findViewById<TextView>(R.id.text).text =
-                        requireContext().getString(R.string.remove_from_favourites)
-                    mBinding.fabMenu.fabItemAddFavourite.findViewById<FloatingActionButton>(R.id.icon)
-                        .setImageDrawable(
-                            ContextCompat.getDrawable(
-                                requireContext(),
-                                R.drawable.ic_favorite_border_white
-                            )
-                        )
+                PhotoDetailEvent.Loading -> Toast.makeText(
+                    requireContext(),
+                    "Downloading image...",
+                    Toast.LENGTH_SHORT
+                ).show()
+                PhotoDetailEvent.Error -> Toast.makeText(
+                    requireContext(),
+                    "Error while downloading the image. Please try again later.",
+                    Toast.LENGTH_SHORT
+                ).show()
+                is PhotoDetailEvent.Downloaded -> {
+                    downloadedFileUri = it.uri
+                    Toast.makeText(requireContext(), "Download completed!", Toast.LENGTH_SHORT)
+                        .show()
+                }
+                is PhotoDetailEvent.Edit -> {
+                    Toast.makeText(requireContext(), "Download completed!", Toast.LENGTH_SHORT)
+                        .show()
+                    sendEditPhotoIntent(it.uri)
+                }
+                is PhotoDetailEvent.SetPhotoAs -> {
+                    Toast.makeText(requireContext(), "Download completed!", Toast.LENGTH_SHORT)
+                        .show()
+                    sendSetPhotoAsIntent(it.uri)
+                }
+                is PhotoDetailEvent.Share -> {
+                    Toast.makeText(requireContext(), "Download completed!", Toast.LENGTH_SHORT)
+                        .show()
+                    sendShareIntent(it.uri)
+                }
+                is PhotoDetailEvent.IsFavourite -> {
+                    if (it.photo != null) {
+                        canRemoveToFavourites()
+                    } else {
+                        canAddToFavourites()
+                    }
                 }
             }
         }
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
-        setClickListeners()
-        setupObservers()
-        viewModel?.getPhotoById(mBinding.photo!!.id)
+    private fun canRemoveToFavourites() {
+        mBinding.fabMenu.fabItemAddFavourite.tag = CAN_REMOVE_FAVOURITE
+        mBinding.fabMenu.fabItemAddFavourite.findViewById<TextView>(R.id.text).text =
+            requireContext().getString(R.string.remove_from_favourites)
+        mBinding.fabMenu.fabItemAddFavourite.findViewById<FloatingActionButton>(R.id.icon)
+            .setImageDrawable(
+                ContextCompat.getDrawable(
+                    requireContext(),
+                    R.drawable.ic_favorite_border_white
+                )
+            )
     }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _mBinding = null
+    private fun canAddToFavourites() {
+        mBinding.fabMenu.fabItemAddFavourite.tag = CAN_ADD_FAVOURITE
+        mBinding.fabMenu.fabItemAddFavourite.findViewById<TextView>(R.id.text).text =
+            requireContext().getString(R.string.add_to_favourites)
+        mBinding.fabMenu.fabItemAddFavourite.findViewById<FloatingActionButton>(R.id.icon)
+            .setImageDrawable(
+                ContextCompat.getDrawable(
+                    requireContext(),
+                    R.drawable.ic_favorite_white
+                )
+            )
     }
 
     private fun hasWriteExternalStoragePermission(requestCode: PermissionUtils.RequestCodeType): Boolean {
@@ -213,7 +225,7 @@ class DetailFragment : BaseFragment<DetailFragment.Listener>(Listener::class.jav
 
     private fun setPhotoAs() {
         downloadedFileUri?.let {
-            sendSetPhotoIntent(it)
+            sendSetPhotoAsIntent(it)
         } ?: run {
             viewModel?.setPhotoAs(requireContext(), mBinding.photo!!.fullHDURL!!)
         }
@@ -239,7 +251,7 @@ class DetailFragment : BaseFragment<DetailFragment.Listener>(Listener::class.jav
         )
     }
 
-    private fun sendSetPhotoIntent(uri: Uri) {
+    private fun sendSetPhotoAsIntent(uri: Uri) {
         val intent = intentSetPhotoAs(uri)
         requireContext().startActivity(
             Intent.createChooser(
