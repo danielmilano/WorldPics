@@ -12,12 +12,19 @@ import android.provider.MediaStore
 import android.util.Log
 import android.widget.Toast
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.DataSource
+import com.bumptech.glide.load.engine.GlideException
+import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.Target
+import com.google.firebase.inject.Deferred
 import java.net.URL
 import java.text.DecimalFormat
 import java.util.Random
 import dreamlab.worldpics.R
 import dreamlab.worldpics.WorldPics
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.async
+import kotlinx.coroutines.launch
 import java.io.*
 import java.lang.Exception
 
@@ -69,40 +76,11 @@ object FileUtils {
         return DecimalFormat("#,##0.#").format(size / Math.pow(1024.0, digitGroups.toDouble())) + " " + units[digitGroups]
     }
 
-    fun setPhotoAs(context: Context, url: String): Pair<Intent?, Uri?> {
-
+    fun downloadPhoto(context: Context, url: String) : Uri? {
         val values = ContentValues()
         values.put(MediaStore.Images.Media.TITLE, "title")
         values.put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg")
-        val uri =
-            context.contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values)
-
-        uri?.let {
-            val outStream: OutputStream?
-            try {
-                outStream = context.contentResolver.openOutputStream(uri)
-                Glide.with(context).asBitmap().load(url)
-                    .submit(Target.SIZE_ORIGINAL, Target.SIZE_ORIGINAL).get()
-                    .compress(Bitmap.CompressFormat.JPEG, 100, outStream)
-                outStream?.close()
-            } catch (e: Exception) {
-                return Pair(null, null)
-            }
-        } ?: return Pair(null, null)
-
-        val intent = intentSetPhotoAs(uri)
-
-        return Pair(intent, uri)
-
-    }
-
-    fun downloadPhoto(context: Context, url: String): Uri? {
-
-        val values = ContentValues()
-        values.put(MediaStore.Images.Media.TITLE, "title")
-        values.put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg")
-        val uri =
-            context.contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values)
+        val uri = context.contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values)
 
         uri?.let {
             val outStream: OutputStream?
@@ -118,7 +96,6 @@ object FileUtils {
         } ?: return null
 
         return uri
-
     }
 
     fun savePhotoInGallery(context: Context, url: String): Uri? {

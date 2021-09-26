@@ -15,7 +15,6 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.content.ContextCompat
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import androidx.transition.AutoTransition
@@ -27,8 +26,7 @@ import dreamlab.worldpics.base.BaseFragment
 import dreamlab.worldpics.databinding.FragmentDetailBinding
 import dreamlab.worldpics.db.PhotoDao
 import dreamlab.worldpics.model.Photo
-import dreamlab.worldpics.util.PermissionUtils
-import dreamlab.worldpics.util.viewModelProvider
+import dreamlab.worldpics.util.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -52,8 +50,10 @@ class DetailFragment : BaseFragment<DetailFragment.Listener>(Listener::class.jav
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        sharedElementEnterTransition = TransitionInflater.from(context).inflateTransition(android.R.transition.move)
+        sharedElementEnterTransition =
+            TransitionInflater.from(context).inflateTransition(android.R.transition.move)
     }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -66,34 +66,7 @@ class DetailFragment : BaseFragment<DetailFragment.Listener>(Listener::class.jav
         return mBinding.root
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
-        viewModel?.isInProgress?.observe(viewLifecycleOwner, Observer {
-            if (it) {
-                Toast.makeText(requireContext(), "Downloading image...", Toast.LENGTH_SHORT).show()
-            } else {
-                Toast.makeText(requireContext(), "Download completed!", Toast.LENGTH_SHORT).show()
-            }
-        })
-        viewModel?.isError?.observe(viewLifecycleOwner,
-            Observer {
-                if (it) {
-                    Toast.makeText(
-                        requireContext(),
-                        "Error while downloading the image. Please try again later.",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                }
-            }
-        )
-        viewModel?.downloadedFileUri?.observe(
-            viewLifecycleOwner,
-            Observer {
-                downloadedFileUri = it
-            }
-        )
-
+    private fun setClickListeners() {
         mBinding.detailToolbar.back.setOnClickListener { mListenerHelper.listener!!.onBackPressed() }
         mBinding.detailToolbar.website.setOnClickListener {
             val userProfileUrl =
@@ -117,29 +90,6 @@ class DetailFragment : BaseFragment<DetailFragment.Listener>(Listener::class.jav
                 setPhotoAs()
             }
         }
-
-        viewModel?.viewModelScope?.launch {
-            viewModel?.getPhotoByIdAsync(mBinding.photo!!.id)?.await()?.let {
-                withContext(Dispatchers.Main) {
-                    mBinding.fabMenu.fabItemAddFavourite.tag = CAN_REMOVE_FAVOURITE
-                    mBinding.fabMenu.fabItemAddFavourite.findViewById<TextView>(R.id.text).text =
-                        requireContext().getString(R.string.remove_from_favourites)
-                    mBinding.fabMenu.fabItemAddFavourite.findViewById<FloatingActionButton>(R.id.icon).setImageDrawable(
-                        ContextCompat.getDrawable(requireContext(), R.drawable.ic_favorite_border_white)
-                    )
-                }
-            } ?: kotlin.run {
-                withContext(Dispatchers.Main) {
-                    mBinding.fabMenu.fabItemAddFavourite.tag = CAN_ADD_FAVOURITE
-                    mBinding.fabMenu.fabItemAddFavourite.findViewById<TextView>(R.id.text).text =
-                        requireContext().getString(R.string.add_to_favourites)
-                    mBinding.fabMenu.fabItemAddFavourite.findViewById<FloatingActionButton>(R.id.icon).setImageDrawable(
-                        ContextCompat.getDrawable(requireContext(), R.drawable.ic_favorite_white)
-                    )
-                }
-            }
-        }
-
         mBinding.fabMenu.fabItemAddFavourite.setOnClickListener {
             when (mBinding.fabMenu.fabItemAddFavourite.tag) {
                 CAN_REMOVE_FAVOURITE -> {
@@ -151,9 +101,13 @@ class DetailFragment : BaseFragment<DetailFragment.Listener>(Listener::class.jav
                     mBinding.fabMenu.fabItemAddFavourite.tag = CAN_ADD_FAVOURITE
                     mBinding.fabMenu.fabItemAddFavourite.findViewById<TextView>(R.id.text).text =
                         requireContext().getString(R.string.add_to_favourites)
-                    mBinding.fabMenu.fabItemAddFavourite.findViewById<FloatingActionButton>(R.id.icon).setImageDrawable(
-                        ContextCompat.getDrawable(requireContext(), R.drawable.ic_favorite_white)
-                    )
+                    mBinding.fabMenu.fabItemAddFavourite.findViewById<FloatingActionButton>(R.id.icon)
+                        .setImageDrawable(
+                            ContextCompat.getDrawable(
+                                requireContext(),
+                                R.drawable.ic_favorite_white
+                            )
+                        )
                     Toast.makeText(
                         requireContext(),
                         "Removed from favourites",
@@ -169,9 +123,13 @@ class DetailFragment : BaseFragment<DetailFragment.Listener>(Listener::class.jav
                     mBinding.fabMenu.fabItemAddFavourite.tag = CAN_REMOVE_FAVOURITE
                     mBinding.fabMenu.fabItemAddFavourite.findViewById<TextView>(R.id.text).text =
                         requireContext().getString(R.string.remove_from_favourites)
-                    mBinding.fabMenu.fabItemAddFavourite.findViewById<FloatingActionButton>(R.id.icon).setImageDrawable(
-                        ContextCompat.getDrawable(requireContext(), R.drawable.ic_favorite_border_white)
-                    )
+                    mBinding.fabMenu.fabItemAddFavourite.findViewById<FloatingActionButton>(R.id.icon)
+                        .setImageDrawable(
+                            ContextCompat.getDrawable(
+                                requireContext(),
+                                R.drawable.ic_favorite_border_white
+                            )
+                        )
                     Toast.makeText(
                         requireContext(),
                         "Added to favourites",
@@ -180,6 +138,40 @@ class DetailFragment : BaseFragment<DetailFragment.Listener>(Listener::class.jav
                 }
             }
         }
+    }
+
+    private fun setupObservers() {
+        viewModel?.detailEvent?.observe(viewLifecycleOwner) {
+            when (it) {
+                PhotoDetailEvent.Loading -> Toast.makeText(requireContext(), "Downloading image...", Toast.LENGTH_SHORT).show()
+                PhotoDetailEvent.Completed -> Toast.makeText(requireContext(), "Download completed!", Toast.LENGTH_SHORT).show()
+                PhotoDetailEvent.Error -> { Toast.makeText(requireContext(), "Error while downloading the image. Please try again later.", Toast.LENGTH_SHORT).show() }
+                is PhotoDetailEvent.Download -> downloadedFileUri = it.uri
+                is PhotoDetailEvent.Edit -> sendEditPhotoIntent(it.uri)
+                is PhotoDetailEvent.SetPhotoDetail -> sendSetPhotoIntent(it.uri)
+                is PhotoDetailEvent.Share -> sendShareIntent(it.uri)
+                is PhotoDetailEvent.OnPhotoDetailAlreadyFavourite -> {
+                    mBinding.fabMenu.fabItemAddFavourite.tag = CAN_REMOVE_FAVOURITE
+                    mBinding.fabMenu.fabItemAddFavourite.findViewById<TextView>(R.id.text).text =
+                        requireContext().getString(R.string.remove_from_favourites)
+                    mBinding.fabMenu.fabItemAddFavourite.findViewById<FloatingActionButton>(R.id.icon)
+                        .setImageDrawable(
+                            ContextCompat.getDrawable(
+                                requireContext(),
+                                R.drawable.ic_favorite_border_white
+                            )
+                        )
+                }
+            }
+        }
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        setClickListeners()
+        setupObservers()
+        viewModel?.getPhotoById(mBinding.photo!!.id)
     }
 
     override fun onDestroyView() {
@@ -193,6 +185,113 @@ class DetailFragment : BaseFragment<DetailFragment.Listener>(Listener::class.jav
             this,
             requestCode
         )
+    }
+
+    private fun editPhoto() {
+        downloadedFileUri?.let {
+            sendEditPhotoIntent(it)
+        } ?: run {
+            viewModel?.editPhoto(requireContext(), mBinding.photo!!.fullHDURL!!)
+        }
+    }
+
+    private fun downloadPhoto() {
+        downloadedFileUri?.let {
+            Toast.makeText(context, "Image already downloaded!", Toast.LENGTH_SHORT).show()
+        } ?: run {
+            viewModel?.downloadPhoto(requireContext(), mBinding.photo!!.fullHDURL!!)
+        }
+    }
+
+    private fun sharePhoto() {
+        downloadedFileUri?.let {
+            sendShareIntent(it)
+        } ?: run {
+            viewModel?.share(requireContext(), mBinding.photo!!.fullHDURL!!)
+        }
+    }
+
+    private fun setPhotoAs() {
+        downloadedFileUri?.let {
+            sendSetPhotoIntent(it)
+        } ?: run {
+            viewModel?.setPhotoAs(requireContext(), mBinding.photo!!.fullHDURL!!)
+        }
+    }
+
+    private fun sendEditPhotoIntent(uri: Uri) {
+        val intent = intentEditPhoto(uri)
+        requireContext().startActivity(
+            Intent.createChooser(
+                intent,
+                requireContext().resources.getString(R.string.edit_photo)
+            )
+        )
+    }
+
+    private fun sendShareIntent(uri: Uri) {
+        val intent = intentSharePhoto(uri)
+        requireContext().startActivity(
+            Intent.createChooser(
+                intent,
+                requireContext().resources.getString(R.string.share_photo)
+            )
+        )
+    }
+
+    private fun sendSetPhotoIntent(uri: Uri) {
+        val intent = intentSetPhotoAs(uri)
+        requireContext().startActivity(
+            Intent.createChooser(
+                intent,
+                requireContext().resources.getString(R.string.set_photo_as)
+            )
+        )
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<String>,
+        grantResults: IntArray
+    ) {
+        when (requestCode) {
+            PermissionUtils.RequestCodeType.SHARE_PHOTO_REQUEST_CODE.id -> {
+                if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    sharePhoto()
+                }
+            }
+            PermissionUtils.RequestCodeType.DOWNLOAD_PHOTO_REQUEST_CODE.id -> {
+                if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    downloadPhoto()
+                }
+            }
+            PermissionUtils.RequestCodeType.SET_PHOTO_AS_REQUEST_CODE.id -> {
+                if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    setPhotoAs()
+                }
+            }
+            PermissionUtils.RequestCodeType.EDIT_PHOTO_REQUEST_CODE.id -> {
+                if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    editPhoto()
+                }
+            }
+        }
+    }
+
+    companion object {
+        private const val ARG_PHOTO = "ARG_PHOTO"
+
+        fun newInstance(photo: Photo): DetailFragment {
+            val fragment = DetailFragment()
+            val bundle = Bundle()
+            bundle.putSerializable(ARG_PHOTO, photo)
+            fragment.arguments = bundle
+            return fragment
+        }
+    }
+
+    interface Listener {
+        fun onBackPressed()
     }
 
     /**
@@ -244,7 +343,10 @@ class DetailFragment : BaseFragment<DetailFragment.Listener>(Listener::class.jav
                 ConstraintSet.BOTTOM
             )*/
             constraintSet.applyTo(mBinding.fabMenu.root)
-            constraintSet.setVisibility(mBinding.fabMenu.fabItemDownloadWallpaper.id, View.INVISIBLE)
+            constraintSet.setVisibility(
+                mBinding.fabMenu.fabItemDownloadWallpaper.id,
+                View.INVISIBLE
+            )
             constraintSet.setVisibility(mBinding.fabMenu.fabItemSetWallpaper.id, View.INVISIBLE)
             constraintSet.setVisibility(mBinding.fabMenu.fabItemAddFavourite.id, View.INVISIBLE)
             //constraintSet.setVisibility(mBinding.fabMenu.fabItemEditPhoto.id, View.INVISIBLE)
@@ -319,9 +421,9 @@ class DetailFragment : BaseFragment<DetailFragment.Listener>(Listener::class.jav
             mBinding.fabMenu.fabItemAddFavourite.animate().alpha(1f).setDuration(duration / 2)
                 .withEndAction { mBinding.fabMenu.fabItemAddFavourite.visibility = View.VISIBLE }
                 .start()
-           /* mBinding.fabMenu.fabItemEditPhoto.animate().alpha(1f).setDuration(duration / 2)
-                .withEndAction { mBinding.fabMenu.fabItemEditPhoto.visibility = View.VISIBLE }
-                .start()*/
+            /* mBinding.fabMenu.fabItemEditPhoto.animate().alpha(1f).setDuration(duration / 2)
+                 .withEndAction { mBinding.fabMenu.fabItemEditPhoto.visibility = View.VISIBLE }
+                 .start()*/
         }
     }
 
@@ -331,82 +433,5 @@ class DetailFragment : BaseFragment<DetailFragment.Listener>(Listener::class.jav
             dp,
             this.resources.displayMetrics
         ).toInt()
-    }
-
-    private fun editPhoto() {
-        downloadedFileUri?.let {
-            viewModel?.editPhoto(requireContext(), it)
-        } ?: run {
-            viewModel?.editPhoto(requireContext(), mBinding.photo!!.fullHDURL!!)
-        }
-    }
-
-    private fun sharePhoto() {
-        downloadedFileUri?.let {
-            viewModel?.share(requireContext(), it)
-        } ?: run {
-            viewModel?.share(requireContext(), mBinding.photo!!.fullHDURL!!)
-        }
-    }
-
-    private fun downloadPhoto() {
-        downloadedFileUri?.let {
-            Toast.makeText(context, "Image already downloaded!", Toast.LENGTH_SHORT).show()
-        } ?: run {
-            viewModel?.downloadPhoto(requireContext(), mBinding.photo!!.fullHDURL!!)
-        }
-    }
-
-    private fun setPhotoAs() {
-        downloadedFileUri?.let {
-            viewModel?.setPhotoAs(requireContext(), it)
-        } ?: run {
-            viewModel?.setPhotoAs(requireContext(), mBinding.photo!!.fullHDURL!!)
-        }
-    }
-
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<String>,
-        grantResults: IntArray
-    ) {
-        when (requestCode) {
-            PermissionUtils.RequestCodeType.SHARE_PHOTO_REQUEST_CODE.id -> {
-                if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    sharePhoto()
-                }
-            }
-            PermissionUtils.RequestCodeType.DOWNLOAD_PHOTO_REQUEST_CODE.id -> {
-                if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    downloadPhoto()
-                }
-            }
-            PermissionUtils.RequestCodeType.SET_PHOTO_AS_REQUEST_CODE.id -> {
-                if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    setPhotoAs()
-                }
-            }
-            PermissionUtils.RequestCodeType.EDIT_PHOTO_REQUEST_CODE.id -> {
-                if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    editPhoto()
-                }
-            }
-        }
-    }
-
-    companion object {
-        private const val ARG_PHOTO = "ARG_PHOTO"
-
-        fun newInstance(photo: Photo): DetailFragment {
-            val fragment = DetailFragment()
-            val bundle = Bundle()
-            bundle.putSerializable(ARG_PHOTO, photo)
-            fragment.arguments = bundle
-            return fragment
-        }
-    }
-
-    interface Listener {
-        fun onBackPressed()
     }
 }

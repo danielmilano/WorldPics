@@ -1,37 +1,31 @@
 package dreamlab.worldpics.ui.detail
 
 import android.content.Context
-import android.content.Intent
 import android.net.Uri
+import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import dreamlab.worldpics.R
 import dreamlab.worldpics.db.PhotoDao
-import dreamlab.worldpics.model.Photo
 import dreamlab.worldpics.util.FileUtils
-import dreamlab.worldpics.util.intentEditPhoto
-import dreamlab.worldpics.util.intentSetPhotoAs
-import dreamlab.worldpics.util.intentSharePhoto
 import kotlinx.coroutines.*
 import javax.inject.Inject
 
 class DetailViewModel @Inject constructor(val photoDao: PhotoDao) : ViewModel() {
-    val isInProgress: MutableLiveData<Boolean> by lazy {
-        MutableLiveData<Boolean>()
+    val detailEvent: MutableLiveData<PhotoDetailEvent> by lazy {
+        MutableLiveData<PhotoDetailEvent>()
     }
 
-    val isError: MutableLiveData<Boolean> by lazy {
-        MutableLiveData<Boolean>()
-    }
-
-    val downloadedFileUri: MutableLiveData<Uri> by lazy {
-        MutableLiveData<Uri>()
-    }
-
-    suspend fun getPhotoByIdAsync(id: String): Deferred<Photo?> {
-        return async {
-            photoDao.getPhotoById(id)
+    fun getPhotoById(id: String) {
+        viewModelScope.launch {
+            try {
+                val result = photoDao.getPhotoById(id)
+                result?.let {
+                    detailEvent.postValue(PhotoDetailEvent.OnPhotoDetailAlreadyFavourite(it))
+                }
+            } catch (e: Exception) {
+                Log.i("DetailViewModel", "Photo not favourite!")
+            }
         }
     }
 
@@ -41,102 +35,52 @@ class DetailViewModel @Inject constructor(val photoDao: PhotoDao) : ViewModel() 
         }
     }
 
-    private suspend fun setPhotoAsAsync(
-        context: Context,
-        url: String
-    ): Deferred<Pair<Intent?, Uri?>> {
-        return async {
-            FileUtils.setPhotoAs(context, url)
-        }
-    }
-
     fun downloadPhoto(context: Context, url: String) {
-        isInProgress.postValue(true)
+        detailEvent.postValue(PhotoDetailEvent.Loading)
         launchDataLoad {
             val uri = downloadPhotoAsync(context, url)
             uri.await()?.let {
-                downloadedFileUri.postValue(it)
-                isInProgress.postValue(false)
+                detailEvent.postValue(PhotoDetailEvent.Completed)
+                detailEvent.postValue(PhotoDetailEvent.Download(it))
             } ?: run {
-                isError.postValue(true)
+                detailEvent.postValue(PhotoDetailEvent.Error)
             }
         }
     }
 
     fun setPhotoAs(context: Context, url: String) {
-        isInProgress.postValue(true)
+        detailEvent.postValue(PhotoDetailEvent.Loading)
         launchDataLoad {
-            val pair = setPhotoAsAsync(context, url)
-            pair.await().first?.let {
-                downloadedFileUri.postValue(pair.await().second)
-                withContext(Dispatchers.Main) {
-                    context.startActivity(
-                        Intent.createChooser(
-                            it,
-                            context.resources.getString(R.string.set_photo_as)
-                        )
-                    )
-                }
-            } ?: isError.postValue(true)
+            val uri = downloadPhotoAsync(context, url)
+            uri.await()?.let {
+                detailEvent.postValue(PhotoDetailEvent.Completed)
+                detailEvent.postValue(PhotoDetailEvent.SetPhotoDetail(it))
+            } ?: detailEvent.postValue(PhotoDetailEvent.Error)
         }
-    }
-
-    fun setPhotoAs(context: Context, uri: Uri) {
-        val intent = intentSetPhotoAs(uri)
-        context.startActivity(
-            Intent.createChooser(
-                intent,
-                context.resources.getString(R.string.set_photo_as)
-            )
-        )
     }
 
     fun editPhoto(context: Context, url: String) {
-        isInProgress.postValue(true)
+        detailEvent.postValue(PhotoDetailEvent.Loading)
         launchDataLoad {
             downloadPhotoAsync(context, url).await()?.let {
-                downloadedFileUri.postValue(it)
-                withContext(Dispatchers.Main) {
-                    editPhoto(context, it)
-                }
+                detailEvent.postValue(PhotoDetailEvent.Completed)
+                detailEvent.postValue(PhotoDetailEvent.Edit(it))
             } ?: run {
-                isError.postValue(true)
+                detailEvent.postValue(PhotoDetailEvent.Error)
             }
         }
-    }
-
-    fun editPhoto(context: Context, uri: Uri) {
-        val intent = intentEditPhoto(uri)
-        context.startActivity(
-            Intent.createChooser(
-                intent,
-                context.resources.getString(R.string.edit_photo)
-            )
-        )
     }
 
     fun share(context: Context, url: String) {
-        isInProgress.postValue(true)
+        detailEvent.postValue(PhotoDetailEvent.Loading)
         launchDataLoad {
             downloadPhotoAsync(context, url).await()?.let {
-                downloadedFileUri.postValue(it)
-                withContext(Dispatchers.Main) {
-                    share(context, it)
-                }
+                detailEvent.postValue(PhotoDetailEvent.Completed)
+                detailEvent.postValue(PhotoDetailEvent.Share(it))
             } ?: run {
-                isError.postValue(true)
+                detailEvent.postValue(PhotoDetailEvent.Error)
             }
         }
-    }
-
-    fun share(context: Context, uri: Uri) {
-        val intent = intentSharePhoto(uri)
-        context.startActivity(
-            Intent.createChooser(
-                intent,
-                context.resources.getString(R.string.share_photo)
-            )
-        )
     }
 
     private fun launchDataLoad(block: suspend () -> Unit): Job {
@@ -149,11 +93,11 @@ class DetailViewModel @Inject constructor(val photoDao: PhotoDao) : ViewModel() 
         }
     }
 
-    suspend fun <T> async(block: suspend CoroutineScope.() -> T): Deferred<T> {
+    private suspend fun <T> async(block: suspend CoroutineScope.() -> T): Deferred<T> {
         return viewModelScope.async(Dispatchers.Default) { block() }
     }
 
-    suspend fun <T> asyncAwait(block: suspend CoroutineScope.() -> T): T {
-        return viewModelScope.async(Dispatchers.Default) { block() }.await()
+    private suspend fun <T> asyncAwait(block: suspend CoroutineScope.() -> T): T {
+        return withContext(viewModelScope.coroutineContext + Dispatchers.Default) { block() }
     }
 }
