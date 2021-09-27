@@ -1,5 +1,6 @@
 package dreamlab.worldpics.db
 
+import androidx.lifecycle.LiveData
 import androidx.room.*
 import dreamlab.worldpics.model.Photo
 
@@ -12,7 +13,7 @@ interface PhotoDao {
     suspend fun deletePhoto(id: String)
 
     @Query("SELECT * FROM photos")
-    suspend fun photos(): List<Photo>?
+    fun photos(): LiveData<List<Photo>>?
 
     @Query("SELECT * FROM photos WHERE (id == :id)")
     suspend fun getPhotoById(id: String): Photo?

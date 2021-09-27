@@ -15,7 +15,7 @@ import dreamlab.worldpics.ui.filter.FilterFragment
 import dreamlab.worldpics.ui.photo.base.BasePhotosFragment
 import dreamlab.worldpics.ui.photo.favourites.FavouritePhotosFragment
 import dreamlab.worldpics.ui.photo.search.SearchPhotosFragment
-import dreamlab.worldpics.ui.photo.top.TopPhotosFragment
+import dreamlab.worldpics.ui.photo.editorchoise.EditorChoicePhotosFragment
 import dreamlab.worldpics.ui.settings.SettingsFragment
 
 class MainActivity : BaseActivity(), BaseViewFragmentHelper, BasePhotosFragment.Listener,
@@ -28,9 +28,9 @@ class MainActivity : BaseActivity(), BaseViewFragmentHelper, BasePhotosFragment.
 
     private enum class DisplayedFragment(val id: Int) {
         SEARCH(0),
-        TOP(1),
-        FAVOURITES(2),
-        SETTINGS(3)
+        FAVOURITES(1),
+        SETTINGS(2),
+        TOP(3)
     }
 
     private lateinit var mBinding: ActivityMainBinding
@@ -51,10 +51,10 @@ class MainActivity : BaseActivity(), BaseViewFragmentHelper, BasePhotosFragment.
                     mBinding.navigationSwitcher.displayedChild = DisplayedFragment.SEARCH.id
                     return@OnNavigationItemSelectedListener true
                 }
-                R.id.hottest -> {
+                /*R.id.hottest -> {
                     mBinding.navigationSwitcher.displayedChild = DisplayedFragment.TOP.id
                     return@OnNavigationItemSelectedListener true
-                }
+                }*/
                 R.id.favourites -> {
                     mBinding.navigationSwitcher.displayedChild = DisplayedFragment.FAVOURITES.id
                     return@OnNavigationItemSelectedListener true
@@ -94,7 +94,7 @@ class MainActivity : BaseActivity(), BaseViewFragmentHelper, BasePhotosFragment.
                 fragmentWithTag<SearchPhotosFragment>(SEARCH_PHOTOS_FRAGMENT_TAG)?.onResetFilters()
             }
             DisplayedFragment.TOP.id -> {
-                fragmentWithTag<TopPhotosFragment>(TOP_PHOTOS_FRAGMENT_TAG)?.onResetFilters()
+                fragmentWithTag<EditorChoicePhotosFragment>(TOP_PHOTOS_FRAGMENT_TAG)?.onResetFilters()
             }
         }
 
@@ -108,7 +108,7 @@ class MainActivity : BaseActivity(), BaseViewFragmentHelper, BasePhotosFragment.
                 )
             }
             DisplayedFragment.TOP.id -> {
-                fragmentWithTag<TopPhotosFragment>(TOP_PHOTOS_FRAGMENT_TAG)?.onApplyFilters(request)
+                fragmentWithTag<EditorChoicePhotosFragment>(TOP_PHOTOS_FRAGMENT_TAG)?.onApplyFilters(request)
             }
         }
     }

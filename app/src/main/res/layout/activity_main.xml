@@ -32,12 +32,12 @@
                         android:layout_height="match_parent"
                         android:tag="SEARCH_PHOTOS_FRAGMENT" />
 
-                    <fragment
+                   <!-- <fragment
                         android:id="@+id/fragment_top_photos"
-                        android:name="dreamlab.worldpics.ui.photo.top.TopPhotosFragment"
+                        android:name="dreamlab.worldpics.ui.photo.editorchoise.EditorChoicePhotosFragment"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:tag="TOP_PHOTOS_FRAGMENT" />
+                        android:tag="TOP_PHOTOS_FRAGMENT" />-->
 
                     <fragment
                         android:id="@+id/fragment_favourite_photos"

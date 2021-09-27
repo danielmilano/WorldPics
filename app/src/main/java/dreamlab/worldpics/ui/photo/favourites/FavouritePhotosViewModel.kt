@@ -10,15 +10,17 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
-class FavouritePhotosViewModel @Inject constructor(val photoDao: PhotoDao) : ViewModel() {
+class FavouritePhotosViewModel @Inject constructor(val photoDao: PhotoDao): ViewModel() {
 
-    val photoList: MutableLiveData<List<Photo>> by lazy {
-        MutableLiveData<List<Photo>>()
-    }
-    fun getFavouritePhotos(){
-        viewModelScope.launch(Dispatchers.IO) {
-            photoList.postValue(photoDao.photos())
+    private var mPhotos: LiveData<List<Photo>>? = null
+
+    init {
+        viewModelScope.launch {
+            mPhotos = photoDao.photos()
         }
     }
+
+    fun getFavouritePhotos(): LiveData<List<Photo>>? = mPhotos
+
 }
 

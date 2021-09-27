@@ -6,10 +6,10 @@
         android:icon="@drawable/ic_search_black"
         android:title="@string/photos" />
 
-    <item
+   <!-- <item
         android:id="@+id/hottest"
         android:icon="@drawable/ic_hottest_black"
-        android:title="@string/hottest" />
+        android:title="@string/hottest" />-->
 
     <item
         android:id="@+id/favourites"

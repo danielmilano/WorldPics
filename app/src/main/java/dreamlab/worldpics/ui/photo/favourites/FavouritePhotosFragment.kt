@@ -35,7 +35,7 @@ class FavouritePhotosFragment :
         viewModel = viewModelProvider(viewModelFactory)
         mAdapter = FavouritePhotoAdapter(::onPhotoClicked)
         mBinding.recycler.adapter = mAdapter
-        viewModel?.photoList?.observe(
+        viewModel?.getFavouritePhotos()?.observe(
             viewLifecycleOwner, {
                 mAdapter.setPhotos(ArrayList(it))
                 if (it.isEmpty()) {
@@ -47,11 +47,6 @@ class FavouritePhotosFragment :
         )
 
         return mBinding.root
-    }
-
-    override fun onResume() {
-        super.onResume()
-        viewModel?.getFavouritePhotos()
     }
 
     override fun onDestroyView() {

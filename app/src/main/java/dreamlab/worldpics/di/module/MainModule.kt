@@ -12,8 +12,8 @@ import dreamlab.worldpics.ui.detail.DetailFragment
 import dreamlab.worldpics.ui.filter.FilterFragment
 import dreamlab.worldpics.ui.photo.search.SearchPhotoViewModel
 import dreamlab.worldpics.ui.photo.search.SearchPhotosFragment
-import dreamlab.worldpics.ui.photo.top.TopPhotoViewModel
-import dreamlab.worldpics.ui.photo.top.TopPhotosFragment
+import dreamlab.worldpics.ui.photo.editorchoise.EditorChoicePhotoViewModel
+import dreamlab.worldpics.ui.photo.editorchoise.EditorChoicePhotosFragment
 import dreamlab.worldpics.ui.settings.SettingsFragment
 import dreamlab.worldpics.ui.settings.SettingsPreferenceFragment
 import dreamlab.worldpics.ui.detail.DetailViewModel
@@ -42,20 +42,20 @@ abstract class MainModule {
     abstract fun bindSearchPhotoViewModel(viewModel: SearchPhotoViewModel): ViewModel
 
     /**
-     * Generates an [AndroidInjector] for the [TopPhotosFragment].
+     * Generates an [AndroidInjector] for the [EditorChoicePhotosFragment].
      */
     @FragmentScoped
     @ContributesAndroidInjector
-    abstract fun contributeTopPhotosFragment(): TopPhotosFragment
+    abstract fun contributeTopPhotosFragment(): EditorChoicePhotosFragment
 
     /**
      * The ViewModels are created by Dagger in a map. Via the @ViewModelKey, we define that we
-     * want to get a [TopPhotoViewModel] class.
+     * want to get a [EditorChoicePhotoViewModel] class.
      */
     @Binds
     @IntoMap
-    @ViewModelKey(TopPhotoViewModel::class)
-    abstract fun bindTopPhotoViewModel(viewModel: TopPhotoViewModel): ViewModel
+    @ViewModelKey(EditorChoicePhotoViewModel::class)
+    abstract fun bindTopPhotoViewModel(viewModel: EditorChoicePhotoViewModel): ViewModel
 
     /**
      * Generates an [AndroidInjector] for the [FilterFragment].
