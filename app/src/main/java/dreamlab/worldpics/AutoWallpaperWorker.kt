@@ -7,11 +7,15 @@ import androidx.work.WorkerParameters
 import dreamlab.worldpics.db.PhotoDao
 import java.lang.Exception
 import java.net.URL
+import javax.inject.Inject
 import kotlin.random.Random
 
 
-class AutoWallpaperWorker(val context: Context, params: WorkerParameters, val photoDao: PhotoDao) :
+class AutoWallpaperWorker(val context: Context, params: WorkerParameters) :
     Worker(context, params) {
+
+    @Inject
+    lateinit var photoDao: PhotoDao
 
     companion object {
         const val AUTO_WALLPAPER_WORK_NAME = "auto_wallpaper_work"
