@@ -30,6 +30,6 @@ class WorldPics : DaggerApplication() {
 
     override fun onCreate() {
         super.onCreate()
-        mSharedPreferenceStorage.resetPreferences()
+        mSharedPreferenceStorage.resetFilterPreferences()
     }
 }

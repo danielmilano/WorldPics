@@ -21,15 +21,15 @@ class SharedPreferenceStorage @Inject constructor(private val context: Context) 
     }
 
     var preferenceOrientation by StringPreference(prefs, PREFERENCE_ORIENTATION, "all")
-
     var preferenceCategory by StringPreference(prefs, PREFERENCE_CATEGORIES, "")
-
     var preferenceColor by StringPreference(prefs, PREFERENCE_COLOR, "")
+    var preferenceAutowallpaper by StringPreference(prefs, PREFERENCE_WORK_MANAGER, "")
 
-    fun resetPreferences() {
+    fun resetFilterPreferences() {
         val preferencesEditor = PreferenceManager.getDefaultSharedPreferences(context).edit()
-        preferencesEditor.clear()
-        PreferenceManager.setDefaultValues(context, R.xml.filters, true)
+        preferencesEditor.remove(PREFERENCE_ORIENTATION)
+        preferencesEditor.remove(PREFERENCE_CATEGORIES)
+        preferencesEditor.remove(PREFERENCE_COLOR)
         preferencesEditor.apply()
     }
 
@@ -45,6 +45,7 @@ class SharedPreferenceStorage @Inject constructor(private val context: Context) 
         const val PREFERENCE_CLEAR_CACHE = "pref_clear_cache"
         const val PREFERENCE_DONATE = "pref_donate"
         const val PREFERENCE_ABOUT_ME = "pref_about_me"
+        const val PREFERENCE_WORK_MANAGER = "pref_work_manager"
     }
 }
 

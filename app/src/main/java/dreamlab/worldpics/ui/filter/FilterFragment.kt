@@ -9,7 +9,6 @@ import androidx.preference.PreferenceFragmentCompat
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import dreamlab.worldpics.R
 import dreamlab.worldpics.base.BaseDialogFragment
-import dreamlab.worldpics.databinding.FragmentDetailBinding
 import dreamlab.worldpics.databinding.FragmentFilterBinding
 import dreamlab.worldpics.model.PhotoRequest
 import dreamlab.worldpics.util.SharedPreferenceStorage
@@ -68,7 +67,7 @@ class FilterFragment : BaseDialogFragment<FilterFragment.Listener>(Listener::cla
             dismiss()
         }
         mBinding.reset.setOnClickListener {
-            mSharedPreferenceStorage.resetPreferences()
+            mSharedPreferenceStorage.resetFilterPreferences()
             mListenerHelper.listener?.onResetFilters()
             dismiss()
         }

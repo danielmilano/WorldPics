@@ -8,7 +8,11 @@
         <entry key="app/src/main/res/layout/cell_info_detail_item.xml" value="0.19739583333333333" />
         <entry key="app/src/main/res/layout/fab_menu.xml" value="0.21197916666666666" />
         <entry key="app/src/main/res/layout/fragment_detail.xml" value="0.403125" />
+        <entry key="app/src/main/res/layout/fragment_filter.xml" value="0.3890625" />
+        <entry key="app/src/main/res/layout/fragment_settings.xml" value="0.403125" />
         <entry key="app/src/main/res/menu/navigation.xml" value="0.403125" />
+        <entry key="app/src/main/res/xml/filters.xml" value="0.3890625" />
+        <entry key="app/src/main/res/xml/info.xml" value="0.3890625" />
       </map>
     </option>
   </component>

@@ -43,4 +43,12 @@
         android:title="Version"
         app:iconSpaceReserved="false" />
 
+    <ListPreference
+        android:entries="@array/work_manager_values"
+        android:entryValues="@array/work_manager_values"
+        android:key="pref_work_manager"
+        android:summary="Every %s hours your wallpaper will be automatically set with one of your favourite photo"
+        android:title="Auto Wallpaper"
+        app:iconSpaceReserved="false" />
+
 </androidx.preference.PreferenceScreen>

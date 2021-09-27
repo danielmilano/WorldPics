@@ -1,5 +1,6 @@
 package dreamlab.worldpics.di.module
 
+import android.app.Application
 import android.content.Context
 import android.net.ConnectivityManager
 import android.os.Bundle
@@ -31,6 +32,11 @@ class ApplicationModule {
     @Provides
     fun provideContext(application: WorldPics): Context {
         return application.applicationContext
+    }
+
+    @Provides
+    fun provideApplication(application: WorldPics) : Application{
+        return application
     }
 
     @Singleton

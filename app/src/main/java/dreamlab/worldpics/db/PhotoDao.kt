@@ -15,6 +15,9 @@ interface PhotoDao {
     @Query("SELECT * FROM photos")
     fun photos(): LiveData<List<Photo>>?
 
+    @Query("SELECT * FROM photos")
+    fun getAll(): List<Photo>
+
     @Query("SELECT * FROM photos WHERE (id == :id)")
     suspend fun getPhotoById(id: String): Photo?
 }

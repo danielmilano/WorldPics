@@ -13,15 +13,19 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
+import androidx.work.OneTimeWorkRequest
+import androidx.work.WorkManager
 import com.codemybrainsout.ratingdialog.RatingDialog
 import com.google.firebase.database.FirebaseDatabase
 import dagger.android.support.AndroidSupportInjection
+import dreamlab.worldpics.AutoWallpaperWorker
 import dreamlab.worldpics.BuildConfig
 import dreamlab.worldpics.R
 import dreamlab.worldpics.WorldPics
 import dreamlab.worldpics.billing.BillingManager
 import dreamlab.worldpics.model.Feedback
 import dreamlab.worldpics.util.FileUtils
+import dreamlab.worldpics.util.SharedPreferenceStorage
 import dreamlab.worldpics.util.SharedPreferenceStorage.Companion.PREFERENCE_ABOUT_ME
 import dreamlab.worldpics.util.SharedPreferenceStorage.Companion.PREFERENCE_CLEAR_CACHE
 import dreamlab.worldpics.util.SharedPreferenceStorage.Companion.PREFERENCE_DONATE
@@ -29,6 +33,7 @@ import dreamlab.worldpics.util.SharedPreferenceStorage.Companion.PREFERENCE_PRIV
 import dreamlab.worldpics.util.SharedPreferenceStorage.Companion.PREFERENCE_RATE_US
 import dreamlab.worldpics.util.SharedPreferenceStorage.Companion.PREFERENCE_VERSION
 import dreamlab.worldpics.util.SharedPreferenceStorage.Companion.PREFERENCE_VISIT_PIXABAY
+import dreamlab.worldpics.util.SharedPreferenceStorage.Companion.PREFERENCE_WORK_MANAGER
 import dreamlab.worldpics.util.viewModelProvider
 import java.text.SimpleDateFormat
 import java.util.*
@@ -43,6 +48,9 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat() {
     @Inject
     lateinit var viewModelFactory: ViewModelProvider.Factory
     private lateinit var viewModel: SettingsViewModel
+
+    @Inject
+    lateinit var mSharedPreferenceStorage: SharedPreferenceStorage
 
     private lateinit var billingManager: BillingManager
 
@@ -152,6 +160,8 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat() {
             true
         }
 
+        setAutoWallpaper()
+
         return super.onCreateView(inflater, container, savedInstanceState)
     }
 
@@ -159,5 +169,40 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat() {
         val startCacheSize = FileUtils.getCacheSize(requireContext())
         val cache: Preference? = findPreference(PREFERENCE_CLEAR_CACHE)
         cache?.summary = String.format("Cache size: %s", startCacheSize)
+    }
+
+    private fun setAutoWallpaper() {
+        val autowallpaper: Preference? = findPreference(PREFERENCE_WORK_MANAGER)
+        viewModel.getFavouritePhotos()?.observe(viewLifecycleOwner) {
+            if (it.isEmpty()) {
+                mSharedPreferenceStorage.preferenceAutowallpaper = null
+                viewModel.cancelWork()
+                autowallpaper?.summary =
+                    "Will set your device wallpaper with a random photo taken from your fovourites photo"
+                autowallpaper?.isVisible = false
+            } else {
+                if (!mSharedPreferenceStorage.preferenceAutowallpaper.isNullOrEmpty()) {
+                    autowallpaper?.summary =
+                        "Every ${mSharedPreferenceStorage.preferenceAutowallpaper} hours your wallpaper will be automatically set with a random photo taken from your fovourites photo"
+                } else {
+                    autowallpaper?.summary =
+                        "Will set your device wallpaper with a random photo taken from your fovourites photo"
+                }
+                autowallpaper?.isVisible = true
+            }
+        }
+        autowallpaper?.onPreferenceChangeListener =
+            Preference.OnPreferenceChangeListener { pref, newValue ->
+                if (newValue?.toString()?.isEmpty() == true) {
+                    autowallpaper?.summary =
+                        "Will set your device wallpaper with a random photo taken from your fovourites photo"
+                } else {
+                    mSharedPreferenceStorage.preferenceAutowallpaper = newValue.toString()
+                    autowallpaper?.summary =
+                        "Every ${mSharedPreferenceStorage.preferenceAutowallpaper} hours your wallpaper will be automatically set with a random photo taken from your fovourites photo"
+                    viewModel.setAutoWallpaper(newValue.toString().toLong())
+                }
+                true
+            }
     }
 }
