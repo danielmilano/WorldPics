@@ -4,25 +4,20 @@ import android.app.WallpaperManager
 import android.content.Context
 import androidx.work.Worker
 import androidx.work.WorkerParameters
-import dreamlab.worldpics.db.PhotoDao
+import dreamlab.worldpics.db.WorldPicsDatabase
 import java.lang.Exception
 import java.net.URL
-import javax.inject.Inject
 import kotlin.random.Random
-
 
 class AutoWallpaperWorker(val context: Context, params: WorkerParameters) :
     Worker(context, params) {
-
-    @Inject
-    lateinit var photoDao: PhotoDao
 
     companion object {
         const val AUTO_WALLPAPER_WORK_NAME = "auto_wallpaper_work"
     }
 
     override fun doWork(): Result {
-        val list = photoDao.getAll()
+        val list = WorldPicsDatabase.getInstance(context).photoDao().getAll()
         val randomIndex = Random.nextInt(list.size)
         val url = list[randomIndex].fullHDURL
         return try {
