@@ -4,12 +4,12 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.lifecycle.Observer
+import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModelProvider
 import dreamlab.worldpics.base.BaseFragment
-import dreamlab.worldpics.databinding.FragmentBasePhotosBinding
 import dreamlab.worldpics.databinding.FragmentFavouritesBinding
 import dreamlab.worldpics.model.Photo
+import dreamlab.worldpics.ui.photo.adapter.FavouritePhotoAdapter
 import dreamlab.worldpics.util.viewModelProvider
 import javax.inject.Inject
 
@@ -33,20 +33,25 @@ class FavouritePhotosFragment :
         super.onCreateView(inflater, container, savedInstanceState)
         _mBinding = FragmentFavouritesBinding.inflate(inflater, container, false)
         viewModel = viewModelProvider(viewModelFactory)
+        return mBinding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
         mAdapter = FavouritePhotoAdapter(::onPhotoClicked)
         mBinding.recycler.adapter = mAdapter
         viewModel?.getFavouritePhotos()?.observe(
             viewLifecycleOwner, {
-                mAdapter.setPhotos(ArrayList(it))
                 if (it.isEmpty()) {
-                    mBinding.emptyPlaceholder.visibility = View.VISIBLE
+                    mBinding.recycler.isVisible = false
+                    mBinding.emptyPlaceholder.isVisible = true
                 } else {
-                    mBinding.emptyPlaceholder.visibility = View.GONE
+                    mAdapter.setPhotos(ArrayList(it))
+                    mBinding.recycler.isVisible = true
+                    mBinding.emptyPlaceholder.isVisible = false
                 }
             }
         )
-
-        return mBinding.root
     }
 
     override fun onDestroyView() {

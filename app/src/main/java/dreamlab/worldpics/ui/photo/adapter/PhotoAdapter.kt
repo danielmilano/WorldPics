@@ -1,4 +1,4 @@
-package dreamlab.worldpics.ui.photo.base
+package dreamlab.worldpics.ui.photo.adapter
 
 import android.view.LayoutInflater
 import android.view.View

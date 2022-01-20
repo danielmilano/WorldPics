@@ -17,6 +17,7 @@ import dreamlab.worldpics.base.BaseFragment
 import dreamlab.worldpics.databinding.FragmentBasePhotosBinding
 import dreamlab.worldpics.model.Photo
 import dreamlab.worldpics.model.PhotoRequest
+import dreamlab.worldpics.ui.photo.adapter.PhotoAdapter
 import dreamlab.worldpics.util.NetworkUtil
 import java.util.*
 import kotlin.math.hypot

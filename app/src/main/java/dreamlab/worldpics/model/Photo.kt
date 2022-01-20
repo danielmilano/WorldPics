@@ -1,5 +1,6 @@
 package dreamlab.worldpics.model
 
+import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.google.gson.annotations.SerializedName
@@ -77,5 +78,8 @@ data class Photo(
     var user: String? = null,
 
     @SerializedName("userImageURL")
-    var userImageURL: String? = null
+    var userImageURL: String? = null,
+
+    @ColumnInfo(typeAffinity = ColumnInfo.BLOB)
+    var imageBlob: ByteArray? = null,
 ) : Serializable

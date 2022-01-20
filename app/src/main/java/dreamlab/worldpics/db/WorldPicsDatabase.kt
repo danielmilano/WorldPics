@@ -4,6 +4,8 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import androidx.room.migration.Migration
+import androidx.sqlite.db.SupportSQLiteDatabase
 import dreamlab.worldpics.model.Photo
 
 /**
@@ -11,7 +13,7 @@ import dreamlab.worldpics.model.Photo
  */
 @Database(
     entities = [Photo::class],
-    version = 1,
+    version = 2,
     exportSchema = false
 )
 
@@ -28,7 +30,8 @@ abstract class WorldPicsDatabase : RoomDatabase() {
             }
 
         private fun buildDatabase(context: Context): WorldPicsDatabase {
-            return Room.databaseBuilder(context, WorldPicsDatabase::class.java, "worldpics-db").build()
+            return Room.databaseBuilder(context, WorldPicsDatabase::class.java, "worldpics-db")
+                .fallbackToDestructiveMigration().build()
         }
     }
 

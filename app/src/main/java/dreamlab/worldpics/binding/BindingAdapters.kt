@@ -49,6 +49,21 @@ fun bindWebFormatImageFromUrl(view: ImageView, photo: Photo) {
         .into(view)
 }
 
+@BindingAdapter("imageFromByteArray")
+fun bindImageFromByteArray(view: ImageView, photo: Photo) {
+    val fadeAnimation =
+        ViewPropertyTransition.Animator {
+            val fadeAnim = ObjectAnimator.ofFloat(it, "alpha", 0f, 1f)
+            fadeAnim.duration = 500
+            fadeAnim.start()
+        }
+
+    Glide.with(view)
+        .load(photo.imageBlob)
+        .transition(GenericTransitionOptions.with(fadeAnimation))
+        .into(view)
+}
+
 @BindingAdapter("largeImageFromUrl")
 fun bindLargeImageFromUrl(view: ImageView, url: String) {
     val fadeAnimation =

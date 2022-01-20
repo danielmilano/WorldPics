@@ -112,8 +112,8 @@ class DetailFragment : BaseFragment<DetailFragment.Listener>(Listener::class.jav
                     ).show()
                 }
                 CAN_ADD_FAVOURITE -> {
-                    viewModel?.addPhotoToFavourites(mBinding.photo!!)
-                    canRemoveToFavourites()
+                    viewModel?.addPhotoToFavourites(requireContext(), mBinding.photo!!)
+                    canRemoveFromFavourites()
                     Toast.makeText(requireContext(), "Added to favourites", Toast.LENGTH_SHORT)
                         .show()
                 }
@@ -156,7 +156,7 @@ class DetailFragment : BaseFragment<DetailFragment.Listener>(Listener::class.jav
                 }
                 is PhotoDetailEvent.IsFavourite -> {
                     if (it.photo != null) {
-                        canRemoveToFavourites()
+                        canRemoveFromFavourites()
                     } else {
                         canAddToFavourites()
                     }
@@ -165,7 +165,7 @@ class DetailFragment : BaseFragment<DetailFragment.Listener>(Listener::class.jav
         }
     }
 
-    private fun canRemoveToFavourites() {
+    private fun canRemoveFromFavourites() {
         mBinding.fabMenu.fabItemAddFavourite.tag = CAN_REMOVE_FAVOURITE
         mBinding.fabMenu.fabItemAddFavourite.findViewById<TextView>(R.id.text).text =
             requireContext().getString(R.string.remove_from_favourites)
@@ -173,7 +173,7 @@ class DetailFragment : BaseFragment<DetailFragment.Listener>(Listener::class.jav
             .setImageDrawable(
                 ContextCompat.getDrawable(
                     requireContext(),
-                    R.drawable.ic_favorite_border_white
+                    R.drawable.ic_favorite_white
                 )
             )
     }
@@ -186,7 +186,7 @@ class DetailFragment : BaseFragment<DetailFragment.Listener>(Listener::class.jav
             .setImageDrawable(
                 ContextCompat.getDrawable(
                     requireContext(),
-                    R.drawable.ic_favorite_white
+                    R.drawable.ic_favorite_border_white
                 )
             )
     }

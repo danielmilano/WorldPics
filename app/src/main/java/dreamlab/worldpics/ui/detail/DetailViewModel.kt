@@ -1,15 +1,21 @@
 package dreamlab.worldpics.ui.detail
 
 import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.bumptech.glide.Glide
+import com.bumptech.glide.request.target.CustomTarget
+import com.bumptech.glide.request.transition.Transition
 import dreamlab.worldpics.db.PhotoDao
 import dreamlab.worldpics.model.Photo
 import dreamlab.worldpics.util.FileUtils
 import kotlinx.coroutines.*
+import java.io.ByteArrayOutputStream
 import javax.inject.Inject
 
 class DetailViewModel @Inject constructor(val photoDao: PhotoDao) : ViewModel() {
@@ -34,10 +40,26 @@ class DetailViewModel @Inject constructor(val photoDao: PhotoDao) : ViewModel() 
         }
     }
 
-    fun addPhotoToFavourites(photo: Photo) {
-        viewModelScope.launch(Dispatchers.IO) {
-            photoDao.insert(photo)
-        }
+    fun addPhotoToFavourites(context: Context, photo: Photo) {
+        Glide.with(context)
+            .asBitmap()
+            .load(photo.largeImageURL)
+            .into(object : CustomTarget<Bitmap>() {
+                override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
+                    val stream = ByteArrayOutputStream()
+                    resource.compress(Bitmap.CompressFormat.PNG, 100, stream)
+                    val byteArray: ByteArray = stream.toByteArray()
+                    resource.recycle()
+                    photo.imageBlob = byteArray
+                    viewModelScope.launch(Dispatchers.IO) {
+                        photoDao.insert(photo)
+                    }
+                }
+
+                override fun onLoadCleared(placeholder: Drawable?) {
+
+                }
+            })
     }
 
     private suspend fun downloadPhotoAsync(context: Context, url: String): Deferred<Uri?> {
